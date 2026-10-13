@@ -17,6 +17,9 @@ Markdown の独自記法（章テンプレート v2 に対応）:
     [[用語]]               … glossary.yaml の説明をホバー／タップで表示
     > 🔍 / > 🧭            … 本文中の一言理由
     ```mermaid             … ビルド時に SVG へ変換（オフラインでも表示できる）
+    ```sql copy=6          … 「写して実行する SQL（読み方は第6章）」の帯を付ける。=N を省くと第6章。
+                             sql 以外（```text copy=8 など）にも付けられる。
+                             第6章より前の章で、copy の付いていない ```sql ブロックは警告になる（付け忘れ防止）
 """
 from __future__ import annotations
 
@@ -93,16 +96,48 @@ class Renderer:
         self.blocks: dict[str, str] = {}
         self.checks: list[tuple[str, str]] = []  # (chapter_id, text)
         self.chapter_id = ""
+        self.chapter_num: int | None = None  # 章番号（整数の章だけ。copy の付け忘れ検出に使う）
 
     # Markdown → HTML（独自記法を含む）
     def render(self, text: str, chapter_id: str = "") -> str:
         if chapter_id:
             self.chapter_id = chapter_id
+        text = self._copy_fences(text)
         text = self._containers(text)
         text = self._mermaid(text)
         out = markdown.markdown(text, extensions=MD_EXTENSIONS, extension_configs=MD_CONFIGS)
         out = self._post(out)
         return out
+
+    COPY_DEFAULT_CHAPTER = 6
+    COPY_SENTINEL = "@@COPY:{}@@"
+
+    def _copy_fences(self, text: str) -> str:
+        """```lang copy[=N] を ```lang に戻し、コードの1行目に目印を入れる（_post で帯に置き換える）。
+        第6章より前の章の ```sql に copy が無ければ警告する。"""
+        out = []
+        in_fence = False
+        for line in text.split("\n"):
+            m = re.match(r"^(\s*)```(\w+)(.*)$", line)
+            if not in_fence and m:
+                in_fence = True
+                indent, lang, rest = m.group(1), m.group(2), m.group(3).strip()
+                cm = re.fullmatch(r"copy(?:=(\d+))?", rest)
+                if rest and not cm:
+                    warnings.append(f"{self.chapter_id}: 不明なコードブロックの指定 ```{lang} {rest}")
+                if cm:
+                    out.append(f"{indent}```{lang}")
+                    out.append(indent + self.COPY_SENTINEL.format(cm.group(1) or self.COPY_DEFAULT_CHAPTER))
+                    continue
+                if (lang == "sql" and self.chapter_num is not None
+                        and self.chapter_num < self.COPY_DEFAULT_CHAPTER):
+                    warnings.append(f"{self.chapter_id}: 第{self.COPY_DEFAULT_CHAPTER}章より前の章の ```sql に copy がありません")
+                out.append(line)
+                continue
+            if in_fence and line.strip().startswith("```"):
+                in_fence = False
+            out.append(line)
+        return "\n".join(out)
 
     def _placeholder(self, html_text: str) -> str:
         key = f"XBLOCKX{len(self.blocks)}XBLOCKX"
@@ -192,6 +227,11 @@ class Renderer:
         return re.sub(r"\[\[(.+?)\]\]", repl, out)
 
     def _post(self, out: str) -> str:
+        # 写して実行する SQL の帯（_copy_fences の目印を置き換える）
+        def copy_note(m):
+            return (f'<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。'
+                    f'読み方は第{m.group(2)}章）</div>{m.group(1)}')
+        out = re.sub(r'(<pre class="highlight"><code[^>]*>)@@COPY:(\d+)@@\n', copy_note, out)
         # SQL の色分け
         def sql(m):
             return f'<pre class="code sql"><code>{highlight_sql(m.group(1))}</code></pre>'
@@ -252,6 +292,7 @@ def build():
     for ch in flat:
         if ch.get("file"):
             meta, body = split_frontmatter((SRC / ch["file"]).read_text(encoding="utf-8"))
+            r.chapter_num = meta.get("number") if isinstance(meta.get("number"), int) else None
             bodies[ch["id"]] = chapter_header(ch, meta, ch["_book"], ch["_part"]) + \
                 f'<div class="prose">{r.render(body, ch["id"])}</div>'
     about_meta, about_body = split_frontmatter((SRC / "about.md").read_text(encoding="utf-8"))

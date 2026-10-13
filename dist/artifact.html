@@ -110,6 +110,8 @@ pre.code .kw { color: var(--accent); font-weight: 600; }
 pre.code .cm { color: var(--muted); font-style: italic; }
 pre.code .st { color: var(--ok); }
 pre.code.text { background: var(--surface); }
+.copy-note { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-bottom: none; border-radius: 8px 8px 0 0; padding: 5px 12px; }
+.copy-note + pre.code { border-top-left-radius: 0; border-top-right-radius: 0; }
 
 /* 一言理由 */
 .aside { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 0 0 18px; font-size: 15px; border-radius: 0 6px 6px 0; }
@@ -445,9 +447,34 @@ postgres=#</code></pre>
 </table></div>
 <aside class="aside mech"><p>🔍 <strong>プロンプトの記号を見る習慣</strong>：<code>#</code> が出ていたら、何でもできるロールで接続しています。打ち間違いがそのまま大きな事故になる状態なので、<code>#</code> を見たら一度手を止める、と覚えておいてください。</p></aside>
 <h2>3. psql の基本</h2>
+<h3>この資料の SQL は2種類ある</h3>
+<p>この資料に出てくる SQL には、2つの役割があります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>種類</th>
+<th>役割</th>
+<th>見た目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>写して実行する SQL</td>
+<td>道具や環境が正しく動いているかを確かめる</td>
+<td>上に「📋 写して実行する SQL」の帯が付く</td>
+</tr>
+<tr>
+<td>読む SQL</td>
+<td>中身を読んで、結果が正しいかを疑う練習の対象</td>
+<td>帯が付かない（第6章から登場）</td>
+</tr>
+</tbody>
+</table></div>
+<p>第3〜5章の SQL は、すべて「写して実行する SQL」です。いまは中身を読めなくてかまいません。帯に書いてある章で、読み方を説明します。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ読み方より先に実行させるのか</strong>：SQL を読む練習には、練習用のデータと、それを動かす道具が先に要ります（学ぶ順＝手を動かせる順）。道具を整える第3〜5章では、確かめるための SQL を「意味だけ」で使い、読み方は道具がそろった第6章から順に説明します。</p></aside>
 <h3>SQL は <code>;</code> で終わる</h3>
 <p>プロンプトで、次の SQL を実行します。</p>
-<pre class="code sql"><code><span class="kw">SELECT</span> version();</code></pre>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span> version();</code></pre>
 <div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
 <thead>
 <tr>
@@ -586,7 +613,7 @@ postgres=#</code></pre>
 <aside class="aside design"><p>🧭 <strong>なぜ <code>\d</code> を覚えるのか</strong>：Claude Code が「articles には published_at 列があります」と説明しても、それが本当かは表の形を見ないと分かりません。<code>\d</code> は、説明ではなく実物を見る方法です。</p></aside>
 <h2>6. 結果を CSV に出す：<code>\copy</code>（第4章のあとで試す）</h2>
 <p>SQL の結果を、Excel などで開ける CSV ファイルに出します。出力先のフォルダ <code>C:\pglearn\out\</code> を先に作っておきます。</p>
-<pre class="code text"><code>pglearn=&gt; \copy (SELECT id, title, published_at FROM articles ORDER BY id) TO 'C:/pglearn/out/articles.csv' WITH (FORMAT csv, HEADER)</code></pre>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code text"><code>pglearn=&gt; \copy (SELECT id, title, published_at FROM articles ORDER BY id) TO 'C:/pglearn/out/articles.csv' WITH (FORMAT csv, HEADER)</code></pre>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -688,7 +715,7 @@ postgres=#</code></pre>
 <li><code>\d</code> で表が4つあること、<code>\d articles</code> で <code>source_id</code> 列に <code>not null</code> が付いていないことを確かめます（配信元が不明な記事があるため）。</li>
 </ol>
 <p>続けて、次の SQL で記事の最初の3本を表示します。</p>
-<pre class="code sql"><code><span class="kw">SELECT</span> id, title <span class="kw">FROM</span> articles <span class="kw">ORDER</span> <span class="kw">BY</span> id <span class="kw">LIMIT</span> 3;</code></pre>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span> id, title <span class="kw">FROM</span> articles <span class="kw">ORDER</span> <span class="kw">BY</span> id <span class="kw">LIMIT</span> 3;</code></pre>
 <div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
 <thead>
 <tr>
@@ -924,7 +951,7 @@ psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\02_
 <h3>入ったことを確かめる</h3>
 <p><code>learner</code> で <code>pglearn</code> に接続し、4つの表の件数を数えます。</p>
 <pre class="code text"><code>psql -h localhost -U learner -d pglearn</code></pre>
-<pre class="code sql"><code><span class="kw">SELECT</span>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span>
     (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> sources)      <span class="kw">AS</span> sources,
     (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> articles)     <span class="kw">AS</span> articles,
     (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> tags)         <span class="kw">AS</span> tags,
@@ -1010,7 +1037,7 @@ CREATE DATABASE pglearn OWNER learner;
 <p><code>DROP DATABASE</code> は、指定したデータベースの中身をすべて消し、元に戻す方法はありません。必ず <code>pglearn</code> と書いてあることを確かめてから実行してください。</p>
 <h2>5. 全員の設定を揃える</h2>
 <p>同じ SQL を実行しても、PC の設定が違うと、並び順や日時の表示が変わることがあります。<code>learner</code> で <code>pglearn</code> に接続し、次の SQL を実行します。</p>
-<pre class="code sql"><code><span class="kw">SELECT</span>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span>
     current_setting(<span class="st">'server_version'</span>)  <span class="kw">AS</span> version,
     current_setting(<span class="st">'server_encoding'</span>) <span class="kw">AS</span> encoding,
     d.datlocprovider                   <span class="kw">AS</span> locale_provider,
@@ -1084,7 +1111,7 @@ CREATE DATABASE pglearn OWNER learner;
 <li>第3節の3行を流し、件数が 3・5・4・8 になることを確かめます。</li>
 <li>
 <p>次の SQL で、記事を1本消してみます。</p>
-<pre class="code text"><code>DELETE FROM articles WHERE id = 5;</code></pre>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code text"><code>DELETE FROM articles WHERE id = 5;</code></pre>
 <p>件数を数え直し、<code>articles</code> が 4 になったことを確かめます。</p>
 </li>
 <li>
@@ -1093,7 +1120,7 @@ CREATE DATABASE pglearn OWNER learner;
 <li>
 <p><code>reviewer</code> で接続し、読めるが書き換えられないことを確かめます。</p>
 <pre class="code text"><code>psql -h localhost -U reviewer -d pglearn</code></pre>
-<pre class="code text"><code>SELECT COUNT(*) FROM articles;
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code text"><code>SELECT COUNT(*) FROM articles;
 DELETE FROM articles WHERE id = 5;</code></pre>
 <p>1行目は <code>5</code> が表示され、2行目は <code>permission denied for table articles</code>（表 articles への権限がない）というエラーになります。エラーになれば成功です。
 6. 第5節の SQL を実行し、結果を資料作成者に送ります。</p>
@@ -1233,7 +1260,7 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 <p><code>learner</code> でも、<code>pglearn</code> の中の表は消せます。それでも困らないのは、第4章のリセットで、数分あれば元に戻せるからです。</p>
 <aside class="aside design"><p>🧭 <strong>ロールを分ける考え方</strong>：「何も壊せないロール」を作るのではなく、「壊れても作り直せる範囲」と「操作できる範囲」を一致させます。<code>pglearn</code> は作り直せますが、ほかのデータベースや、ロールの設定は作り直せるとは限りません。</p></aside>
 <p>いま接続しているロールは、次の SQL で確かめられます。</p>
-<pre class="code sql"><code><span class="kw">SELECT</span> current_user, current_database();</code></pre>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span> current_user, current_database();</code></pre>
 <div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
 <thead>
 <tr>
@@ -1249,7 +1276,7 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 </tbody>
 </table></div><div class="result-foot">(1 行)</div></div>
 <p><code>current_user</code> が接続しているロール、<code>current_database</code> が接続しているデータベースです。2つのロールの違いは、次の SQL で見られます。</p>
-<pre class="code sql"><code><span class="kw">SELECT</span> rolname, rolsuper, rolcreatedb, rolcreaterole
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span> rolname, rolsuper, rolcreatedb, rolcreaterole
 <span class="kw">FROM</span> pg_roles
 <span class="kw">WHERE</span> rolname <span class="kw">IN</span> (<span class="st">'learner'</span>, <span class="st">'postgres'</span>, <span class="st">'reviewer'</span>)
 <span class="kw">ORDER</span> <span class="kw">BY</span> rolname;</code></pre>

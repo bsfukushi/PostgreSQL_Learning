@@ -135,7 +135,7 @@ psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\02_
 psql -h localhost -U learner -d pglearn
 ```
 
-```sql
+```sql copy=6
 SELECT
     (SELECT COUNT(*) FROM sources)      AS sources,
     (SELECT COUNT(*) FROM articles)     AS articles,
@@ -200,7 +200,7 @@ SELECT
 
 同じ SQL を実行しても、PC の設定が違うと、並び順や日時の表示が変わることがあります。`learner` で `pglearn` に接続し、次の SQL を実行します。
 
-```sql
+```sql copy=6
 SELECT
     current_setting('server_version')  AS version,
     current_setting('server_encoding') AS encoding,
@@ -239,7 +239,7 @@ WHERE d.datname = current_database();
 2. 第3節の3行を流し、件数が 3・5・4・8 になることを確かめます。
 3. 次の SQL で、記事を1本消してみます。
 
-    ```text
+    ```text copy=8
     DELETE FROM articles WHERE id = 5;
     ```
 
@@ -252,7 +252,7 @@ WHERE d.datname = current_database();
     psql -h localhost -U reviewer -d pglearn
     ```
 
-    ```text
+    ```text copy=8
     SELECT COUNT(*) FROM articles;
     DELETE FROM articles WHERE id = 5;
     ```

@@ -5,7 +5,7 @@
 import re, subprocess, sys
 md = open(sys.argv[1], encoding="utf-8").read()
 psql = sys.argv[sys.argv.index("--") + 1:]
-blocks = list(re.finditer(r"```sql\n(.*?)```", md, flags=re.S))
+blocks = list(re.finditer(r"```sql[^\n]*\n(.*?)```", md, flags=re.S))  # ```sql copy=6 なども対象
 ng = 0
 for i, m in enumerate(blocks, 1):
     sql = m.group(1)

@@ -96,11 +96,24 @@ postgres=#
 
 ## 3. psql の基本
 
+### この資料の SQL は2種類ある
+
+この資料に出てくる SQL には、2つの役割があります。
+
+| 種類 | 役割 | 見た目 |
+|---|---|---|
+| 写して実行する SQL | 道具や環境が正しく動いているかを確かめる | 上に「📋 写して実行する SQL」の帯が付く |
+| 読む SQL | 中身を読んで、結果が正しいかを疑う練習の対象 | 帯が付かない（第6章から登場） |
+
+第3〜5章の SQL は、すべて「写して実行する SQL」です。いまは中身を読めなくてかまいません。帯に書いてある章で、読み方を説明します。
+
+> 🧭 **なぜ読み方より先に実行させるのか**：SQL を読む練習には、練習用のデータと、それを動かす道具が先に要ります（学ぶ順＝手を動かせる順）。道具を整える第3〜5章では、確かめるための SQL を「意味だけ」で使い、読み方は道具がそろった第6章から順に説明します。
+
 ### SQL は `;` で終わる
 
 プロンプトで、次の SQL を実行します。
 
-```sql
+```sql copy=6
 SELECT version();
 ```
 
@@ -213,7 +226,7 @@ pglearn=> \d articles
 
 SQL の結果を、Excel などで開ける CSV ファイルに出します。出力先のフォルダ `C:\pglearn\out\` を先に作っておきます。
 
-```text
+```text copy=6
 pglearn=> \copy (SELECT id, title, published_at FROM articles ORDER BY id) TO 'C:/pglearn/out/articles.csv' WITH (FORMAT csv, HEADER)
 ```
 
@@ -283,7 +296,7 @@ pgAdmin4 の表の画面では、[[NULL]] は `[null]` と表示されます。�
 
 続けて、次の SQL で記事の最初の3本を表示します。
 
-```sql
+```sql copy=6
 SELECT id, title FROM articles ORDER BY id LIMIT 3;
 ```
 

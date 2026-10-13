@@ -64,7 +64,7 @@ flowchart LR
 
 いま接続しているロールは、次の SQL で確かめられます。
 
-```sql
+```sql copy=6
 SELECT current_user, current_database();
 ```
 
@@ -76,7 +76,7 @@ SELECT current_user, current_database();
 
 `current_user` が接続しているロール、`current_database` が接続しているデータベースです。2つのロールの違いは、次の SQL で見られます。
 
-```sql
+```sql copy=6
 SELECT rolname, rolsuper, rolcreatedb, rolcreaterole
 FROM pg_roles
 WHERE rolname IN ('learner', 'postgres', 'reviewer')
