@@ -7,6 +7,7 @@
 - src/glossary.yaml   用語集（本文の [[用語]] と付録Aの元）
 - src/vol1/ vol2/ bessatsu/ appendix/   章ごとの Markdown
 - src/sql/            初期化SQL（99_reset → 01_schema → 02_seed）
+- src/workspace/      メンバーの作業フォルダ C:\pglearn\ のひな形（CLAUDE.md・モデル固定・検証役 sql-checker）。第5章と同じ内容を保つ
 - build/build.py      Markdown → HTML
 - build/verify_sql.py 章内のSQLを実DBで実行し、結果表の行数と照合
 - dist/index.html     単体で開ける完全版（配布用）／ dist/artifact.html（Claudeのアーティファクト用）

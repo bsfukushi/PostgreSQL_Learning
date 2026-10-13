@@ -5,7 +5,7 @@
 
 ## バージョン
 
-> **現在: v0.3.0**（本文あり：第3・4・5・7・10章）
+> **現在: v0.4.0**（本文あり：第3・4・5・7・10章。第5章に検証の仕組みを追加）
 
 | バージョン | マイルストーン |
 |---|---|
@@ -106,6 +106,12 @@ PostgreSQL_Learning/
 | Excel「テキストまたは CSV から」の「元のファイル」で UTF-8 を選べる | 中〜高 |
 | pgAdmin4 の「View/Edit Data → All Rows」、NULL の `[null]` 表示、Query Tool の自動コミット既定オン | 中 |
 | psql の \copy で、引用符内の `\` がエスケープとして読まれうる | 中 |
+
+### Step 1-W: 作業フォルダのひな形（src/workspace/）
+- [x] 作成（CLAUDE.md / .claude/settings.json / .claude/agents/sql-checker.md）（2026-10-14）
+- [ ] 配り方を決める（zip で配る／リポジトリから取る／付録に全文を載せる）
+- [ ] PC で実地確認：C:\pglearn で起動して Opus になるか、sql-checker が Sonnet・reviewer で動くか（/tasks の表示）、CLAUDE.md の流れどおりに報告されるか
+- [ ] Windows でサブエージェントの Bash から pgpass.conf が読めるか（裏取りでは推測止まり）
 
 ### Step 1-4: 第4章 サンプルデータを入れる・元に戻す
 - [x] 執筆（クラウド。2026-10-14）

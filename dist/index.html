@@ -1141,14 +1141,15 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 <article id="page-ch05" data-id="ch05" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第5章</span>Claude Codeに頼む前の約束</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第3章（pgAdmin4とpsql）、第4章（サンプルデータ）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
 <ul>
 <li>Claude Code がデータベースを操作するときに、裏で何が起きているかを説明できる</li>
-<li>Claude Code に <code>postgres</code> ではなく <code>learner</code> で接続させる理由を説明できる</li>
+<li>Claude Code に <code>postgres</code> ではなく <code>learner</code> と <code>reviewer</code> で接続させる理由を説明できる</li>
 <li>パスワードを Claude Code に見せずに、psql が接続できるように設定できる</li>
-<li>「指示の最小型」の6項目を使って、最初の依頼を出し、結果を確かめられる</li>
+<li>「指示の最小型」の6項目を使って依頼を出し、返ってきた検証材料を確かめられる</li>
+<li>Claude Code が書いた SQL を、別のモデルに検証させる理由と手順が分かる</li>
 </ul>
 <h2>1. Claude Code は「psql を代わりに打つ人」</h2>
 <p>Claude Code にデータベースのことを頼むと、Claude Code は SQL を考え、psql のコマンドを組み立てて、あなたの PC で実行します。第3章・第4章であなたが打っていたコマンドを、代わりに打っているのと同じです。</p>
-<figure class="diagram"><svg aria-roledescription="flowchart-v2" role="graphics-document document" viewBox="0 0 982.953125 128" style="max-width: 982.953125px;" class="flowchart" xmlns="http://www.w3.org/2000/svg" width="100%" id="mmd-d0"><style>#mmd-d0{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;fill:#000000;}#mmd-d0 .error-icon{fill:#552222;}#mmd-d0 .error-text{fill:#552222;stroke:#552222;}#mmd-d0 .edge-thickness-normal{stroke-width:1px;}#mmd-d0 .edge-thickness-thick{stroke-width:3.5px;}#mmd-d0 .edge-pattern-solid{stroke-dasharray:0;}#mmd-d0 .edge-thickness-invisible{stroke-width:0;fill:none;}#mmd-d0 .edge-pattern-dashed{stroke-dasharray:3;}#mmd-d0 .edge-pattern-dotted{stroke-dasharray:2;}#mmd-d0 .marker{fill:#666;stroke:#666;}#mmd-d0 .marker.cross{stroke:#666;}#mmd-d0 svg{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;}#mmd-d0 p{margin:0;}#mmd-d0 .label{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;color:#000000;}#mmd-d0 .cluster-label text{fill:#333;}#mmd-d0 .cluster-label span{color:#333;}#mmd-d0 .cluster-label span p{background-color:transparent;}#mmd-d0 .label text,#mmd-d0 span{fill:#000000;color:#000000;}#mmd-d0 .node rect,#mmd-d0 .node circle,#mmd-d0 .node ellipse,#mmd-d0 .node polygon,#mmd-d0 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mmd-d0 .rough-node .label text,#mmd-d0 .node .label text,#mmd-d0 .image-shape .label,#mmd-d0 .icon-shape .label{text-anchor:middle;}#mmd-d0 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mmd-d0 .rough-node .label,#mmd-d0 .node .label,#mmd-d0 .image-shape .label,#mmd-d0 .icon-shape .label{text-align:center;}#mmd-d0 .node.clickable{cursor:pointer;}#mmd-d0 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mmd-d0 .arrowheadPath{fill:#333333;}#mmd-d0 .edgePath .path{stroke:#666;stroke-width:2.0px;}#mmd-d0 .flowchart-link{stroke:#666;fill:none;}#mmd-d0 .edgeLabel{background-color:white;text-align:center;}#mmd-d0 .edgeLabel p{background-color:white;}#mmd-d0 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mmd-d0 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mmd-d0 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mmd-d0 .cluster text{fill:#333;}#mmd-d0 .cluster span{color:#333;}#mmd-d0 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mmd-d0 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mmd-d0 rect.text{fill:none;stroke-width:0;}#mmd-d0 .icon-shape,#mmd-d0 .image-shape{background-color:white;text-align:center;}#mmd-d0 .icon-shape p,#mmd-d0 .image-shape p{background-color:white;padding:2px;}#mmd-d0 .icon-shape rect,#mmd-d0 .image-shape rect{opacity:0.5;background-color:white;fill:white;}#mmd-d0 :root{--mermaid-font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;}</style><g><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="4.5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="11" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="-1" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="12" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mmd-d0_flowchart-v2-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="-1" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mmd-d0_flowchart-v2-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_you_cc_0" d="M268,39.795L285.719,36.496C303.438,33.197,338.875,26.598,373.657,26.476C408.439,26.354,442.566,32.708,459.629,35.885L476.693,39.063"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_you_1" d="M480.625,64L462.906,64C445.188,64,409.75,64,374.979,64C340.208,64,306.104,64,289.052,64L272,64"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_pg_2" d="M740.625,49.415L751.639,48.179C762.654,46.943,784.682,44.472,806.056,45.181C827.429,45.89,848.147,49.781,858.506,51.726L868.866,53.671"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_pg_cc_3" d="M872.797,73.591L861.783,75.659C850.768,77.727,828.74,81.864,807.373,82.77C786.007,83.677,765.304,81.354,754.952,80.193L744.6,79.031"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_you_4" d="M480.625,88.205L462.906,91.504C445.188,94.803,409.75,101.402,374.968,101.524C340.186,101.646,306.059,95.292,288.996,92.115L271.932,88.937"></path></g><g class="edgeLabels"><g transform="translate(374.3125, 20)" class="edgeLabel"><g transform="translate(-16.1875, -12)" class="label"><foreignObject height="24" width="32.375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>頼む</p></span></div></foreignObject></g></g><g transform="translate(374.3125, 64)" class="edgeLabel"><g transform="translate(-81.3125, -12)" class="label"><foreignObject height="24" width="162.625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>実行してよいか尋ねる</p></span></div></foreignObject></g></g><g transform="translate(806.7109375, 42)" class="edgeLabel"><g transform="translate(-41.0859375, -12)" class="label"><foreignObject height="24" width="82.171875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>psql を実行</p></span></div></foreignObject></g></g><g transform="translate(806.7109375, 86)" class="edgeLabel"><g transform="translate(-16, -12)" class="label"><foreignObject height="24" width="32"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>結果</p></span></div></foreignObject></g></g><g transform="translate(374.3125, 108)" class="edgeLabel"><g transform="translate(-40.1875, -12)" class="label"><foreignObject height="24" width="80.375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>結果と説明</p></span></div></foreignObject></g></g></g><g class="nodes"><g transform="translate(138, 64)" id="flowchart-you-0" class="node default"><rect height="102" width="260" y="-51" x="-130" style="" class="basic label-container"></rect><g transform="translate(-100, -36)" style="" class="label"><rect></rect><foreignObject height="72" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>あなた<br>（頼む・許可する・確かめる）</p></span></div></foreignObject></g></g><g transform="translate(610.625, 64)" id="flowchart-cc-1" class="node default"><rect height="102" width="260" y="-51" x="-130" style="" class="basic label-container"></rect><g transform="translate(-100, -36)" style="" class="label"><rect></rect><foreignObject height="72" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Claude Code<br>（SQL とコマンドを考える）</p></span></div></foreignObject></g></g><g transform="translate(923.875, 64)" id="flowchart-pg-5" class="node default"><path transform="translate(-51.078125, -48.364424267437066)" style="" class="basic label-container" d="M0,11.242949511624708 a51.078125,11.242949511624708 0,0,0 102.15625,0 a51.078125,11.242949511624708 0,0,0 -102.15625,0 l0,74.24294951162472 a51.078125,11.242949511624708 0,0,0 102.15625,0 l0,-74.24294951162472"></path><g transform="translate(-43.578125, -14)" style="" class="label"><rect></rect><foreignObject height="48" width="87.15625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>PostgreSQL<br>pglearn</p></span></div></foreignObject></g></g></g></g></g></svg></figure>
-<p>この図から、約束が3つ出てきます。</p>
+<figure class="diagram"><svg aria-roledescription="flowchart-v2" role="graphics-document document" viewBox="0 0 1508.0625 220" style="max-width: 1508.0625px;" class="flowchart" xmlns="http://www.w3.org/2000/svg" width="100%" id="mmd-d0"><style>#mmd-d0{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;fill:#000000;}#mmd-d0 .error-icon{fill:#552222;}#mmd-d0 .error-text{fill:#552222;stroke:#552222;}#mmd-d0 .edge-thickness-normal{stroke-width:1px;}#mmd-d0 .edge-thickness-thick{stroke-width:3.5px;}#mmd-d0 .edge-pattern-solid{stroke-dasharray:0;}#mmd-d0 .edge-thickness-invisible{stroke-width:0;fill:none;}#mmd-d0 .edge-pattern-dashed{stroke-dasharray:3;}#mmd-d0 .edge-pattern-dotted{stroke-dasharray:2;}#mmd-d0 .marker{fill:#666;stroke:#666;}#mmd-d0 .marker.cross{stroke:#666;}#mmd-d0 svg{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;}#mmd-d0 p{margin:0;}#mmd-d0 .label{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;color:#000000;}#mmd-d0 .cluster-label text{fill:#333;}#mmd-d0 .cluster-label span{color:#333;}#mmd-d0 .cluster-label span p{background-color:transparent;}#mmd-d0 .label text,#mmd-d0 span{fill:#000000;color:#000000;}#mmd-d0 .node rect,#mmd-d0 .node circle,#mmd-d0 .node ellipse,#mmd-d0 .node polygon,#mmd-d0 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mmd-d0 .rough-node .label text,#mmd-d0 .node .label text,#mmd-d0 .image-shape .label,#mmd-d0 .icon-shape .label{text-anchor:middle;}#mmd-d0 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mmd-d0 .rough-node .label,#mmd-d0 .node .label,#mmd-d0 .image-shape .label,#mmd-d0 .icon-shape .label{text-align:center;}#mmd-d0 .node.clickable{cursor:pointer;}#mmd-d0 .root .anchor path{fill:#666!important;stroke-width:0;stroke:#666;}#mmd-d0 .arrowheadPath{fill:#333333;}#mmd-d0 .edgePath .path{stroke:#666;stroke-width:2.0px;}#mmd-d0 .flowchart-link{stroke:#666;fill:none;}#mmd-d0 .edgeLabel{background-color:white;text-align:center;}#mmd-d0 .edgeLabel p{background-color:white;}#mmd-d0 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mmd-d0 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mmd-d0 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mmd-d0 .cluster text{fill:#333;}#mmd-d0 .cluster span{color:#333;}#mmd-d0 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mmd-d0 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mmd-d0 rect.text{fill:none;stroke-width:0;}#mmd-d0 .icon-shape,#mmd-d0 .image-shape{background-color:white;text-align:center;}#mmd-d0 .icon-shape p,#mmd-d0 .image-shape p{background-color:white;padding:2px;}#mmd-d0 .icon-shape rect,#mmd-d0 .image-shape rect{opacity:0.5;background-color:white;fill:white;}#mmd-d0 :root{--mermaid-font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;}</style><g><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerHeight="8" markerWidth="8" markerUnits="userSpaceOnUse" refY="5" refX="4.5" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="11" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="-1" viewBox="0 0 10 10" class="marker flowchart-v2" id="mmd-d0_flowchart-v2-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="12" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mmd-d0_flowchart-v2-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="-1" viewBox="0 0 11 11" class="marker cross flowchart-v2" id="mmd-d0_flowchart-v2-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_you_cc_0" d="M268,84.569L288.833,80.974C309.667,77.379,351.333,70.19,392.346,70.551C433.358,70.913,473.716,78.827,493.896,82.783L514.075,86.74"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_you_1" d="M518,109.941L497.167,109.451C476.333,108.961,434.667,107.98,393.667,107.49C352.667,107,312.333,107,292.167,107L272,107"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_pg_2" d="M778,65.588L798.833,57.99C819.667,50.392,861.333,35.196,917.458,27.598C973.583,20,1044.167,20,1110.284,20C1176.401,20,1238.052,20,1284.669,29.203C1331.286,38.406,1362.868,56.812,1378.659,66.015L1394.45,75.218"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_pg_cc_3" d="M1397.906,138.821L1381.539,149.017C1365.172,159.214,1332.438,179.607,1285.245,189.803C1238.052,200,1176.401,200,1110.284,200C1044.167,200,973.583,200,918.089,193.107C862.595,186.215,822.19,172.43,801.988,165.537L781.786,158.645"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_ck_4" d="M778,98.725L798.833,96.438C819.667,94.15,861.333,89.575,902.339,89.955C943.345,90.335,983.69,95.67,1003.862,98.337L1024.035,101.005"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_ck_pg_5" d="M1201.5,113L1217.867,113C1234.234,113,1266.969,113,1299.037,112.369C1331.105,111.738,1362.507,110.476,1378.208,109.845L1393.909,109.214"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_ck_cc_6" d="M1028,124.471L1007.167,127.226C986.333,129.981,944.667,135.49,903.663,136.03C862.659,136.57,822.317,132.141,802.147,129.926L781.976,127.711"></path><path marker-end="url(#mmd-d0_flowchart-v2-pointEnd)" style="" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" id="L_cc_you_7" d="M518,138.49L497.167,142.575C476.333,146.66,434.667,154.83,393.651,154.483C352.636,154.136,312.271,145.271,292.089,140.839L271.907,136.407"></path></g><g class="edgeLabels"><g transform="translate(393, 63)" class="edgeLabel"><g transform="translate(-16.1875, -12)" class="label"><foreignObject height="24" width="32.375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>頼む</p></span></div></foreignObject></g></g><g transform="translate(393, 107)" class="edgeLabel"><g transform="translate(-81.3125, -12)" class="label"><foreignObject height="24" width="162.625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>実行してよいか尋ねる</p></span></div></foreignObject></g></g><g transform="translate(1114.75, 20)" class="edgeLabel"><g transform="translate(-41.0859375, -12)" class="label"><foreignObject height="24" width="82.171875"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>psql を実行</p></span></div></foreignObject></g></g><g transform="translate(1114.75, 200)" class="edgeLabel"><g transform="translate(-16, -12)" class="label"><foreignObject height="24" width="32"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>結果</p></span></div></foreignObject></g></g><g transform="translate(903, 85)" class="edgeLabel"><g transform="translate(-100, -24)" class="label"><foreignObject height="48" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>依頼文と SQL と数字だけ渡す</p></span></div></foreignObject></g></g><g transform="translate(1299.703125, 113)" class="edgeLabel"><g transform="translate(-73.203125, -12)" class="label"><foreignObject height="24" width="146.40625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>reviewer で読むだけ</p></span></div></foreignObject></g></g><g transform="translate(903, 141)" class="edgeLabel"><g transform="translate(-40.1875, -12)" class="label"><foreignObject height="24" width="80.375"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>検証の結果</p></span></div></foreignObject></g></g><g transform="translate(393, 163)" class="edgeLabel"><g transform="translate(-100, -24)" class="label"><foreignObject height="48" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" class="labelBkg" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"><p>結果・検証材料・検証の結果</p></span></div></foreignObject></g></g></g><g class="nodes"><g transform="translate(138, 107)" id="flowchart-you-0" class="node default"><rect height="102" width="260" y="-51" x="-130" style="" class="basic label-container"></rect><g transform="translate(-100, -36)" style="" class="label"><rect></rect><foreignObject height="72" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>あなた<br>（頼む・許可する・確かめる）</p></span></div></foreignObject></g></g><g transform="translate(648, 113)" id="flowchart-cc-1" class="node default"><rect height="102" width="260" y="-51" x="-130" style="" class="basic label-container"></rect><g transform="translate(-100, -36)" style="" class="label"><rect></rect><foreignObject height="72" width="200"><div style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>Claude Code<br>（SQL とコマンドを考える）</p></span></div></foreignObject></g></g><g transform="translate(1448.984375, 107)" id="flowchart-pg-5" class="node default"><path transform="translate(-51.078125, -48.364424267437066)" style="" class="basic label-container" d="M0,11.242949511624708 a51.078125,11.242949511624708 0,0,0 102.15625,0 a51.078125,11.242949511624708 0,0,0 -102.15625,0 l0,74.24294951162472 a51.078125,11.242949511624708 0,0,0 102.15625,0 l0,-74.24294951162472"></path><g transform="translate(-43.578125, -14)" style="" class="label"><rect></rect><foreignObject height="48" width="87.15625"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>PostgreSQL<br>pglearn</p></span></div></foreignObject></g></g><g transform="translate(1114.75, 113)" id="flowchart-ck-9" class="node default"><rect height="78" width="173.5" y="-39" x="-86.75" style="" class="basic label-container"></rect><g transform="translate(-56.75, -24)" style="" class="label"><rect></rect><foreignObject height="48" width="113.5"><div style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel"><p>検証役<br>（別のモデル）</p></span></div></foreignObject></g></g></g></g></g></svg></figure>
+<p>この図から、約束が5つ出てきます。</p>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -1161,7 +1162,7 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 <tr>
 <td>psql を実行する矢印</td>
 <td>強いロールで接続すると、消してはいけないものまで消せる</td>
-<td><strong>約束1</strong> 接続は <code>learner</code> で</td>
+<td><strong>約束1</strong> 書く役は <code>learner</code>、検証役は <code>reviewer</code> で接続する</td>
 </tr>
 <tr>
 <td>psql を実行する矢印</td>
@@ -1173,10 +1174,15 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 <td>頼み方があいまいだと、意図と違う SQL が出る。許可を読まずに押すと、そのまま実行される</td>
 <td><strong>約束3</strong> 指示の最小型で頼み、<strong>約束4</strong> 許可する前にコマンドを読む</td>
 </tr>
+<tr>
+<td>検証役への矢印</td>
+<td>書いたモデル自身に確かめさせると、同じ思い込みのまま「正しい」と答える</td>
+<td><strong>約束5</strong> 検証は別のモデルにさせ、判断は人がする</td>
+</tr>
 </tbody>
 </table></div>
 <aside class="aside design"><p>🧭 <strong>なぜ Claude Code を触る前に約束を決めるのか</strong>：Claude Code は、頼まれたことを速く、それらしく実行します。間違いがあっても、エラーにならずに進むことがあります。後から気をつけるより、先に「間違えても壊れない範囲」と「確かめる場所」を決めておくほうが、確実に事故を防げます。</p></aside>
-<h2>2. 約束1：接続は <code>learner</code> で</h2>
+<h2>2. 約束1：書く役は <code>learner</code>、検証役は <code>reviewer</code></h2>
 <p>第4章で、ロールを3つ作りました。</p>
 <div class="scroll"><table>
 <thead>
@@ -1409,12 +1415,66 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 <tr>
 <td>⑥</td>
 <td>実行後に見せるもの</td>
-<td>結果と、確かめるための件数（元の表の件数など）</td>
+<td>結果と<strong>検証材料</strong>（下の表）、検証役の報告</td>
 </tr>
 </tbody>
 </table></div>
-<aside class="aside design"><p>🧭 <strong>なぜ⑤と⑥を入れるのか</strong>：①〜④は「何をしてほしいか」、⑤と⑥は「あなたが確かめるための材料」です。Claude Code の説明の文章は、SQL の中身と食い違っていることがあります。SQL そのものと件数を見せてもらえば、説明を信じるのではなく、自分で確かめられます。</p></aside>
-<p>第7章の「頼み方の例」も、この6項目でできています。第3部からは、各章の「Claude Codeで使うなら」で、その章で確かめるべきこと（⑥の中身）が増えていきます。指示の型の完全版は、第2冊の第14章で扱います。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ⑤と⑥を入れるのか</strong>：①〜④は「何をしてほしいか」、⑤と⑥は「あなたが確かめるための材料」です。Claude Code の説明の文章は、SQL の中身と食い違っていることがあります。SQL そのものと数字を見せてもらえば、説明を信じるのではなく、自分で確かめられます。</p></aside>
+<h3>⑥の中身：検証材料</h3>
+<p>⑥で出してもらうものを、この資料では<strong>検証材料</strong>と呼び、記号で固定します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>記号</th>
+<th>検証材料</th>
+<th>出す役</th>
+<th>例（配信元ごとの記事数）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a</td>
+<td>基準の件数（使った表それぞれの件数）</td>
+<td>書く役</td>
+<td>sources 3、articles 5</td>
+</tr>
+<tr>
+<td>b</td>
+<td>結果の件数・合計と、a との差の理由</td>
+<td>書く役</td>
+<td>合計 4。配信元が不明の記事が1本あるため</td>
+</tr>
+<tr>
+<td>c</td>
+<td>別解（別の書き方で出した結果）との比較</td>
+<td><strong>検証役</strong></td>
+<td>別解も 2・2・0 で一致</td>
+</tr>
+<tr>
+<td>d</td>
+<td>境目の行（0件・NULL・重複になりそうな行）</td>
+<td>書く役</td>
+<td>記事0本の「地域ニュース栃木」が 0 で出ている</td>
+</tr>
+<tr>
+<td>e</td>
+<td>前提（「〜と解釈した」という仮定）</td>
+<td>書く役</td>
+<td>配信元が不明の記事は数えない、と解釈した</td>
+</tr>
+<tr>
+<td>f</td>
+<td>依頼とのずれ（頼んでいない条件・結合、頼んだ条件の抜け）</td>
+<td><strong>検証役</strong></td>
+<td>見つからなかった</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜ「正しいか確認して」と頼まないのか</strong>：そう頼むと、返ってくるのは「正しいです」という文章です。文章は、読んでも正しいかどうか判断できません。数字や具体的な行なら、知っている値（3・5・4・8 など）と比べたり、2つの数字が合うかを見たりして、あなたが判断できます。</p></aside>
+<p>第3部からは、各章の「Claude Codeで使うなら」で、その章で足す検証材料が増えていきます。指示の型の完全版は、第2冊の第14章で扱います。</p>
+<h3>毎回書くのは①と③だけ</h3>
+<p>②（接続先）、④（してよいこと）、⑤、⑥の決まった部分は、第6節で置く作業フォルダの <code>CLAUDE.md</code> に書いてあります。Claude Code は、このファイルを毎回読み込みます。だから、ふだんの依頼に書くのは、①（目的）と③（使う表）と、その時々に足したいことだけで足ります。</p>
+<p>ただし、<code>CLAUDE.md</code> は「守ってほしいお願い」で、守らせる仕組みではありません。許可の前にコマンドを読む（約束4）のは、続けてください。</p>
 <h2>5. 約束4：許可する前にコマンドを読む</h2>
 <p>Claude Code は、あなたの PC でコマンドを実行する前に、「このコマンドを実行してよいか」を尋ねます。ここで読むのは、次の4か所です。</p>
 <div class="scroll"><table>
@@ -1427,7 +1487,7 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 <tbody>
 <tr>
 <td><code>-U</code> の後ろ</td>
-<td><code>learner</code> か。<code>postgres</code> なら断る</td>
+<td>書く役なら <code>learner</code>、検証役なら <code>reviewer</code> か。<code>postgres</code> なら断る</td>
 </tr>
 <tr>
 <td><code>-d</code> の後ろ</td>
@@ -1446,65 +1506,174 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 <aside class="aside mech"><p>🔍 <strong>なぜ <code>WITH</code> のときは中まで見るのか</strong>：<code>WITH</code> で始まる SQL は、長い SQL を段に分けて書く形です（読み方は第9章）。ふつうは <code>SELECT</code> の組み合わせですが、段の中に <code>DELETE</code> などを書くこともでき、最後が <code>SELECT</code> で終わっていてもデータが変わります。最初の単語だけでは、読むか変えるかを判断できない形です。</p></aside>
 <p>許可の選択肢には、「今後は同じ種類のコマンドを確認しない」という意味のものが出ることがあります。psql について、これは選ばないでください。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ psql の「今後は確認しない」を選ばないのか</strong>：psql は、<code>SELECT</code> も <code>DELETE</code> も同じ <code>psql</code> というコマンドで実行します。一度「確認しない」にすると、あとで <code>DELETE</code> を含むコマンドが出てきたときにも、尋ねられずに実行されます。読む機会そのものがなくなります。</p></aside>
-<h2>6. 手を動かす</h2>
+<h2>6. 約束5：検証は別のモデルにさせ、判断は人がする</h2>
+<h3>なぜ別のモデルなのか</h3>
+<p>SQL を書いたモデルに「検証して」と頼むと、書いたときと同じ読み違いのまま、「正しいです」と答えることがあります。たとえば、第7章で見る「頼んでいない表まで結合して、記事数が2倍になる」SQL は、文法としては正しいので、書いた本人には誤りに見えません。</p>
+<p>そこで、検証は次の2つを満たす相手にさせます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>条件</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>別のモデル</strong></td>
+<td>モデルごとに読み違いの癖が違うので、同じ誤りを見逃しにくい</td>
+</tr>
+<tr>
+<td><strong>書いたときの説明を見せない</strong></td>
+<td>説明を読むと、それに引っ張られて「そのとおりです」と追認しやすい</td>
+</tr>
+</tbody>
+</table></div>
+<p>この資料では、書く役を <strong>Opus</strong>、検証役を <strong>Sonnet</strong> に固定します（どちらも Claude のモデルの種類です）。</p>
+<aside class="aside design"><p>🧭 <strong>一致は「正しい」の証明ではない</strong>：2つのモデルの結果が一致しても、両方が同じ方向に間違えることはあります。別のモデルにさせる効果がいちばん大きいのは、<strong>食い違ったときに止まれる</strong>ことです。一致したときも、最後は、あなたが数字（a・b）と前提（e）を見て判断します。</p></aside>
+<h3>作業フォルダのひな形を置く</h3>
+<p>資料作成者から受け取った作業フォルダのひな形を、<code>C:\pglearn\</code> に置きます。第4章の <code>sql</code> と、第3章の <code>out</code> と同じ場所です。</p>
+<pre class="code text"><code>C:\pglearn\
+├── CLAUDE.md                 ← この章の約束（接続先、してよいこと、検証の流れ）
+├── .claude\
+│   ├── settings.json         ← 書く役のモデルを Opus に固定する
+│   └── agents\
+│       └── sql-checker.md    ← 検証役（Sonnet、reviewer で接続、読むだけ）
+├── sql\                      ← 初期化SQL（第4章）
+└── out\                      ← CSV の出力先（第3章）</code></pre>
+<p>Claude Code は、<strong>起動したフォルダ</strong>にあるこれらのファイルを読み込みます。だから、Claude Code は必ず <code>C:\pglearn\</code> で起動します。</p>
+<pre class="code text"><code>cd C:\pglearn
+claude</code></pre>
+<p><code>.claude</code> のように点で始まるフォルダは、エクスプローラーの設定によっては表示されません。見えなくても、置いてあれば動きます。</p>
+<h3>検証の流れ</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>順番</th>
+<th>だれが</th>
+<th>やること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>書く役（Opus、<code>learner</code>）</td>
+<td>SQL を書いて実行し、検証材料の a・b・d・e を出す</td>
+</tr>
+<tr>
+<td>2</td>
+<td>書く役</td>
+<td>検証役（<code>sql-checker</code>）に、<strong>依頼文・SQL・結果の数字の3つだけ</strong>を渡す</td>
+</tr>
+<tr>
+<td>3</td>
+<td>検証役（Sonnet、<code>reviewer</code>）</td>
+<td>依頼と SQL のずれを探し（f）、別の書き方の SQL を自分で書いて実行し（c）、数字を比べる</td>
+</tr>
+<tr>
+<td>4</td>
+<td>書く役</td>
+<td>自分の結果、a・b・d・e、検証役の報告を、加工せずに並べて報告する</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>あなた</strong></td>
+<td>下の4つを確かめて判断する</td>
+</tr>
+</tbody>
+</table></div>
+<p>あなたが確かめるのは、次の4つです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>確かめること</th>
+<th>見る場所</th>
+<th>おかしいとき</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>検証役が別のモデルで動いたか</td>
+<td><code>/tasks</code> と入力し、<code>sql-checker</code> の行のモデル名が Sonnet か</td>
+<td>検証をやり直させる</td>
+</tr>
+<tr>
+<td>数字が知っている値と合うか</td>
+<td>a・b（最初の状態なら 3・5・4・8）</td>
+<td>差の理由（b）を説明できなければ、結果を使わない</td>
+</tr>
+<tr>
+<td>2つの結果が一致したか</td>
+<td>検証役の報告の「一致・不一致」</td>
+<td>不一致なら、どちらも使わずに、資料作成者に質問する</td>
+</tr>
+<tr>
+<td>前提が頼んだ意図と合うか</td>
+<td>e</td>
+<td>意図と違えば、①を書き直して頼み直す</td>
+</tr>
+</tbody>
+</table></div>
+<p>4つ目の「前提が意図と合うか」は、あなたにしか確かめられません。何を知りたかったのかは、あなたしか知らないからです。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ <code>/tasks</code> でモデルを見るのか</strong>：書く役が検証役を呼ぶときに、別のモデルを指定してしまうと、定義ファイルで決めたモデルよりそちらが優先されます。また、あなたがセッションの途中で <code>/model</code> でモデルを切り替えると、書く役のモデルも変わります。設定ファイルでモデルを決めても、「必ずそのモデルで動いた」とまでは言えないので、最後に目で確かめます。</p>
+<p>🔍 <strong>なぜ検証役は <code>reviewer</code> で接続するのか</strong>：検証役も SQL を実行します。検証役がうっかりデータを書き換えると、書く役の結果と比べる意味がなくなります。<code>reviewer</code> は読む権限しか持たないので、書き換えようとしても PostgreSQL がエラーで止めます（第4章）。</p></aside>
+<h2>7. 手を動かす</h2>
 <ol>
-<li>第3節の手順で pgpass.conf を作り、<code>-w</code> 付きのコマンドで、パスワードを聞かれずに接続できることを確かめます。</li>
-<li>psql で第2節の2つの SQL を実行し、<code>learner</code> で接続していること、<code>learner</code> がスーパーユーザーでないこと（<code>rolsuper</code> が <code>f</code>）を確かめます。</li>
+<li>第3節の手順で pgpass.conf を作り、<code>-w</code> 付きのコマンドで、<code>learner</code> と <code>reviewer</code> の両方が、パスワードを聞かれずに接続できることを確かめます。</li>
+<li>psql で第2節の2つの SQL を実行し、<code>learner</code> で接続していること、3つのロールのうち <code>postgres</code> だけがスーパーユーザー（<code>rolsuper</code> が <code>t</code>）であることを確かめます。</li>
+<li>第6節のひな形を <code>C:\pglearn\</code> に置き、そのフォルダで Claude Code を起動します。<code>/model</code> と入力し、Opus が選ばれていることを確かめます。</li>
 <li>
-<p>Claude Code を起動し、次のとおりに頼みます。</p>
+<p>次のとおりに頼みます（②④⑤⑥は <code>CLAUDE.md</code> にあるので、書くのは①と③です）。</p>
 <pre class="code text"><code>PostgreSQL 18 の学習用DBで、記事の件数を数えてください。
 ① 目的: articles の行数を知りたい
-② 接続先: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
-③ 使う表: articles
-④ SELECT だけ実行する。INSERT / UPDATE / DELETE はしない
-⑤ 実行前に SQL を見せる
-⑥ 実行後に、結果の数字をそのまま表示する</code></pre>
+③ 使う表: articles</code></pre>
 </li>
 <li>
-<p>許可を求められたら、第5節の4か所を読んでから許可します。</p>
+<p>許可を求められたら、第5節の4か所を読んでから許可します。書く役のコマンドは <code>-U learner</code>、検証役のコマンドは <code>-U reviewer</code> になっているはずです。</p>
 </li>
-<li>結果が 5 であることを確かめます。5 でなければ、第4章の軽いリセットをしてから、もう一度頼みます。</li>
+<li>報告に、結果（5）、検証材料 a・b・d・e、検証役の報告の表がそろっていることを確かめます。</li>
+<li><code>/tasks</code> と入力し、<code>sql-checker</code> が Sonnet で動いたことを確かめます。</li>
+<li>結果が 5 でなければ、第4章の軽いリセットをしてから、もう一度頼みます。</li>
 </ol>
 <h2>💡 Claude Codeで使うなら</h2>
-<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>この章で決めた約束を入れた、ふだんの頼み方の形です。「…」の部分を、その時々の内容に置き換えます。</p>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>ひな形の作業フォルダ（<code>C:\pglearn\</code>）で起動したときの、ふだんの頼み方の形です。「…」の部分を、その時々の内容に置き換えます。</p>
 <pre class="code text"><code>PostgreSQL 18 の学習用DBで、…してください。
 ① 目的: …
-② 接続先: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
 ③ 使う表: …
+（その章で足す検証材料があれば、ここに書く）</code></pre>
+<p>ひな形の外（別のフォルダ）で頼むときは、②④⑤⑥も書きます。</p>
+<pre class="code text"><code>② 接続先: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
 ④ SELECT だけ実行する。INSERT / UPDATE / DELETE / DROP / TRUNCATE はしない
 ⑤ 実行前に SQL と、どういう考えで書いたかを1行で見せる
-⑥ 実行後に、結果と、元の表の件数を表示する
-- パスワードは聞かない。接続できないときは、エラーの文章をそのまま見せて止まる</code></pre>
+⑥ 実行後に、検証材料 a・b・d・e を出し、sql-checker エージェントに検証させてから報告する</code></pre>
 <p><strong>出てきたものの検証ポイント</strong></p>
 <ol>
-<li>実行するコマンドの <code>-U</code> が <code>learner</code>、<code>-d</code> が <code>pglearn</code> か</li>
+<li>実行するコマンドの <code>-U</code> が、書く役は <code>learner</code>、検証役は <code>reviewer</code> か。<code>-d</code> が <code>pglearn</code> か</li>
 <li>実行した SQL が、⑤で見せられた SQL と同じか</li>
 <li>報告の数字が、実行結果の表示と同じか（報告の文章だけを信じない）</li>
+<li>検証役の報告が「一致」か。<code>/tasks</code> で、検証役が Sonnet で動いたか</li>
 </ol>
 <p><strong>起きがちな失敗と、その理由</strong></p>
 <ul>
 <li><strong>何も表示されないまま止まる</strong>：psql がパスワードの入力を待っています。pgpass.conf が無いか、名前が <code>pgpass.conf.txt</code> になっているか、書いた内容（データベース名・ロール名・ポート）がコマンドと一致していないことが原因です。<code>-w</code> を付けると、止まらずにエラーになります。</li>
 <li><strong>「接続できないので <code>postgres</code> で接続しました」と報告される</strong>：Claude Code は、目的を果たすために別の方法を試すことがあります。②の接続先を毎回書き、許可の前に <code>-U</code> を読むことで防ぎます。</li>
 <li><strong>パスワードを聞かれる</strong>：「接続のためにパスワードを教えてください」と言われても、会話には書きません。理由は第3節のとおりです。</li>
+<li><strong>検証役を呼ばずに報告される</strong>：<code>CLAUDE.md</code> はお願いなので、省かれることがあります。また、<code>C:\pglearn\</code> 以外のフォルダで起動すると、<code>CLAUDE.md</code> そのものが読み込まれません。報告に検証役の表が無ければ、「sql-checker に検証させてから報告して」と頼み直します。</li>
+<li><strong>検証役の報告が「一致」なのに、数字がおかしい</strong>：2つのモデルが同じ方向に間違えることはあります。一致は証明ではないので、a・b の数字を自分で確かめる手順は省きません。</li>
 </ul></section>
 <h2>確認問題</h2>
 <details class="quiz"><summary><span class="q">Q1. Claude Code が、次のコマンドを実行してよいか尋ねてきました。<code>psql -h localhost -U postgres -d pglearn -c "SELECT COUNT(*) FROM articles;"</code> どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>-U postgres</code> を疑います。SELECT だけなので結果は同じですが、スーパーユーザーで接続する習慣がつくと、いずれ DELETE や DROP も <code>postgres</code> で実行されます。許可せずに、<code>learner</code> で接続するように頼み直します。</p></div></details>
 <details class="quiz"><summary><span class="q">Q2. Claude Code に件数を数えるよう頼んだら、コマンドを実行したまま数分たっても何も表示されません。何を疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>psql がパスワードの入力を待っていることを疑います。止めてから、pgpass.conf の場所と名前（<code>.txt</code> が付いていないか）、中身（<code>localhost:5432:pglearn:learner:…</code>）を確かめます。コマンドに <code>-w</code> を付けるように頼めば、次からは止まらずにエラーになります。</p></div></details>
-<details class="quiz"><summary><span class="q">Q3. Claude Code が「articles は 5 件でした」と報告しました。実行したコマンドは <code>psql ... -c "SELECT COUNT(*) FROM articles WHERE status = 'active';"</code> でした。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>頼んでいない条件（<code>WHERE status = 'active'</code>）が付いていることを疑います。いまのデータではたまたま全件が <code>active</code> なので 5 になりますが、意味は「表示中の記事の件数」で、「記事の件数」とは違います。報告の文章ではなく、実行した SQL を読んで確かめます。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. Claude Code が「articles は 5 件でした」と報告しました。実行したコマンドは <code>psql ... -c "SELECT COUNT(*) FROM articles WHERE status = 'active';"</code> でした。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>頼んでいない条件（<code>WHERE status = 'active'</code>）が付いていることを疑います。いまのデータではたまたま全件が <code>active</code> なので 5 になりますが、意味は「表示中の記事の件数」で、「記事の件数」とは違います。報告の文章ではなく、実行した SQL を読んで確かめます。（検証役の報告の「f. 依頼とのずれ」に、この条件が挙がっているはずです。挙がっていなければ、それも疑う材料です。）</p></div></details>
+<details class="quiz"><summary><span class="q">Q4. 報告に検証役の表があり、「一致」と書かれていました。<code>/tasks</code> を見ると、<code>sql-checker</code> の行のモデル名が Opus でした。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>検証役が、書く役と同じモデルで動いたことを疑います。同じモデルどうしでは同じ読み違いをしやすく、「一致」の意味が弱くなります。書く役が検証役を呼ぶときにモデルを指定したか、<code>sql-checker.md</code> の <code>model</code> の行が書き換わっていないかを確かめ、「モデルを指定せずに sql-checker を呼んで、検証し直して」と頼みます。</p></div></details>
 <details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>🔍 スーパーユーザーは、データベースの外にも手が届く</h3>
 <p>スーパーユーザーは、データベースの中だけでなく、PostgreSQL が動いている PC のファイルを読み書きしたり、PC のコマンドを実行したりする SQL も使えます（例：<code>COPY ... TO PROGRAM</code>）。<code>postgres</code> で接続した Claude Code は、psql 経由で PC そのものにも手が届く、ということです。<code>learner</code> にはこの力がありません。</p>
-<h3>🧭 決まりごとを毎回書かずに済ませる方法</h3>
-<p>②の接続先や④の禁止事項は、毎回同じです。Claude Code には、作業するフォルダに置いた <code>CLAUDE.md</code> というファイルを、毎回読み込む仕組みがあります。たとえば <code>C:\pglearn\CLAUDE.md</code> に次のように書いておき、そのフォルダで Claude Code を起動すると、毎回の依頼に書く量を減らせます。</p>
-<pre class="code text"><code># この作業フォルダでの約束
-- PostgreSQL には、ホスト localhost、ロール learner、データベース pglearn で接続する。psql には -w を付ける
-- postgres ロールでは接続しない
-- 頼まれていない INSERT / UPDATE / DELETE / DROP / TRUNCATE はしない
-- パスワードは聞かない。接続できないときは、エラーの文章を見せて止まる</code></pre>
-<p>ただし、<code>CLAUDE.md</code> は「守ってほしいお願い」で、守らせる仕組みではありません。許可の前にコマンドを読む（約束4）のは、<code>CLAUDE.md</code> を置いても続けてください。パスワードは <code>CLAUDE.md</code> にも書きません。</p>
-<h3>🔍 読み取りしかできないロールは第18章で</h3>
-<p><code>learner</code> は表を消せるロールです。「読むことしかできないロール」を作ると、Claude Code が間違えても、データは変わりません。ロールの権限を細かく決める方法（<code>GRANT</code> / <code>REVOKE</code>）は、MCP サーバーと一緒に第18章で扱います。</p>
+<h3>🧭 もっと強く守らせる方法を、あえて使わない理由</h3>
+<p>Claude Code には、コマンドを実行する前に割り込んで、決まりに合わないものを止める仕組み（フック）もあります。これを使えば、「検証役を通さずに報告する」ことを、お願いではなく仕組みで止められます。</p>
+<p>この資料では、まずは使いません。仕組みが増えるほど、うまく動かないときに原因を探す場所が増え、非エンジニアのメンバーが自分で直せなくなるからです。代わりに、<code>/tasks</code> で目で確かめる手順を置いています。検証を省く事故が実際に起きるようなら、フックを足すことを考えます。</p>
+<h3>🔍 読み取り専用ロールと MCP</h3>
+<p><code>reviewer</code> のような読むだけのロールは、第2冊の MCP サーバー（第17〜19章）でも使います。権限を細かく決める方法（<code>GRANT</code> / <code>REVOKE</code>）は、第18章で扱います。</p>
 <p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/libpq-pgpass.html">パスワードファイル</a> と <a href="https://www.postgresql.org/docs/18/role-attributes.html">ロールの属性</a> を参照してください。</p></div></details>
-<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ Claude Code が実行するコマンドの <code>-U</code>（<code>learner</code> か）と <code>-d</code>（<code>pglearn</code> か）を、許可する前に読んだか</p></div></div></article>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ 許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</p></div></div></article>
 <article id="page-ch06" data-id="ch06" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第6章</span>SELECTを読む</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch07" data-id="ch07" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第7章</span>JOINを読む</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第4章（サンプルデータ）、第6章（SELECTを読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
 <ul>
@@ -2357,7 +2526,7 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 <article id="page-ex06" data-id="ex06" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別6</span>PoCの外へ出るとき</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr><tr><th>データベース</th><td>表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。</td></tr><tr><th>ロール</th><td>PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。</td></tr><tr><th>スーパーユーザー</th><td>すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。</td></tr><tr><th>文字コード</th><td>文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。</td></tr><tr><th>照合順序</th><td>文字を並べるときの順番のルール。大文字と小文字、ひらがなとカタカナのどれを先にするかなどが決まる。英語では collation。</td></tr><tr><th>トランザクション</th><td>複数の変更を「全部成功するか、何もしないか」の1つのまとまりとして扱う仕組み。</td></tr><tr><th>pgpass</th><td>psql などが接続するときに、パスワードを聞かずに読みにいくファイル。Windows では %APPDATA%\postgresql\pgpass.conf。</td></tr></table></div></div></article>
 <article id="page-apB" data-id="apB" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録B</span>指示テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">3章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">4章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">5章</span>Claude Code が実行するコマンドの <code>-U</code>（<code>learner</code> か）と <code>-d</code>（<code>pglearn</code> か）を、許可する前に読んだか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
+<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">3章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">4章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">5章</span>許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
 <article id="page-apD" data-id="apD" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録D</span>初期化SQL一式</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>第4章で実行する初期化 SQL です。<code>99_reset.sql</code> → <code>01_schema.sql</code> → <code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p><h2>01_schema.sql</h2><pre class="code sql"><code><span class="kw">SET</span> client_encoding = <span class="st">'UTF8'</span>;  <span class="cm">-- このファイルは UTF-8。PC の設定に関係なく正しく読ませる（第4章）</span>
 <span class="cm">-- =============================================================</span>
 <span class="cm">-- 01_schema.sql  学習用サンプル：ニュース情報（第4章で実行）</span>
