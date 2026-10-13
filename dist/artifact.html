@@ -222,7 +222,7 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 <div class="nav-part">第2部 表と SQL を読む</div>
 <ul>
 <li data-required="true" class="ready"><a href="#ch02" data-id="ch02"><span class="n">5</span><span class="t">表の形を読む（テーブル設計の基本）</span><span class="done" aria-label="読了">✓</span></a></li>
-<li data-required="true" class="todo"><a href="#ch06" data-id="ch06"><span class="n">6</span><span class="t">SELECTを読む</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="ready"><a href="#ch06" data-id="ch06"><span class="n">6</span><span class="t">SELECTを読む</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="ready"><a href="#ch07" data-id="ch07"><span class="n">7</span><span class="t">JOINを読む</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="todo"><a href="#ch08" data-id="ch08"><span class="n">8</span><span class="t">書き換える文を読み、やってから戻す</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="todo"><a href="#ch09" data-id="ch09"><span class="n">9</span><span class="t">件数・重複・NULLの検算</span><span class="done" aria-label="読了">✓</span></a></li>
@@ -302,6 +302,10 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 <td>型・タイムゾーン・制約、エラーは表が守ってくれた印</td>
 </tr>
 <tr>
+<td><a href="#ch06">第6章 SELECTを読む</a></td>
+<td>読む順番、COUNT の違い、NULL が先頭に来る並び順、ズレの3分類と検算の4手順</td>
+</tr>
+<tr>
 <td><a href="#ch07">第7章 JOINを読む</a></td>
 <td>実行結果の表、行が増える・消える図、確認問題、折りたたみの豆知識</td>
 </tr>
@@ -323,7 +327,7 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 <li>正は <code>src/</code> 配下の章ごとの Markdown です。<code>python3 build/build.py</code> で、この HTML を作り直します。</li>
 <li>図（ER図）はビルドのときに画像（SVG）にしているので、インターネットにつながっていなくても表示できます。</li>
 <li>付録A（用語集）、付録C（チェックリスト）、付録D（初期化SQL）は、本文と SQL ファイルから自動で作られます。</li>
-<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第2〜5章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
+<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第2〜6章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
 </ul></div></article>
 <article id="page-ch00" data-id="ch00" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ はじめに</p><h1><span class="ch-no">第0章</span>はじめに（読み方・所要時間・質問テンプレート）</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch01" data-id="ch01" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 準備：考え方と道具</p><h1><span class="ch-no">第1章</span>RDBとは何か・用語の固定</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
@@ -1830,7 +1834,7 @@ claude</code></pre>
 </tr>
 </tbody>
 </table></div><div class="result-foot">(1 行)</div></div>
-<p>引用符で囲んだ <code>'10'</code> は文字なので、辞書の順番のように1文字目から比べます。<code>'1'</code> は <code>'9'</code> より前なので、「10 は 9 より小さい」（<code>t</code>）になります。引用符のない <code>10</code> は整数なので、ふつうに「10 は 9 より小さくない」（<code>f</code>）です。</p>
+<p>引用符で囲んだ <code>'10'</code> は文字なので、ふつうの並べ方のルールでは、辞書の順番のように1文字目から比べます。<code>'1'</code> は <code>'9'</code> より前なので、「10 は 9 より小さい」（<code>t</code>）になります。引用符のない <code>10</code> は整数なので、ふつうに「10 は 9 より小さくない」（<code>f</code>）です。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ型が大事なのか</strong>：番号や金額を <code>text</code> で持つと、並べ替えたときに「1, 10, 2, 3…」のような順番になり、<code>&gt;</code> で絞ったときの結果も変わります。エラーにはならず、値の比べ方だけが静かに変わるので、第6章で扱う「値が変わる」ズレの原因になります。Claude Code が作った表で、数字のはずの列が <code>text</code> になっていないかは、<code>\d</code> の <code>Type</code> で確かめられます。</p></aside>
 <h2>3. 日時とタイムゾーン：「いつ」をずらさない</h2>
 <h3>タイムゾーン付きで保存する</h3>
@@ -1863,7 +1867,7 @@ claude</code></pre>
 <p><code>published_at</code> の末尾の <code>+09</code> は、「日本時間（UTC より9時間進んでいる）で表示している」という印です。<code>AT TIME ZONE 'UTC'</code> は、同じ瞬間を UTC（世界の基準の時刻）の時計で読むとどうなるかを表示します。記事2は、日本では10月2日の朝ですが、UTC ではまだ10月1日です。</p>
 <aside class="aside design"><p>🧭 <strong>なぜタイムゾーン付きで保存するのか</strong>：ニュースの配信元には、海外のサービスや、UTC で時刻を返すシステムもあります。時刻だけを保存すると、「9時」が日本の9時なのか UTC の9時なのかが分からなくなります。タイムゾーン付きで保存しておけば、どこから来た時刻でも、同じ1本の時間の線の上に並べられます。</p></aside>
 <h3>タイムゾーンを書かない日時は、設定で意味が変わる</h3>
-<p>SQL の中で日時を書くときも、タイムゾーンを書かないと、接続している人の設定で解釈されます。psql で、自分の接続だけ設定を UTC に変えて試します（この設定は、psql を終えると元に戻ります）。</p>
+<p>SQL の中で日時を書くときも、タイムゾーンを書かないと、接続している人の設定で解釈されます。psql で、自分の接続だけ設定を UTC に変えて試します（この設定はその接続の中だけで効き、<code>RESET</code> するか psql を終えると元に戻ります）。</p>
 <pre class="code text"><code>SET TimeZone = 'UTC';
 SELECT COUNT(*) FROM articles WHERE published_at &gt;= '2026-10-02 00:00';
 SELECT COUNT(*) FROM articles WHERE published_at &gt;= '2026-10-02 00:00+09';
@@ -1969,7 +1973,7 @@ INSERT INTO tags (name) VALUES ('テスト') RETURNING id;</code></pre>
 <p>手順3でデータを変えたので、第3章の軽いリセットで元に戻します。</p>
 </li>
 </ol>
-<p>PC の設定によっては、エラーの文章が日本語で表示されます。意味は同じです。</p>
+<p>PC の設定によっては、エラーの文章が日本語で表示されることがあります。意味は同じです。</p>
 <h3>Claude Code で（書く役 → 検証役 → あなた）</h3>
 <p><code>C:\pglearn\</code> で Claude Code を起動し、次のとおりに頼みます。第4章で決めた流れを、初めて通しで使います。</p>
 <pre class="code text"><code>PostgreSQL 18 の学習用DBで、articles 表の決まりごとを一覧にしてください。
@@ -2038,12 +2042,496 @@ INSERT INTO tags (name) VALUES ('テスト') RETURNING id;</code></pre>
 <p>名前から「タイムゾーンも一緒に保存している」と思われがちですが、実際に保存しているのは「1つの瞬間」だけです。入れるときに、書かれたタイムゾーン（無ければ接続の設定）を使って瞬間に直し、表示するときに、接続の設定の時刻に直します。「どの国の記事か」を残したいときは、タイムゾーンの名前を別の列に持たせます。</p>
 <p>タイムゾーンの無い <code>timestamp</code> という型もあります。こちらは「時計の針の位置」だけを保存するので、どこの時刻なのかが分かりません。この資料では使いません。</p>
 <h3>🧭 <code>serial</code> と書かれていたら</h3>
-<p>古い書き方では、番号を振る列を <code>id serial</code> と書きます。動きはほぼ同じですが、番号を人が指定して入れることもできてしまいます。Claude Code が <code>serial</code> で表を作ってきたら、<code>GENERATED ALWAYS AS IDENTITY</code> で書き直すように頼んでかまいません。</p>
+<p>番号を振る列は、<code>id serial</code> と書かれることもあります。これは PostgreSQL 独自の書き方で、<code>GENERATED ALWAYS AS IDENTITY</code> は SQL の標準の書き方です。動きはほぼ同じですが、<code>serial</code> では番号を人が指定して入れることもできてしまいます。Claude Code が <code>serial</code> で表を作ってきたら、<code>GENERATED ALWAYS AS IDENTITY</code> で書き直すように頼んでかまいません。</p>
 <h3>🔍 CHECK 制約</h3>
 <p><code>status</code> の <code>CHECK (status IN ('active', 'hidden'))</code> は、「この2つの値しか入れてはいけない」という決まりです。<code>'Active'</code>（大文字）や <code>'非表示'</code> のような表記ゆれを入口で止められます。</p>
 <p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/ddl-constraints.html">制約</a>、<a href="https://www.postgresql.org/docs/18/datatype-datetime.html">日付／時刻データ型</a>、<a href="https://www.postgresql.org/docs/18/ddl-identity-columns.html">識別列</a> を参照してください。</p></div></details>
 <div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ エラーが出たとき、決まりごと（制約）を外すのではなく、どのデータが決まりに合わなかったかを確かめたか</p></div></div></article>
-<article id="page-ch06" data-id="ch06" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第6章</span>SELECTを読む</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch06" data-id="ch06" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第6章</span>SELECTを読む</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第3章（サンプルデータ）、第4章（Claude Codeに頼む前の約束）、第5章（表の形を読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
+<ul>
+<li>SELECT を、書かれた順ではなく「実行される順」に読める</li>
+<li><code>COUNT(*)</code> と <code>COUNT(列)</code>、<code>GROUP BY</code>、<code>DISTINCT</code>、<code>ORDER BY</code> と <code>LIMIT</code> が、結果の行や値をどう変えるかを説明できる</li>
+<li>エラーにならずに結果がずれる失敗を、<strong>ズレの3分類</strong>で言い分けられる</li>
+<li><strong>検算の4手順</strong>で、Claude Code の結果を確かめられる</li>
+</ul>
+<h2>1. SELECT は「表から表を作る」</h2>
+<p>SELECT は、表を材料にして、新しい表（結果）を作る文です。書く順番と、PostgreSQL が考える順番が違うので、<strong>考える順番で読む</strong>のがコツです。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> source_id, <span class="kw">COUNT</span>(*) <span class="kw">AS</span> article_count   <span class="cm">-- ④ どの列を出すか</span>
+<span class="kw">FROM</span> articles                                  <span class="cm">-- ① どの表から</span>
+<span class="kw">WHERE</span> status = <span class="st">'active'</span>                        <span class="cm">-- ② どの行を残すか</span>
+<span class="kw">GROUP</span> <span class="kw">BY</span> source_id                             <span class="cm">-- ③ どの単位でまとめるか</span>
+<span class="kw">ORDER</span> <span class="kw">BY</span> source_id;                            <span class="cm">-- ⑤ どの順に並べるか</span></code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">source_id</th>
+<th style="text-align: right;">article_count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: right;"><span class="null">NULL</span></td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>読む順</th>
+<th>句</th>
+<th>やること</th>
+<th>この例では</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><code>FROM</code></td>
+<td>材料の表を決める</td>
+<td><code>articles</code> の5行</td>
+</tr>
+<tr>
+<td>②</td>
+<td><code>WHERE</code></td>
+<td>条件に合う行だけ残す</td>
+<td><code>status</code> が <code>active</code> の行（いまは5行とも）</td>
+</tr>
+<tr>
+<td>③</td>
+<td><code>GROUP BY</code></td>
+<td>同じ値の行を1つにまとめる</td>
+<td><code>source_id</code> ごとに3グループ</td>
+</tr>
+<tr>
+<td>④</td>
+<td><code>SELECT</code></td>
+<td>出す列を決める（数えるならここ）</td>
+<td>グループごとの行数</td>
+</tr>
+<tr>
+<td>⑤</td>
+<td><code>ORDER BY</code></td>
+<td>並べる</td>
+<td><code>source_id</code> の小さい順</td>
+</tr>
+<tr>
+<td>⑥</td>
+<td><code>LIMIT</code></td>
+<td>先頭から何行だけ出すか</td>
+<td>（この例では無し）</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside mech"><p>🔍 <strong>なぜ読む順が大事なのか</strong>：結果の行数が変わるのは、①〜③と⑥のどこかです。行数がおかしいときは、<code>SELECT</code> の列ではなく、<code>FROM</code>・<code>WHERE</code>・<code>GROUP BY</code>・<code>LIMIT</code> を順に疑います。</p></aside>
+<h2>2. WHERE：行を残す条件</h2>
+<p><code>WHERE</code> は、条件が「正しい」行だけを残します。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> id, title, published_at
+<span class="kw">FROM</span> articles
+<span class="kw">WHERE</span> published_at &gt;= <span class="st">'2026-10-02 00:00+09'</span>
+<span class="kw">ORDER</span> <span class="kw">BY</span> id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>published_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>2026-10-02 08:30:00+09</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>2026-10-02 12:00:00+09</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>配信元不明の転載記事</td>
+<td>2026-10-03 18:00:00+09</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<p>記事4（公開日時が <button type="button" class="term" data-def="値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。">NULL</button>）は、結果に入っていません。公開日時が分からないので、「10月2日以降か」と聞かれても「正しい」とは言えないからです。</p>
+<aside class="aside mech"><p>🔍 <strong>NULL の行は、WHERE で静かに消える</strong>：「10月2日以降<strong>ではない</strong>記事」を <code>WHERE published_at &lt; '2026-10-02 00:00+09'</code> で探しても、記事4は出てきません。どちらの条件でも消えるので、2つの結果を足しても全体の5件になりません。理由（NULL の三値論理）は第9章で扱います。いまは「NULL を許す列で絞ったら、NULL の行の行き先を確かめる」と覚えてください。</p></aside>
+<h2>3. 数える：COUNT(*) と COUNT(列)</h2>
+<p><code>COUNT</code> には2つの書き方があり、数えるものが違います。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> <span class="kw">COUNT</span>(*)                  <span class="kw">AS</span> all_rows,
+       <span class="kw">COUNT</span>(published_at)       <span class="kw">AS</span> with_published_at,
+       <span class="kw">COUNT</span>(source_id)          <span class="kw">AS</span> with_source,
+       <span class="kw">COUNT</span>(<span class="kw">DISTINCT</span> source_id) <span class="kw">AS</span> sources_used
+<span class="kw">FROM</span> articles;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">all_rows</th>
+<th style="text-align: right;">with_published_at</th>
+<th style="text-align: right;">with_source</th>
+<th style="text-align: right;">sources_used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(1 行)</div></div>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>書き方</th>
+<th>数えるもの</th>
+<th style="text-align: right;">結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>COUNT(*)</code></td>
+<td>行の数</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td><code>COUNT(published_at)</code></td>
+<td><code>published_at</code> が NULL でない行の数</td>
+<td style="text-align: right;">4（記事4を数えない）</td>
+</tr>
+<tr>
+<td><code>COUNT(source_id)</code></td>
+<td><code>source_id</code> が NULL でない行の数</td>
+<td style="text-align: right;">4（記事5を数えない）</td>
+</tr>
+<tr>
+<td><code>COUNT(DISTINCT source_id)</code></td>
+<td>NULL を除いた、<code>source_id</code> の種類の数</td>
+<td style="text-align: right;">2（1 と 2）</td>
+</tr>
+</tbody>
+</table></div>
+<p>「記事は何件？」と頼んで返ってくる数字は、どれも「記事の件数」に見えます。どの <code>COUNT</code> かで答えが変わるので、SQL の <code>COUNT(...)</code> の中を必ず読みます。</p>
+<h2>4. GROUP BY：まとめて数える</h2>
+<p>第1節の例の <code>GROUP BY source_id</code> は、「<code>source_id</code> が同じ行を1つのグループにまとめる」という意味です。グループごとに <code>COUNT(*)</code> を数えるので、「配信元ごとの記事数」になります。</p>
+<p>ここで見てほしいのは、3行目の <code>source_id</code> が NULL のグループです。配信元が不明の記事5も、「NULL のグループ」として1行にまとまって出てきます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">source_id</th>
+<th style="text-align: right;">article_count</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td>テック日報の記事</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td>経済ウィークリーの記事</td>
+</tr>
+<tr>
+<td style="text-align: right;">NULL</td>
+<td style="text-align: right;">1</td>
+<td>配信元が不明の記事</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>合計</strong></td>
+<td style="text-align: right;"><strong>5</strong></td>
+<td><strong>articles の全件数と一致する</strong></td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside mech"><p>🔍 <strong>グループの合計は、元の件数と一致するはず</strong>：<code>GROUP BY</code> は行を分けるだけで、増やしも減らしもしません。だから <code>COUNT(*)</code> の合計は、<code>WHERE</code> で絞ったあとの件数と一致します。一致しないときは、<code>JOIN</code> で行が増えている（第7章）か、<code>WHERE</code> で行が減っているかのどちらかです。</p></aside>
+<h2>5. DISTINCT：重複を消す</h2>
+<p><code>DISTINCT</code> は、結果の中で同じ行を1つにまとめます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> source_id
+<span class="kw">FROM</span> articles
+<span class="kw">ORDER</span> <span class="kw">BY</span> source_id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">source_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: right;"><span class="null">NULL</span></td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<p>記事は5本ありますが、<code>source_id</code> の値は 1・2・NULL の3種類なので、3行になります。</p>
+<aside class="aside design"><p>🧭 <strong>DISTINCT を見たら、なぜ重複したのかを疑う</strong>：「使われている配信元の一覧」のように、もともと重複を消したいときに使うのは正しい使い方です。一方で、結果に同じ行が何度も出てきたのを <code>DISTINCT</code> で消している場合は、重複が生まれた原因（多くは、頼んでいない表の結合）が残ったままです。第7章で、この形の失敗を詳しく見ます。</p></aside>
+<h2>6. ORDER BY と LIMIT：順番は書かないと決まらない</h2>
+<h3>「新しい順に3件」の落とし穴</h3>
+<p>「公開日時が新しい順に3件」を、素直に書くと次のようになります。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> id, title, published_at
+<span class="kw">FROM</span> articles
+<span class="kw">ORDER</span> <span class="kw">BY</span> published_at DESC
+<span class="kw">LIMIT</span> 3;</code></pre>
+<div class="result wrong"><div class="result-head"><span class="badge-wrong">誤った結果</span><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>published_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">4</td>
+<td>為替相場、週明けは小動き</td>
+<td><span class="null">NULL</span></td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>配信元不明の転載記事</td>
+<td>2026-10-03 18:00:00+09</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>2026-10-02 12:00:00+09</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<p>公開日時が分からない記事4が、いちばん上に来ました。エラーは出ていません。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ NULL が先頭に来るのか</strong>：PostgreSQL は、並べ替えのとき NULL を「どんな値よりも大きい」ものとして扱います。<code>DESC</code>（大きい順）にすると、NULL がいちばん先に並びます。</p></aside>
+<p>NULL を最後に回すには、<code>NULLS LAST</code> を付けます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> id, title, published_at
+<span class="kw">FROM</span> articles
+<span class="kw">ORDER</span> <span class="kw">BY</span> published_at DESC NULLS LAST
+<span class="kw">LIMIT</span> 3;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>published_at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">5</td>
+<td>配信元不明の転載記事</td>
+<td>2026-10-03 18:00:00+09</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>2026-10-02 12:00:00+09</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>2026-10-02 08:30:00+09</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<h3>同じ値が並ぶと、どちらが先かは決まらない</h3>
+<p><code>ORDER BY source_id LIMIT 1</code> のように、並べる列に同じ値（記事1と記事2はどちらも <code>source_id</code> が 1）があると、どちらが先に出るかは決まっていません。今日は記事1が出ても、データが増えたり、PostgreSQL の内部の都合が変わったりすると、記事2が出ることがあります。<code>ORDER BY</code> が無い <code>LIMIT</code> も同じで、どの行が出るかは決まっていません。</p>
+<aside class="aside design"><p>🧭 <strong>順番を決めきる書き方</strong>：最後に主キーを足して <code>ORDER BY source_id, id</code> のように書くと、同じ値のときの順番も決まります。主キーは重複しないので、順番が必ず1通りになります。</p></aside>
+<p>並び順は、文字の並べ方のルール（第3章で確かめた <code>lc_collate</code>）にも左右されます。メンバー間で設定が違うと、同じ SQL でも順番が変わることがあります。</p>
+<h2>7. ズレの3分類</h2>
+<p>ここまでの例は、どれもエラーにならずに結果がずれるものでした。この資料では、こうしたズレを3つに分けて呼びます。以降の章の「起きがちな失敗」も、この分け方で説明します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>分類</th>
+<th>何が起きるか</th>
+<th>この章の例</th>
+<th>以降の章の例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>行が減る</strong></td>
+<td>あるはずの行が、結果から消える</td>
+<td><code>WHERE</code> で公開日時が NULL の記事が消える</td>
+<td>INNER JOIN で相手のいない行が消える（第7章）</td>
+</tr>
+<tr>
+<td><strong>行が増える</strong></td>
+<td>1行のはずのものが、何行にもなる</td>
+<td>（この章には無い）</td>
+<td>1対多の JOIN で記事数が2倍になる（第7章）</td>
+</tr>
+<tr>
+<td><strong>値が変わる</strong></td>
+<td>行数は合っているのに、値や順番が違う</td>
+<td><code>COUNT(*)</code> と <code>COUNT(列)</code> の違い、NULL が先頭に来る並び順</td>
+<td>タイムゾーン（第5章）、型による比べ方（第5章）</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜ分類するのか</strong>：「なんか数字が変」のままだと、どこを疑えばよいか決まりません。「行が減った」なら <code>WHERE</code> と INNER JOIN、「行が増えた」なら JOIN、「値が変わった」なら <code>COUNT</code> の中身や型、タイムゾーンを疑う、というように、分類が決まると疑う場所が決まります。</p></aside>
+<h2>8. 検算の4手順</h2>
+<p>ズレに気づくための手順です。この資料では、毎回この順番で確かめます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>手順</th>
+<th>やること</th>
+<th>第4章の検証材料</th>
+<th>この章の例（配信元ごとの記事数）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>基準の表の件数を数える</td>
+<td>a</td>
+<td>articles は 5</td>
+</tr>
+<tr>
+<td>②</td>
+<td>処理後の件数（合計）を数える</td>
+<td>b</td>
+<td>2＋2＋1＝5</td>
+</tr>
+<tr>
+<td>③</td>
+<td>差の理由を言葉で説明する</td>
+<td>b（理由）</td>
+<td>差は 0。GROUP BY は行を分けるだけなので正しい</td>
+</tr>
+<tr>
+<td>④</td>
+<td>期待していた件数と比べる</td>
+<td>あなた</td>
+<td>「配信元が不明な記事も1行で出す」と頼んだなら 5 で正しい</td>
+</tr>
+</tbody>
+</table></div>
+<p>①と②は、Claude Code に出させれば済みます（検証材料 a・b）。③も Claude Code に書かせますが、その説明が正しいかは、あなたが読んで判断します。④は、何を頼んだかを知っているあなたにしかできません。</p>
+<aside class="aside design"><p>🧭 <strong>③で説明できない結果は使わない</strong>：①と②の差を言葉で説明できないときは、どこかで想定外のことが起きています。結果が「それらしい数字」でも、使わずに頼み直すか、資料作成者に質問してください。</p></aside>
+<h2>9. 第2〜4章の SQL を読み直す</h2>
+<p>第2〜4章で「写して実行する SQL」として使った SQL も、いまなら読めます。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span>
+    (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> sources)      <span class="kw">AS</span> sources,
+    (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> articles)     <span class="kw">AS</span> articles,
+    (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> tags)         <span class="kw">AS</span> tags,
+    (<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> article_tags) <span class="kw">AS</span> article_tags;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">sources</th>
+<th style="text-align: right;">articles</th>
+<th style="text-align: right;">tags</th>
+<th style="text-align: right;">article_tags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">8</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(1 行)</div></div>
+<p>第3章で「最初の状態」を確かめた SQL です。<code>( )</code> の中にそれぞれ小さな SELECT があり、4つの表の <code>COUNT(*)</code> を1行に並べています。<code>FROM</code> が無いのは、どの表の行でもなく、計算した値を1行だけ出すためです。</p>
+<p>第4章でロールを確かめた SQL は、「<code>pg_roles</code>（ロールの一覧の表）から、<code>WHERE rolname IN (...)</code> で3つのロールの行だけ残し、<code>ORDER BY rolname</code> で名前順に並べる」と読めます。</p>
+<h2>10. 手を動かす</h2>
+<h3>psql で</h3>
+<ol>
+<li>第1節の SQL を、①〜⑤の順に指でたどりながら読み、実行します。合計が5になることを確かめます。</li>
+<li>第3節の SQL を実行し、4つの数字がなぜ違うのかを、自分の言葉で説明します。</li>
+<li>第6節の「新しい順に3件」を、<code>NULLS LAST</code> なしとありで実行し、結果を比べます。</li>
+</ol>
+<h3>Claude Code で</h3>
+<p><code>C:\pglearn\</code> で Claude Code を起動し、次のとおりに頼みます。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、公開日時が新しい記事を3件出してください。
+① 目的: 最近の記事を3件知りたい
+③ 使う表: articles
+- d として、公開日時が NULL の記事がどう扱われたかを示す</code></pre>
+<p>返ってきたら、<code>/tasks</code> で検証役が Sonnet で動いたことを確かめたうえで、次を見ます。</p>
+<ol>
+<li>結果に記事4（公開日時が NULL）が入っていないか。入っていたら「値が変わる」ズレです</li>
+<li>SQL に <code>NULLS LAST</code>、または <code>WHERE published_at IS NOT NULL</code> があるか</li>
+<li>検証役の報告（c と f）が、NULL の扱いに触れているか</li>
+</ol>
+<h2>💡 Claude Codeで使うなら</h2>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、配信元ごとの記事数を出してください。
+① 目的: 配信元ごとの記事数を知りたい。配信元が不明な記事も「不明」として1行で出す
+③ 使う表: articles, sources
+- b として、記事数の合計と articles の総件数を並べ、差の理由を書く
+- e として、COUNT(*) と COUNT(列) のどちらを使ったか、その理由を書く
+- 並べ替えは、同じ値のときの順番も決まるように書く</code></pre>
+<p><strong>この章で足す検証材料</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>記号</th>
+<th>足すもの</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>b</td>
+<td>グループごとの数の合計と、基準の件数（a）の比較</td>
+<td>GROUP BY は行を増やしも減らしもしないので、合計は一致するはず</td>
+</tr>
+<tr>
+<td>d</td>
+<td>NULL の行がどこに行ったか（WHERE で消えた／NULL のグループになった／並び順の先頭に来た）</td>
+<td>NULL は、条件・集計・並び順のどこでも、静かに結果を変える</td>
+</tr>
+<tr>
+<td>e</td>
+<td>どの <code>COUNT</code> を使ったか、<code>ORDER BY</code> で順番を決めきったか</td>
+<td>同じ「件数」「上位3件」でも、書き方で答えが変わる</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>出てきたものの検証ポイント</strong></p>
+<ol>
+<li>結果の合計が、a（articles の総件数）と一致しているか</li>
+<li><code>COUNT(...)</code> の中身が、頼んだ意味と合っているか</li>
+<li><code>LIMIT</code> があるなら、その前に <code>ORDER BY</code> があり、主キーなどで順番が決めきられているか</li>
+</ol>
+<p><strong>起きがちな失敗と、その理由</strong></p>
+<ul>
+<li><strong>「最新の3件」に、公開日時が不明な記事が入る</strong>：<code>DESC</code> で並べると NULL が先頭に来るためです。（値が変わる）</li>
+<li><strong>「記事数」が 4 と報告される</strong>：<code>COUNT(published_at)</code> や <code>COUNT(source_id)</code> で数えると、NULL の行が数えられないためです。どの列の NULL でない数なのかを、e で確かめます。（値が変わる）</li>
+<li><strong><code>DISTINCT</code> を付けて「重複を除きました」と報告される</strong>：重複が出た原因が残っているかもしれません。どの表を <code>FROM</code> や <code>JOIN</code> に入れたかを読みます。（行が増える、の隠れた形）</li>
+<li><strong>実行するたびに、結果の順番が変わる</strong>：<code>ORDER BY</code> が無いか、同じ値の行の順番が決まっていないためです。（値が変わる）</li>
+</ul></section>
+<h2>確認問題</h2>
+<details class="quiz"><summary><span class="q">Q1. Claude Code が「記事は 4 件です」と報告しました。SQL は <code>SELECT COUNT(source_id) FROM articles;</code> でした。あなたの psql では <code>COUNT(*)</code> が 5 です。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>COUNT(source_id)</code> を疑います。これは「<code>source_id</code> が NULL でない行の数」なので、配信元が不明な記事5を数えていません。「記事の件数」を知りたいなら <code>COUNT(*)</code> です。ズレの3分類では「値が変わる」にあたります。</p></div></details>
+<details class="quiz"><summary><span class="q">Q2. 「配信元ごとの記事数」の結果が「1：2件、2：2件」の2行で、合計は 4 でした。articles の総件数は 5 です。検算の4手順の③で、差の 1 をどう説明しますか？ また、それで正しいかはどう決めますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>差の 1 は、<code>source_id</code> が NULL の記事5です。<code>WHERE source_id IS NOT NULL</code> や INNER JOIN などで消えた（行が減る）と説明できます。それで正しいかは④で決まります。「配信元が分かる記事だけ」を頼んだなら 4 で正しく、「全記事を配信元ごとに」を頼んだなら、NULL のグループが抜けているので誤りです。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. 「新しい順に3件」と頼んだら、1件目が「為替相場、週明けは小動き」でした。公開日時の欄は空です。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>ORDER BY published_at DESC</code> で、NULL が先頭に来ていることを疑います。公開日時が分からない記事は、「新しい記事」とは言えません。<code>NULLS LAST</code> を付けるか、<code>WHERE published_at IS NOT NULL</code> で除くように頼み直します。どちらにするかは、「公開日時が不明な記事を一覧に入れたいか」で決めます。</p></div></details>
+<details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>🔍 書く順と考える順が違う理由</h3>
+<p>SQL は、英語の文に近い「何を（SELECT）、どこから（FROM）、どんな条件で（WHERE）」という順番で書くようになっています。書く順番は人にとっての読みやすさに合わせたもので、PostgreSQL が考える順番とは違っています。<code>SELECT</code> で付けた別名（<code>AS article_count</code> など）を <code>WHERE</code> で使えないのも、<code>WHERE</code> が <code>SELECT</code> より先に考えられるからです。</p>
+<h3>🔍 NULL の並び順を決める</h3>
+<p><code>NULLS FIRST</code>（NULL を先頭）と <code>NULLS LAST</code>（NULL を最後）で、NULL の位置を指定できます。何も書かないと、小さい順（<code>ASC</code>）では最後、大きい順（<code>DESC</code>）では先頭になります。</p>
+<h3>🧭 <code>SELECT *</code> をあまり使わない理由</h3>
+<p><code>SELECT *</code> は「すべての列」の意味です。手早く中身を見るには便利ですが、表に列が増えると結果も変わります。Claude Code に結果を出させるときは、必要な列を名前で書かせたほうが、何を見ているかがはっきりします。</p>
+<p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/queries.html">問い合わせ（SELECT）</a> と <a href="https://www.postgresql.org/docs/18/functions-aggregate.html">集約関数</a> を参照してください。</p></div></details>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ 結果の行数や合計を、基準の件数（a）と比べ、差の理由を「ズレの3分類」のどれかで言えたか</p></div></div></article>
 <article id="page-ch07" data-id="ch07" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第7章</span>JOINを読む</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第3章（サンプルデータ）、第6章（SELECTを読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
 <ul>
 <li><button type="button" class="term" data-def="2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。">JOIN</button>（結合）が何をしているかを、「行の動き」で説明できる</li>
@@ -2900,7 +3388,7 @@ e（前提）として、設計案を出す前に、次の5つの問いに対す
 <article id="page-ex06" data-id="ex06" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別6</span>PoCの外へ出るとき</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr><tr><th>データベース</th><td>表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。</td></tr><tr><th>ロール</th><td>PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。</td></tr><tr><th>スーパーユーザー</th><td>すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。</td></tr><tr><th>文字コード</th><td>文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。</td></tr><tr><th>照合順序</th><td>文字を並べるときの順番のルール。大文字と小文字、ひらがなとカタカナのどれを先にするかなどが決まる。英語では collation。</td></tr><tr><th>トランザクション</th><td>複数の変更を「全部成功するか、何もしないか」の1つのまとまりとして扱う仕組み。</td></tr><tr><th>pgpass</th><td>psql などが接続するときに、パスワードを聞かずに読みにいくファイル。Windows では %APPDATA%\postgresql\pgpass.conf。</td></tr><tr><th>制約</th><td>表に入れてよい値の決まりごと。主キー・UNIQUE・NOT NULL・外部キー・CHECK など。決まりに合わない値はエラーで止められる。</td></tr><tr><th>シーケンス</th><td>番号を順に渡す部品。IDENTITY の列は、これを使って番号を振る。渡した番号は、INSERT が失敗しても戻らない。</td></tr></table></div></div></article>
 <article id="page-apB" data-id="apB" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録B</span>指示テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">2章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">3章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">4章</span>許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</li><li><span class="from">5章</span>エラーが出たとき、決まりごと（制約）を外すのではなく、どのデータが決まりに合わなかったかを確かめたか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
+<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">2章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">3章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">4章</span>許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</li><li><span class="from">5章</span>エラーが出たとき、決まりごと（制約）を外すのではなく、どのデータが決まりに合わなかったかを確かめたか</li><li><span class="from">6章</span>結果の行数や合計を、基準の件数（a）と比べ、差の理由を「ズレの3分類」のどれかで言えたか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
 <article id="page-apD" data-id="apD" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録D</span>初期化SQL一式</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>第3章で実行する初期化 SQL です。<code>99_reset.sql</code> → <code>01_schema.sql</code> → <code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p><h2>01_schema.sql</h2><pre class="code sql"><code><span class="kw">SET</span> client_encoding = <span class="st">'UTF8'</span>;  <span class="cm">-- このファイルは UTF-8。PC の設定に関係なく正しく読ませる（第4章）</span>
 <span class="cm">-- =============================================================</span>
 <span class="cm">-- 01_schema.sql  学習用サンプル：ニュース情報（第4章で実行）</span>

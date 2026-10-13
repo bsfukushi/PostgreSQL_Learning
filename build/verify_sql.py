@@ -13,7 +13,8 @@ for i, m in enumerate(blocks, 1):
     sql = m.group(2)
     after = md[m.end():m.end() + 400]
     exp = re.match(r"\s*:::result (\d+)", after)
-    r = subprocess.run(psql + ["-X", "-A", "-t", "-c", sql], capture_output=True, text=True)
+    # NULL を "(null)" と表示させる。表示しないと NULL だけの行が空行になり、行数から漏れる
+    r = subprocess.run(psql + ["-X", "-A", "-t", "-P", "null=(null)", "-c", sql], capture_output=True, text=True)
     failed = r.returncode != 0 or "ERROR" in r.stderr
     if re.match(r"\s*:::result error", after):  # エラーになるのが正しい例
         ng += 0 if failed else 1
