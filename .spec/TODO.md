@@ -23,7 +23,8 @@ PostgreSQL_Learning/
 │   ├── toc.yaml         目次（章ID・番号・必修/任意・本文ファイル）
 │   ├── glossary.yaml    用語集
 │   ├── about.md
-│   ├── vol1/            第1冊の章MD（v1_07_join.md, v1_10_five-questions.md）
+│   ├── vol1/            第1冊の章MD（v1_02〜v1_07, v1_10。ファイル名は表示の章番号、章 ID は toc.yaml）
+│   ├── workspace/       メンバーの作業フォルダ C:\pglearn\ のひな形（CLAUDE.md / .claude/）
 │   ├── vol2/            第2冊（空）
 │   ├── bessatsu/        別冊（空）
 │   ├── appendix/        付録（空）
@@ -31,7 +32,7 @@ PostgreSQL_Learning/
 ├── build/               build.py / template.html / render_mermaid.mjs / verify_sql.py / package.json
 ├── dist/                ← 派生物（直接編集しない）index.html / artifact.html
 ├── docs/                壁打ちハンドオフ
-├── .spec/               PLAN / SPEC / TODO / KNOWLEDGE / archive/
+├── .spec/               PLAN / SPEC / TODO / XREF（章のつながり台帳）/ KNOWLEDGE / archive/
 ├── .agent/              memory/ / handoff/
 └── .claude/             agents/ / settings.local.json
 ```
@@ -39,17 +40,22 @@ PostgreSQL_Learning/
 ## 未解決・要確認事項
 
 ### ともさんの判断待ち
-1. ~~再開ポイントの選択~~ → 執筆を優先（2026-10-14 決定）。第3章・第4章を執筆済み
+1. ~~再開ポイントの選択~~ → 執筆を優先（2026-10-14 決定）。第2〜6章を執筆済み
 2. 見本の体裁（色、文字の大きさ、枠の種類、図の形、ER図の大きさ）
 3. 1章30分の仮置きでよいか。学習期間の目安（週◯回×◯分）→「はじめに」に書く
 4. 配布方法: アーティファクトのリンク共有／HTMLファイル配布／共有フォルダ
 5. MCP サーバーの選定（リファレンス実装はアーカイブ済みとの報告あり・未確認。候補: bytebase/dbhub、crystaldba/postgres-mcp）。選定前に「UPDATE が拒否されること」を手元で検証
 6. ニュース本文を保存する場合の著作権の扱い（事例の設計に影響）
-7. `dist/` を git で追跡するか（配布物として残す／派生物として除外する）
+7. `dist/` を git で追跡するか（配布物として残す／派生物として除外する）。いまは追跡されている（.gitignore に書いてあるが、それ以前に追跡されたため）
+8. 作業フォルダのひな形（`src/workspace/`）の配り方（zip／リポジトリから取る／付録に全文）
+9. 第2章（pgAdmin4とpsql）が最長（本文約2.2万字）。30分に収まるか、分けるか削るか
+10. 仮に決めた名前・場所の確認：ロール `learner`・`reviewer`、DB `pglearn`、`C:\pglearn\`（sql / out / ひな形）、初期化SQLの1行目の `SET client_encoding`、コマンドプロンプトに統一
 
 ### 環境
 - 手元の PostgreSQL は **16**（`C:\Program Files\PostgreSQL\16`、PATH 未登録）。資料は 18 前提なので、v18 での照合環境を用意する
 - `build/node_modules` 未インストール（`cd build && npm i`）
+- クラウドセッション：PostgreSQL は 16 のみ（v18 は apt.postgresql.org が拒否される）。照合はしない。下見は一時クラスタで可（HANDOFF 2026-10-14 クラウドの記録）
+- クラウドセッション：グローバルスキル（/handoff・/init-session）は使えない。次に PC を使うとき、リポジトリの `.claude/skills/` にコピーするか決める（public なので中身を確認してから）
 
 ### 執筆前に裏取りが必要な事実
 | 項目 | 確度 |
