@@ -1,0 +1,10 @@
+# Agent temporary files
+.agent/reports/
+.agent/handoff/messages/
+
+# Claude Code の個人設定（autoMemoryDirectory の絶対パスを含む）
+.claude/settings.local.json
+
+# ビルドの依存・キャッシュ
+build/node_modules/
+__pycache__/

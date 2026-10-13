@@ -1,0 +1,324 @@
+<title>PostgreSQL学習資料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<style>
+/* レイアウト：左に固定の章メニュー、右に1章ずつの本文。結果表は psql の出力を思わせる等幅の帳票。 */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #1b2330;
+  --muted: #5a6577;
+  --line: #d8dee7;
+  --accent: #2f5690;
+  --accent-soft: #e5ecf6;
+  --claude: #8a4f12;
+  --claude-soft: #fbf2e6;
+  --wrong: #b3261e;
+  --wrong-soft: #fbe9e7;
+  --ok: #1f6f47;
+  --mark: #fff0a8;
+  --null: #8a93a3;
+  --code-bg: #eef1f6;
+  --diagram-bg: #ffffff;
+  --f-display: "Zen Kaku Gothic New", "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+  --f-mono: "JetBrains Mono", "BIZ UDGothic", "MS Gothic", ui-monospace, monospace;
+  --nav-w: 288px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151c; --surface: #191e27; --ink: #e3e7ee; --muted: #9ba5b5; --line: #2b3341;
+    --accent: #93b4e8; --accent-soft: #1e2a3c; --claude: #e3a865; --claude-soft: #2a2117;
+    --wrong: #f08a7f; --wrong-soft: #34191a; --ok: #74c99e; --mark: #5a4b12; --null: #7d8797;
+    --code-bg: #141922; --diagram-bg: #f4f6f9; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151c; --surface: #191e27; --ink: #e3e7ee; --muted: #9ba5b5; --line: #2b3341;
+  --accent: #93b4e8; --accent-soft: #1e2a3c; --claude: #e3a865; --claude-soft: #2a2117;
+  --wrong: #f08a7f; --wrong-soft: #34191a; --ok: #74c99e; --mark: #5a4b12; --null: #7d8797;
+  --code-bg: #141922; --diagram-bg: #f4f6f9; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.85; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- 外枠 ---------- */
+.shell { display: grid; grid-template-columns: var(--nav-w) minmax(0, 1fr); min-height: 100vh; }
+.topbar { display: none; }
+
+/* ---------- 左メニュー ---------- */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto;
+  background: var(--surface); border-right: 1px solid var(--line);
+  padding-block: 20px 40px; padding-inline: 14px; font-size: 14px; line-height: 1.5;
+}
+.brand { display: block; text-decoration: none; color: var(--ink); padding: 0 8px 14px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.brand b { display: block; font-family: var(--f-display); font-weight: 900; font-size: 18px; letter-spacing: .02em; }
+.brand small { color: var(--muted); font-family: var(--f-mono); font-size: 11px; letter-spacing: .04em; }
+.toggle { display: flex; align-items: center; gap: 8px; padding: 6px 8px 10px; color: var(--muted); font-size: 13px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.nav-book { margin: 18px 8px 4px; font-family: var(--f-display); font-weight: 700; font-size: 13px; color: var(--ink); letter-spacing: .06em; }
+.nav-part { margin: 10px 8px 2px; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.nav ul { list-style: none; margin: 0; padding: 0; }
+.nav li a {
+  display: grid; grid-template-columns: 2.4em 1fr auto; gap: 4px; align-items: baseline;
+  padding: 5px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+}
+.nav li a:hover { background: var(--accent-soft); }
+.nav li.todo a { color: var(--muted); }
+.nav li a.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.nav .n { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.nav li.ready .n::after { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: 4px; vertical-align: middle; }
+.nav .done { color: var(--ok); font-weight: 700; visibility: hidden; }
+.nav li.is-done .done { visibility: visible; }
+.nav.only-required li[data-required="false"] { display: none; }
+.legend { margin: 16px 8px 0; color: var(--muted); font-size: 12px; }
+
+/* ---------- 本文 ---------- */
+.main { min-width: 0; padding-block: 40px 80px; padding-inline: 40px; }
+article { max-width: 46rem; margin: 0 auto; }
+.ch-head { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 28px; }
+.crumb { margin: 0 0 6px; color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+.ch-head h1 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(26px, 4vw, 34px); line-height: 1.35; text-wrap: balance; }
+.ch-no { display: block; font-family: var(--f-mono); font-weight: 600; font-size: 14px; color: var(--accent); letter-spacing: .08em; margin-bottom: 4px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.pill { font-size: 12px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.pill.req { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.pill.draft { border-style: dashed; }
+.prereq { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+
+.prose h2 { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.45; margin: 48px 0 14px; text-wrap: balance; }
+.prose h3 { font-size: 17px; margin: 32px 0 8px; }
+.prose p, .prose ul, .prose ol { margin: 0 0 16px; }
+.prose li { margin-bottom: 4px; }
+.prose li > pre, .prose li > .scroll { margin-top: 8px; }
+.prose code { font-family: var(--f-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.prose mark { background: var(--mark); color: inherit; padding: 0 2px; }
+.scroll { overflow-x: auto; margin: 0 0 18px; }
+.prose table { border-collapse: collapse; font-size: 14px; line-height: 1.6; min-width: 100%; }
+.prose th, .prose td { border-bottom: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+.prose th { font-weight: 700; border-bottom: 2px solid var(--line); white-space: nowrap; }
+.prose td[align="right"], .prose th[align="right"] { text-align: right; font-variant-numeric: tabular-nums; }
+
+pre.code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 13.5px; line-height: 1.7; margin: 0 0 18px; }
+pre.code code { background: none; padding: 0; font-size: inherit; }
+pre.code .kw { color: var(--accent); font-weight: 600; }
+pre.code .cm { color: var(--muted); font-style: italic; }
+pre.code .st { color: var(--ok); }
+pre.code.text { background: var(--surface); }
+
+/* 一言理由 */
+.aside { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 0 0 18px; font-size: 15px; border-radius: 0 6px 6px 0; }
+.aside.design { border-left-color: var(--ok); }
+.aside p { margin: 0; }
+
+/* 実行結果（psql の出力を思わせる帳票） */
+.result { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0 0 20px; overflow: hidden; }
+.result-head { display: flex; gap: 8px; align-items: center; padding: 6px 12px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--code-bg); }
+.result .scroll { margin: 0; }
+.result table { font-family: var(--f-mono); font-size: 13px; }
+.result th { background: transparent; }
+.result-foot { font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding: 4px 12px 8px; }
+.result.wrong { border-color: var(--wrong); }
+.result.wrong .result-head { background: var(--wrong-soft); }
+.badge-wrong { color: var(--wrong); font-weight: 700; }
+.null { color: var(--null); font-style: italic; font-family: var(--f-mono); font-size: .9em; }
+
+/* 図 */
+.fig { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px 16px; margin: 0 0 22px; overflow-x: auto; }
+.fig-cap { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.fig-row { display: flex; align-items: center; gap: 12px; width: max-content; }
+.fig-arrow { font-family: var(--f-mono); font-size: 22px; color: var(--muted); }
+table.mini { border-collapse: collapse; font-family: var(--f-mono); font-size: 12.5px; min-width: 0; }
+table.mini caption { caption-side: top; text-align: left; font-family: var(--f-body); font-size: 12px; color: var(--muted); padding-bottom: 4px; }
+table.mini th, table.mini td { border: 1px solid var(--line); padding: 3px 8px; white-space: nowrap; }
+table.mini tr.lost td { background: var(--wrong-soft); color: var(--wrong); text-decoration: line-through; }
+table.mini tr.gone td { border-style: dashed; color: var(--wrong); font-family: var(--f-body); }
+table.mini tr.hit td { background: var(--accent-soft); }
+table.mini tr.dup td { background: var(--claude-soft); color: var(--claude); font-weight: 600; }
+figure.diagram { margin: 0 0 22px; background: var(--diagram-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow-x: auto; }
+figure.diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* Claude Code の枠 */
+.box.claude { border: 1px solid var(--claude); background: var(--claude-soft); border-radius: 10px; padding: 16px 18px 6px; margin: 0 0 24px; }
+.box-title { margin: 0 0 10px !important; font-size: 15px !important; color: var(--claude); }
+.box.claude pre.code { background: var(--surface); }
+
+/* 確認問題・豆知識 */
+details.quiz { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0 0 12px; }
+details.quiz summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+details.quiz summary::-webkit-details-marker { display: none; }
+details.quiz .reveal { font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+details.quiz[open] .reveal { visibility: hidden; }
+details.quiz .ans { border-top: 1px dashed var(--line); padding: 12px 14px 2px; }
+details.why { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); margin: 36px 0 24px; }
+details.why summary { cursor: pointer; padding: 12px 0; font-family: var(--f-display); font-weight: 700; font-size: 18px; }
+details.why .why-body { padding-bottom: 8px; }
+.check { border: 1px dashed var(--accent); border-radius: 8px; padding: 10px 14px; margin: 24px 0; }
+.check-label { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: .04em; }
+.check p { margin: 4px 0 0; }
+
+/* 用語 */
+.term { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: help; border-bottom: 1px dotted var(--accent); }
+.tip { position: fixed; z-index: 30; max-width: min(320px, calc(100vw - 32px)); background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.6; padding: 8px 12px; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+
+/* 付録 */
+table.gloss th { white-space: nowrap; }
+ul.checklist { list-style: none; padding: 0; }
+ul.checklist li { border-bottom: 1px solid var(--line); padding: 8px 0; display: grid; grid-template-columns: 4em 1fr; gap: 8px; }
+ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.stub { color: var(--muted); }
+
+/* 章末 */
+.ch-foot { max-width: 46rem; margin: 48px auto 0; display: grid; gap: 16px; }
+.done-btn { justify-self: start; font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--ok); color: var(--ok); background: var(--surface); cursor: pointer; }
+.done-btn[aria-pressed="true"] { background: var(--ok); color: var(--surface); }
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pager a { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; text-decoration: none; color: var(--ink); background: var(--surface); min-width: 0; }
+.pager a small { display: block; color: var(--muted); font-size: 12px; }
+.pager a.next { text-align: right; grid-column: 2; }
+.pager a:hover { border-color: var(--accent); }
+
+/* ---------- スマートフォン ---------- */
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .topbar { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; align-items: center; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--line); padding: 8px 16px; }
+  .topbar button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 6px; padding: 4px 12px; }
+  .topbar span { font-family: var(--f-display); font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav { position: fixed; inset: 0 auto 0 0; width: min(88vw, 320px); z-index: 40; transform: translateX(-100%); transition: transform .2s ease; height: 100%; padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+  .nav.open { transform: none; box-shadow: 0 0 0 100vmax rgba(0,0,0,.35); }
+  .main { padding-block: 24px 64px; padding-inline: 16px; }
+  .prose h2 { margin-top: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .nav { transition: none; } }
+</style>
+
+<div class="topbar"><button type="button" id="menuBtn" aria-controls="nav" aria-expanded="false">目次</button><span id="topTitle">PostgreSQL学習資料</span></div>
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="章の一覧">
+    <a class="brand" href="#about"><b>PostgreSQL学習資料</b><small>PostgreSQL 18 ／ 見本 v0.1</small></a>
+    <label class="toggle"><input type="checkbox" id="onlyReq">必修だけ表示</label>
+    {{NAV}}
+    <p class="legend">● 本文あり　✓ 読了</p>
+  </nav>
+  <main class="main" id="main">
+    {{ARTICLES}}
+    <div class="ch-foot" id="chFoot"></div>
+  </main>
+</div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script>
+(function () {
+  var ORDER = {{ORDER}};
+  var NAMES = {{NAMES}};
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var done = {};
+  try { done = JSON.parse(store.get('pgl-done') || '{}') || {}; } catch (e) { done = {}; }
+
+  var nav = document.getElementById('nav');
+  var foot = document.getElementById('chFoot');
+  var menuBtn = document.getElementById('menuBtn');
+  var topTitle = document.getElementById('topTitle');
+
+  function markDone() {
+    nav.querySelectorAll('li').forEach(function (li) {
+      var a = li.querySelector('a');
+      li.classList.toggle('is-done', !!done[a.dataset.id]);
+    });
+  }
+
+  function show(id) {
+    if (ORDER.indexOf(id) < 0) id = 'about';
+    document.querySelectorAll('main article').forEach(function (a) { a.hidden = a.dataset.id !== id; });
+    nav.querySelectorAll('a[data-id]').forEach(function (a) {
+      var on = a.dataset.id === id;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    var i = ORDER.indexOf(id);
+    var prev = ORDER[i - 1], next = ORDER[i + 1];
+    var html = '';
+    if (id !== 'about') {
+      html += '<button type="button" class="done-btn" id="doneBtn" aria-pressed="' + (!!done[id]) + '">' +
+              (done[id] ? '✓ 読み終えた' : '読み終えた') + '</button>';
+    }
+    html += '<div class="pager">' +
+      (prev ? '<a class="prev" href="#' + prev + '"><small>← 前へ</small>' + NAMES[prev] + '</a>' : '') +
+      (next ? '<a class="next" href="#' + next + '"><small>次へ →</small>' + NAMES[next] + '</a>' : '') +
+      '</div>';
+    foot.innerHTML = html;
+    var btn = document.getElementById('doneBtn');
+    if (btn) btn.addEventListener('click', function () {
+      done[id] = !done[id];
+      store.set('pgl-done', JSON.stringify(done));
+      btn.setAttribute('aria-pressed', String(!!done[id]));
+      btn.textContent = done[id] ? '✓ 読み終えた' : '読み終えた';
+      markDone();
+    });
+    topTitle.textContent = NAMES[id] || 'PostgreSQL学習資料';
+    nav.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    window.scrollTo(0, 0);
+  }
+
+  function route() { show((location.hash || '#about').slice(1)); }
+  window.addEventListener('hashchange', route);
+
+  // 必修だけ表示
+  var only = document.getElementById('onlyReq');
+  only.checked = store.get('pgl-only-req') === '1';
+  nav.classList.toggle('only-required', only.checked);
+  only.addEventListener('change', function () {
+    nav.classList.toggle('only-required', only.checked);
+    store.set('pgl-only-req', only.checked ? '1' : '0');
+  });
+
+  // スマートフォンの目次
+  menuBtn.addEventListener('click', function () {
+    var open = !nav.classList.contains('open');
+    nav.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { nav.classList.remove('open'); hideTip(); }
+  });
+
+  // 用語の説明
+  var tip = document.getElementById('tip');
+  var tipOwner = null;
+  function showTip(el) {
+    tip.textContent = el.dataset.def;
+    tip.hidden = false;
+    var r = el.getBoundingClientRect();
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(Math.max(16, r.left), window.innerWidth - w - 16);
+    var top = r.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = r.top - h - 6;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tipOwner = el;
+  }
+  function hideTip() { tip.hidden = true; tipOwner = null; }
+  document.addEventListener('mouseover', function (e) { var t = e.target.closest && e.target.closest('.term'); if (t) showTip(t); });
+  document.addEventListener('mouseout', function (e) { var t = e.target.closest && e.target.closest('.term'); if (t) hideTip(); });
+  document.addEventListener('focusin', function (e) { if (e.target.classList && e.target.classList.contains('term')) showTip(e.target); });
+  document.addEventListener('focusout', function (e) { if (e.target.classList && e.target.classList.contains('term')) hideTip(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('.term');
+    if (t) { if (tipOwner === t) hideTip(); else showTip(t); }
+    else if (tipOwner) hideTip();
+  });
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  markDone();
+  route();
+})();
+</script>

@@ -1,0 +1,356 @@
+# INDEX.md - メモリ目次
+
+> 自動生成 — `py ~/.claude/scripts/generate-index.py` で更新
+> エントリ数: memory 0 件 / troubleshoot 81 件
+
+## タイプ別
+
+### troubleshoot (80件)
+
+- **alb-listener-port-conflict-on-swap** [aws, cdk, cloudformation, alb, elbv2, listener] — 
+- **artisan-serve-env-passthrough.md** [laravel, artisan-serve, env, php, dev-server, windows] — 
+- **aws-config-japanese-comment** [aws, aws-cli, config, encoding, cp932, windows] — ~/.aws/config に UTF-8 日本語コメントを書くと AWS CLI v2 が「Unable to par
+- **az-query-japanese-key-cp932** [azure, az-cli, jmespath, query, encoding, cp932, windows, powershell, silent-failure] — az CLI の --query に日本語キー名を書くと CP932 で落ちて invalid jmespath_typ
+- **az-query-jmespath-cmd-reinterpret** [azure, az-cli, jmespath, query, powershell, windows, cmd, quoting, silent-failure] — 
+- **barcode-reader-ime** [barcode, ime, input, windows] — 
+- **better-sqlite3-electron-rebuild** [better-sqlite3, electron, native-module, rebuild] — 
+- **bulk-replace-side-effects** [refactoring, replace, side-effect] — 
+- **cfn-retain-orphan-name-conflict** [aws, cdk, cloudformation, rollback, s3, ecr] — 
+- **context-rollback-stale-file-overwrite** [claude-code, context-compaction, long-session, git, regression, session-management] — 
+- **cp932-unicode-output** [python, windows, encoding, cp932] — 
+- **css-inline-priority** [css, specificity, inline-style] — 
+- **ec2-sg-description-charset** [aws, cdk, cloudformation, security-group, ec2] — 
+- **ecc-agent-not-found** [claude-code, subagent, ecc, agents, vscode-extension] — 
+- **edit-garbled-japanese** [edit-tool, japanese, encoding, utf8] — 
+- **eloquent-collection-except-reindex.md** [laravel, eloquent, collection, except, only, reindex, foreign-key] — 
+- **env-append-no-trailing-newline** [env, shell, ssh, append, newline, secret-handling, sakura] — .env に `>> ` や printf で追記したら最終行の変数値に連結して秘密鍵が壊れた
+- **express-import-drops-cjk-font-silently** [adobe-express, html-export, font, japanese, cjk, adobe-fonts, typekit, silent-failure, slide] — 
+- **firebase-auth-navigate-timing** [firebase, auth, react, navigation] — 
+- **firebase-emulator-java-missing** [firebase, emulator, java, winget, windows] — 
+- **firebase-key-vsix** [firebase, vscodeignore, vsix, secret-exposure, irreversible] — 
+- **firestore-collectiongroup-rules** [firestore, security-rules, collection-group, query, permission] — 
+- **firestore-composite-index** [firestore, index, query] — 
+- **firestore-named-database** [firestore, database, configuration] — 
+- **firestore-security-rules-query** [firestore, security-rules, query, permission] — 
+- **force-push-leaves-old-commit-reachable** [git, github, force-push, secret-exposure, irreversible, gh-cli] — 
+- **gh-api-f-flag-no-stdin-expansion.md** [gh-cli, github, api, stdin, heredoc, pull-request] — 
+- **gh-credential-helper-oom-crash** [gh, git, push, credential, out-of-memory, windows, go, 一時障害] — 
+- **gh-credential-helper-stale-path** [gh, git, credential, migration, windows, path] — 
+- **gh-json-cp932-parse-failure.md** [gh-cli, powershell, json, encoding, cp932, windows, github] — 
+- **gha-pr-base-sha-stale.md** [github-actions, pull-request, ci, base-sha, rerun, status-check, gh-cli] — 
+- **gha-pr-conflict-no-run.md** [github-actions, pull-request, ci, merge-conflict, mergeable, gh-cli, git] — 
+- **gha-rerun-stale-event-payload.md** [github-actions, pull-request, rerun, labels, event-payload, ci, gh-cli] — 
+- **gitignore-on-other-branch-leaves-you-unprotected** [git, gitignore, branch, secret-exposure, irreversible, commit, windows] — 
+- **herd-bin-shim-stale-user-path** [herd, php, composer, migration, windows, path, laravel] — 
+- **hook-path-breaks-after-tool-install** [claude-code, hooks, settings, migration, windows, path] — 
+- **imap-modified-utf7** [imap, encoding, utf7, japanese, imapflow] — 
+- **imap-move-uid-stale** [imap, imapflow, uid, move, mail] — 
+- **laravel-route-param-positional-binding.md** [laravel, routing, controller, route-parameter, dependency-injection, php, 404] — 
+- **msys2-drive-path** [python, msys2, git-bash, windows, path] — 
+- **nginx-upstream-dns-startup** [nginx, dns, upstream, certbot, systemd, vps, outage] — 
+- **node-http-chunk-utf8-garbled** [node, http, encoding, utf8, chunk, api] — 
+- **npm-ci-lockfile-optional-deps** [npm, package-lock, ci, github-actions, optional-dependencies, windows] — 
+- **npm-outdated-versions** [npm, package-version, dependency] — 
+- **pao-swallows-phpstan-config-error** [phpstan, larastan, laravel, pao, silent-failure, php] — 
+- **pencil-mcp-pipe-multi-window.md** [pencil, mcp, vscode, named-pipe, multi-window, windows] — 
+- **pest-arch-expect-array-and-semantics** [pest, arch-test, php, laravel, false-green, mutation-testing, testing] — 
+- **pest-global-helper-name-collision.md** [pest, phpunit, php, test, fatal-error, helper, laravel] — 
+- **pg-migrate-fresh-function-survives.md** [postgresql, laravel, migration, migrate-fresh, trigger, plpgsql, pest] — 
+- **pg-session-timezone-date-shift.md** [postgresql, laravel, timestamptz, timezone, date, carbon] — 
+- **phantom-user-message-hallucination** [claude-code, hallucination, context-compaction, long-session, session-management] — 
+- **powershell-erroractionpreference-native-exit** [powershell, windows, exit-code, native-command, silent-failure, az-cli, gh-cli, docker, error-handling] — PowerShell の $ErrorActionPreference = "Stop" はネイティブコマンド（az /
+- **powershell-missing-property-count-zero** [powershell, windows, api, json, false-green, silent-failure, invoke-restmethod] — PowerShell では存在しないプロパティの .Count が 0 になるため、「キー名を間違えた」と「本当に 0 
+- **ps1-run-with-powershell-association-broken** [powershell, windows, ps1, association, uac, registry] — 
+- **psql-sudo-postgres-var-expansion** [postgresql, psql, sudo, shell, permission] — 
+- **qdrant-local-delete-collection-persists** [qdrant, qdrant-client, local-mode, reindex, silent-failure, python] — 
+- **rds-force-ssl-pg-no-ssl** [aws, rds, postgresql, pg, node, ssl, ecs] — 
+- **ripgrep-glob-last-match-wins** [ripgrep, rg, grep, glob, search, cli] — 
+- **robocopy-xd-space-path-not-excluded** [windows, powershell, robocopy, backup, migration, quoting] — 
+- **sed-i-strips-crlf-git-bash** [sed, git-bash, msys2, windows, crlf, line-ending, legacy, encoding, silent-failure] — Git Bash の sed -i が CRLF を LF に変換し、1文字置換のつもりが全行変更になる（レガシーサイト
+- **shadcn-add-case-insensitive-conflict** [shadcn, windows, filesystem, case-insensitive, cli] — 
+- **shadcn-init-font-sans-self-reference** [shadcn, tailwind-v4, nextjs, font, css-variables] — 
+- **smtputf8-header-bounce** [mail, postfix, php, encoding, smtputf8] — 
+- **sqlite-jst-datetime** [sqlite, datetime, timezone, jst] — 
+- **ssh-cygdrive-path-direct-call** [ssh, scp, cygwin, cygdrive, git-bash, windows, sakura, deploy, marathon, migration] — deploy.sh 流用で ssh を直叩きすると Local 同梱 cygwin ssh の /cygdrive パス
+- **stacked-pr-merge-delete-branch-closes-child** [github, gh-cli, pull-request, stacked-pr, branch-protection] — 
+- **style-attr-selector-js-rewrite** [css, attribute-selector, inline-style, javascript, responsive] — 
+- **symfony-mailer-starttls-loopback-cert-mismatch.md** [laravel, symfony-mailer, smtp, starttls, postfix, tls, loopback, mail] — 
+- **toisostring-date-offset** [javascript, date, timezone, jst] — 
+- **vba-http-cache** [vba, http, cache, windows] — 
+- **vitest-filter-bracket-zero-match** [vitest, test-filter, regex, nextjs, dynamic-route, mutation-testing, false-green] — 
+- **vscode-cli-fullpath** [vscode, cli, windows, path, electron] — 
+- **vscode-keybindings-config** [vscode, keybindings, claude-code, settings] — 
+- **vscode-sdk-stream-stall** [claude-code, vscode-extension, sdk, stream, stall, error-handling] — 
+- **vscode-webview-srcdoc-inherits-csp.md** [vscode, webview, csp, iframe, extension] — 
+- **vscodeignore-transitive-deps** [vscodeignore, better-sqlite3, native-module, vsce, vsix] — 
+- **vsix-version-bump** [vsix, vscode, version, packaging] — 
+- **wallclock-boundary-test-false-green** [testing, boundary-value, clock, false-green, mutation-testing, firestore, vitest] — 
+- **webview-prompt-confirm-blocked** [vscode, webview, prompt, confirm, ui] — 
+- **worktree-agent-destructive** [worktree, agent, parallel, destructive] — 
+
+## タグ別クイックリファレンス
+
+- `404` (1): laravel-route-param-positional-binding.md
+- `adobe-express` (1): express-import-drops-cjk-font-silently
+- `adobe-fonts` (1): express-import-drops-cjk-font-silently
+- `agent` (1): worktree-agent-destructive
+- `agents` (1): ecc-agent-not-found
+- `alb` (1): alb-listener-port-conflict-on-swap
+- `api` (3): gh-api-f-flag-no-stdin-expansion.md, node-http-chunk-utf8-garbled, powershell-missing-property-count-zero
+- `append` (1): env-append-no-trailing-newline
+- `arch-test` (1): pest-arch-expect-array-and-semantics
+- `artisan-serve` (1): artisan-serve-env-passthrough.md
+- `association` (1): ps1-run-with-powershell-association-broken
+- `attribute-selector` (1): style-attr-selector-js-rewrite
+- `auth` (1): firebase-auth-navigate-timing
+- `aws` (5): alb-listener-port-conflict-on-swap, aws-config-japanese-comment, cfn-retain-orphan-name-conflict, ec2-sg-description-charset, rds-force-ssl-pg-no-ssl
+- `aws-cli` (1): aws-config-japanese-comment
+- `az-cli` (3): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret, powershell-erroractionpreference-native-exit
+- `azure` (2): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret
+- `backup` (1): robocopy-xd-space-path-not-excluded
+- `barcode` (1): barcode-reader-ime
+- `base-sha` (1): gha-pr-base-sha-stale.md
+- `better-sqlite3` (2): better-sqlite3-electron-rebuild, vscodeignore-transitive-deps
+- `boundary-value` (1): wallclock-boundary-test-false-green
+- `branch` (1): gitignore-on-other-branch-leaves-you-unprotected
+- `branch-protection` (1): stacked-pr-merge-delete-branch-closes-child
+- `cache` (1): vba-http-cache
+- `carbon` (1): pg-session-timezone-date-shift.md
+- `case-insensitive` (1): shadcn-add-case-insensitive-conflict
+- `cdk` (3): alb-listener-port-conflict-on-swap, cfn-retain-orphan-name-conflict, ec2-sg-description-charset
+- `certbot` (1): nginx-upstream-dns-startup
+- `chunk` (1): node-http-chunk-utf8-garbled
+- `ci` (4): gha-pr-base-sha-stale.md, gha-pr-conflict-no-run.md, gha-rerun-stale-event-payload.md, npm-ci-lockfile-optional-deps
+- `cjk` (1): express-import-drops-cjk-font-silently
+- `claude-code` (6): context-rollback-stale-file-overwrite, ecc-agent-not-found, hook-path-breaks-after-tool-install, phantom-user-message-hallucination, vscode-keybindings-config, vscode-sdk-stream-stall
+- `cli` (3): ripgrep-glob-last-match-wins, shadcn-add-case-insensitive-conflict, vscode-cli-fullpath
+- `clock` (1): wallclock-boundary-test-false-green
+- `cloud-functions` (1): firebase-functions-eventarc-first-trigger
+- `cloudformation` (3): alb-listener-port-conflict-on-swap, cfn-retain-orphan-name-conflict, ec2-sg-description-charset
+- `cmd` (1): az-query-jmespath-cmd-reinterpret
+- `collection` (1): eloquent-collection-except-reindex.md
+- `collection-group` (1): firestore-collectiongroup-rules
+- `commit` (1): gitignore-on-other-branch-leaves-you-unprotected
+- `composer` (1): herd-bin-shim-stale-user-path
+- `config` (1): aws-config-japanese-comment
+- `configuration` (1): firestore-named-database
+- `confirm` (1): webview-prompt-confirm-blocked
+- `context-compaction` (2): context-rollback-stale-file-overwrite, phantom-user-message-hallucination
+- `controller` (1): laravel-route-param-positional-binding.md
+- `cp932` (4): aws-config-japanese-comment, az-query-japanese-key-cp932, cp932-unicode-output, gh-json-cp932-parse-failure.md
+- `credential` (2): gh-credential-helper-oom-crash, gh-credential-helper-stale-path
+- `crlf` (1): sed-i-strips-crlf-git-bash
+- `csp` (1): vscode-webview-srcdoc-inherits-csp.md
+- `css` (2): css-inline-priority, style-attr-selector-js-rewrite
+- `css-variables` (1): shadcn-init-font-sans-self-reference
+- `cygdrive` (1): ssh-cygdrive-path-direct-call
+- `cygwin` (1): ssh-cygdrive-path-direct-call
+- `database` (1): firestore-named-database
+- `date` (2): pg-session-timezone-date-shift.md, toisostring-date-offset
+- `datetime` (1): sqlite-jst-datetime
+- `dependency` (1): npm-outdated-versions
+- `dependency-injection` (1): laravel-route-param-positional-binding.md
+- `deploy` (1): ssh-cygdrive-path-direct-call
+- `destructive` (1): worktree-agent-destructive
+- `dev-server` (1): artisan-serve-env-passthrough.md
+- `dns` (1): nginx-upstream-dns-startup
+- `docker` (1): powershell-erroractionpreference-native-exit
+- `dynamic-route` (1): vitest-filter-bracket-zero-match
+- `ec2` (1): ec2-sg-description-charset
+- `ecc` (1): ecc-agent-not-found
+- `ecr` (1): cfn-retain-orphan-name-conflict
+- `ecs` (1): rds-force-ssl-pg-no-ssl
+- `edit-tool` (1): edit-garbled-japanese
+- `elbv2` (1): alb-listener-port-conflict-on-swap
+- `electron` (2): better-sqlite3-electron-rebuild, vscode-cli-fullpath
+- `eloquent` (1): eloquent-collection-except-reindex.md
+- `emulator` (1): firebase-emulator-java-missing
+- `encoding` (9): aws-config-japanese-comment, az-query-japanese-key-cp932, cp932-unicode-output, edit-garbled-japanese, gh-json-cp932-parse-failure.md, imap-modified-utf7, node-http-chunk-utf8-garbled, sed-i-strips-crlf-git-bash, smtputf8-header-bounce
+- `env` (2): artisan-serve-env-passthrough.md, env-append-no-trailing-newline
+- `error-handling` (2): powershell-erroractionpreference-native-exit, vscode-sdk-stream-stall
+- `event-payload` (1): gha-rerun-stale-event-payload.md
+- `eventarc` (1): firebase-functions-eventarc-first-trigger
+- `except` (1): eloquent-collection-except-reindex.md
+- `exit-code` (1): powershell-erroractionpreference-native-exit
+- `extension` (1): vscode-webview-srcdoc-inherits-csp.md
+- `false-green` (4): pest-arch-expect-array-and-semantics, powershell-missing-property-count-zero, vitest-filter-bracket-zero-match, wallclock-boundary-test-false-green
+- `fatal-error` (1): pest-global-helper-name-collision.md
+- `filesystem` (1): shadcn-add-case-insensitive-conflict
+- `firebase` (4): firebase-auth-navigate-timing, firebase-emulator-java-missing, firebase-functions-eventarc-first-trigger, firebase-key-vsix
+- `firestore` (5): firestore-collectiongroup-rules, firestore-composite-index, firestore-named-database, firestore-security-rules-query, wallclock-boundary-test-false-green
+- `firestore-trigger` (1): firebase-functions-eventarc-first-trigger
+- `font` (2): express-import-drops-cjk-font-silently, shadcn-init-font-sans-self-reference
+- `force-push` (1): force-push-leaves-old-commit-reachable
+- `foreign-key` (1): eloquent-collection-except-reindex.md
+- `gh` (2): gh-credential-helper-oom-crash, gh-credential-helper-stale-path
+- `gh-cli` (8): force-push-leaves-old-commit-reachable, gh-api-f-flag-no-stdin-expansion.md, gh-json-cp932-parse-failure.md, gha-pr-base-sha-stale.md, gha-pr-conflict-no-run.md, gha-rerun-stale-event-payload.md, powershell-erroractionpreference-native-exit, stacked-pr-merge-delete-branch-closes-child
+- `git` (6): context-rollback-stale-file-overwrite, force-push-leaves-old-commit-reachable, gh-credential-helper-oom-crash, gh-credential-helper-stale-path, gha-pr-conflict-no-run.md, gitignore-on-other-branch-leaves-you-unprotected
+- `git-bash` (3): msys2-drive-path, sed-i-strips-crlf-git-bash, ssh-cygdrive-path-direct-call
+- `github` (4): force-push-leaves-old-commit-reachable, gh-api-f-flag-no-stdin-expansion.md, gh-json-cp932-parse-failure.md, stacked-pr-merge-delete-branch-closes-child
+- `github-actions` (4): gha-pr-base-sha-stale.md, gha-pr-conflict-no-run.md, gha-rerun-stale-event-payload.md, npm-ci-lockfile-optional-deps
+- `gitignore` (1): gitignore-on-other-branch-leaves-you-unprotected
+- `glob` (1): ripgrep-glob-last-match-wins
+- `go` (1): gh-credential-helper-oom-crash
+- `grep` (1): ripgrep-glob-last-match-wins
+- `hallucination` (1): phantom-user-message-hallucination
+- `helper` (1): pest-global-helper-name-collision.md
+- `herd` (1): herd-bin-shim-stale-user-path
+- `heredoc` (1): gh-api-f-flag-no-stdin-expansion.md
+- `hooks` (1): hook-path-breaks-after-tool-install
+- `html-export` (1): express-import-drops-cjk-font-silently
+- `http` (2): node-http-chunk-utf8-garbled, vba-http-cache
+- `iframe` (1): vscode-webview-srcdoc-inherits-csp.md
+- `imap` (2): imap-modified-utf7, imap-move-uid-stale
+- `imapflow` (2): imap-modified-utf7, imap-move-uid-stale
+- `ime` (1): barcode-reader-ime
+- `index` (1): firestore-composite-index
+- `inline-style` (2): css-inline-priority, style-attr-selector-js-rewrite
+- `input` (1): barcode-reader-ime
+- `invoke-restmethod` (1): powershell-missing-property-count-zero
+- `irreversible` (3): firebase-key-vsix, force-push-leaves-old-commit-reachable, gitignore-on-other-branch-leaves-you-unprotected
+- `japanese` (3): edit-garbled-japanese, express-import-drops-cjk-font-silently, imap-modified-utf7
+- `java` (1): firebase-emulator-java-missing
+- `javascript` (2): style-attr-selector-js-rewrite, toisostring-date-offset
+- `jmespath` (2): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret
+- `json` (2): gh-json-cp932-parse-failure.md, powershell-missing-property-count-zero
+- `jst` (2): sqlite-jst-datetime, toisostring-date-offset
+- `keybindings` (1): vscode-keybindings-config
+- `labels` (1): gha-rerun-stale-event-payload.md
+- `larastan` (1): pao-swallows-phpstan-config-error
+- `laravel` (10): artisan-serve-env-passthrough.md, eloquent-collection-except-reindex.md, herd-bin-shim-stale-user-path, laravel-route-param-positional-binding.md, pao-swallows-phpstan-config-error, pest-arch-expect-array-and-semantics, pest-global-helper-name-collision.md, pg-migrate-fresh-function-survives.md, pg-session-timezone-date-shift.md, symfony-mailer-starttls-loopback-cert-mismatch.md
+- `legacy` (1): sed-i-strips-crlf-git-bash
+- `line-ending` (1): sed-i-strips-crlf-git-bash
+- `listener` (1): alb-listener-port-conflict-on-swap
+- `local-mode` (1): qdrant-local-delete-collection-persists
+- `long-session` (2): context-rollback-stale-file-overwrite, phantom-user-message-hallucination
+- `loopback` (1): symfony-mailer-starttls-loopback-cert-mismatch.md
+- `mail` (3): imap-move-uid-stale, smtputf8-header-bounce, symfony-mailer-starttls-loopback-cert-mismatch.md
+- `marathon` (1): ssh-cygdrive-path-direct-call
+- `mcp` (1): pencil-mcp-pipe-multi-window.md
+- `merge-conflict` (1): gha-pr-conflict-no-run.md
+- `mergeable` (1): gha-pr-conflict-no-run.md
+- `migrate-fresh` (1): pg-migrate-fresh-function-survives.md
+- `migration` (6): gh-credential-helper-stale-path, herd-bin-shim-stale-user-path, hook-path-breaks-after-tool-install, pg-migrate-fresh-function-survives.md, robocopy-xd-space-path-not-excluded, ssh-cygdrive-path-direct-call
+- `move` (1): imap-move-uid-stale
+- `msys2` (2): msys2-drive-path, sed-i-strips-crlf-git-bash
+- `multi-window` (1): pencil-mcp-pipe-multi-window.md
+- `mutation-testing` (3): pest-arch-expect-array-and-semantics, vitest-filter-bracket-zero-match, wallclock-boundary-test-false-green
+- `named-pipe` (1): pencil-mcp-pipe-multi-window.md
+- `native-command` (1): powershell-erroractionpreference-native-exit
+- `native-module` (2): better-sqlite3-electron-rebuild, vscodeignore-transitive-deps
+- `navigation` (1): firebase-auth-navigate-timing
+- `newline` (1): env-append-no-trailing-newline
+- `nextjs` (2): shadcn-init-font-sans-self-reference, vitest-filter-bracket-zero-match
+- `nginx` (1): nginx-upstream-dns-startup
+- `node` (2): node-http-chunk-utf8-garbled, rds-force-ssl-pg-no-ssl
+- `npm` (2): npm-ci-lockfile-optional-deps, npm-outdated-versions
+- `only` (1): eloquent-collection-except-reindex.md
+- `optional-dependencies` (1): npm-ci-lockfile-optional-deps
+- `out-of-memory` (1): gh-credential-helper-oom-crash
+- `outage` (1): nginx-upstream-dns-startup
+- `package-lock` (1): npm-ci-lockfile-optional-deps
+- `package-version` (1): npm-outdated-versions
+- `packaging` (1): vsix-version-bump
+- `pao` (1): pao-swallows-phpstan-config-error
+- `parallel` (1): worktree-agent-destructive
+- `path` (5): gh-credential-helper-stale-path, herd-bin-shim-stale-user-path, hook-path-breaks-after-tool-install, msys2-drive-path, vscode-cli-fullpath
+- `pencil` (1): pencil-mcp-pipe-multi-window.md
+- `permission` (3): firestore-collectiongroup-rules, firestore-security-rules-query, psql-sudo-postgres-var-expansion
+- `pest` (3): pest-arch-expect-array-and-semantics, pest-global-helper-name-collision.md, pg-migrate-fresh-function-survives.md
+- `pg` (1): rds-force-ssl-pg-no-ssl
+- `php` (7): artisan-serve-env-passthrough.md, herd-bin-shim-stale-user-path, laravel-route-param-positional-binding.md, pao-swallows-phpstan-config-error, pest-arch-expect-array-and-semantics, pest-global-helper-name-collision.md, smtputf8-header-bounce
+- `phpstan` (1): pao-swallows-phpstan-config-error
+- `phpunit` (1): pest-global-helper-name-collision.md
+- `plpgsql` (1): pg-migrate-fresh-function-survives.md
+- `postfix` (2): smtputf8-header-bounce, symfony-mailer-starttls-loopback-cert-mismatch.md
+- `postgresql` (4): pg-migrate-fresh-function-survives.md, pg-session-timezone-date-shift.md, psql-sudo-postgres-var-expansion, rds-force-ssl-pg-no-ssl
+- `powershell` (7): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret, gh-json-cp932-parse-failure.md, powershell-erroractionpreference-native-exit, powershell-missing-property-count-zero, ps1-run-with-powershell-association-broken, robocopy-xd-space-path-not-excluded
+- `prompt` (1): webview-prompt-confirm-blocked
+- `ps1` (1): ps1-run-with-powershell-association-broken
+- `psql` (1): psql-sudo-postgres-var-expansion
+- `pull-request` (5): gh-api-f-flag-no-stdin-expansion.md, gha-pr-base-sha-stale.md, gha-pr-conflict-no-run.md, gha-rerun-stale-event-payload.md, stacked-pr-merge-delete-branch-closes-child
+- `push` (1): gh-credential-helper-oom-crash
+- `python` (3): cp932-unicode-output, msys2-drive-path, qdrant-local-delete-collection-persists
+- `qdrant` (1): qdrant-local-delete-collection-persists
+- `qdrant-client` (1): qdrant-local-delete-collection-persists
+- `query` (5): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret, firestore-collectiongroup-rules, firestore-composite-index, firestore-security-rules-query
+- `quoting` (2): az-query-jmespath-cmd-reinterpret, robocopy-xd-space-path-not-excluded
+- `rds` (1): rds-force-ssl-pg-no-ssl
+- `react` (1): firebase-auth-navigate-timing
+- `rebuild` (1): better-sqlite3-electron-rebuild
+- `refactoring` (1): bulk-replace-side-effects
+- `regex` (1): vitest-filter-bracket-zero-match
+- `registry` (1): ps1-run-with-powershell-association-broken
+- `regression` (1): context-rollback-stale-file-overwrite
+- `reindex` (2): eloquent-collection-except-reindex.md, qdrant-local-delete-collection-persists
+- `replace` (1): bulk-replace-side-effects
+- `rerun` (2): gha-pr-base-sha-stale.md, gha-rerun-stale-event-payload.md
+- `responsive` (1): style-attr-selector-js-rewrite
+- `rg` (1): ripgrep-glob-last-match-wins
+- `ripgrep` (1): ripgrep-glob-last-match-wins
+- `robocopy` (1): robocopy-xd-space-path-not-excluded
+- `rollback` (1): cfn-retain-orphan-name-conflict
+- `route-parameter` (1): laravel-route-param-positional-binding.md
+- `routing` (1): laravel-route-param-positional-binding.md
+- `s3` (1): cfn-retain-orphan-name-conflict
+- `sakura` (2): env-append-no-trailing-newline, ssh-cygdrive-path-direct-call
+- `scp` (1): ssh-cygdrive-path-direct-call
+- `sdk` (1): vscode-sdk-stream-stall
+- `search` (1): ripgrep-glob-last-match-wins
+- `secret-exposure` (3): firebase-key-vsix, force-push-leaves-old-commit-reachable, gitignore-on-other-branch-leaves-you-unprotected
+- `secret-handling` (1): env-append-no-trailing-newline
+- `security-group` (1): ec2-sg-description-charset
+- `security-rules` (2): firestore-collectiongroup-rules, firestore-security-rules-query
+- `sed` (1): sed-i-strips-crlf-git-bash
+- `session-management` (2): context-rollback-stale-file-overwrite, phantom-user-message-hallucination
+- `settings` (2): hook-path-breaks-after-tool-install, vscode-keybindings-config
+- `shadcn` (2): shadcn-add-case-insensitive-conflict, shadcn-init-font-sans-self-reference
+- `shell` (2): env-append-no-trailing-newline, psql-sudo-postgres-var-expansion
+- `side-effect` (1): bulk-replace-side-effects
+- `silent-failure` (8): az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret, express-import-drops-cjk-font-silently, pao-swallows-phpstan-config-error, powershell-erroractionpreference-native-exit, powershell-missing-property-count-zero, qdrant-local-delete-collection-persists, sed-i-strips-crlf-git-bash
+- `slide` (1): express-import-drops-cjk-font-silently
+- `smtp` (1): symfony-mailer-starttls-loopback-cert-mismatch.md
+- `smtputf8` (1): smtputf8-header-bounce
+- `specificity` (1): css-inline-priority
+- `sqlite` (1): sqlite-jst-datetime
+- `ssh` (2): env-append-no-trailing-newline, ssh-cygdrive-path-direct-call
+- `ssl` (1): rds-force-ssl-pg-no-ssl
+- `stacked-pr` (1): stacked-pr-merge-delete-branch-closes-child
+- `stall` (1): vscode-sdk-stream-stall
+- `starttls` (1): symfony-mailer-starttls-loopback-cert-mismatch.md
+- `status-check` (1): gha-pr-base-sha-stale.md
+- `stdin` (1): gh-api-f-flag-no-stdin-expansion.md
+- `stream` (1): vscode-sdk-stream-stall
+- `subagent` (1): ecc-agent-not-found
+- `sudo` (1): psql-sudo-postgres-var-expansion
+- `symfony-mailer` (1): symfony-mailer-starttls-loopback-cert-mismatch.md
+- `systemd` (1): nginx-upstream-dns-startup
+- `tailwind-v4` (1): shadcn-init-font-sans-self-reference
+- `test` (1): pest-global-helper-name-collision.md
+- `test-filter` (1): vitest-filter-bracket-zero-match
+- `testing` (2): pest-arch-expect-array-and-semantics, wallclock-boundary-test-false-green
+- `timestamptz` (1): pg-session-timezone-date-shift.md
+- `timezone` (3): pg-session-timezone-date-shift.md, sqlite-jst-datetime, toisostring-date-offset
+- `tls` (1): symfony-mailer-starttls-loopback-cert-mismatch.md
+- `trigger` (1): pg-migrate-fresh-function-survives.md
+- `typekit` (1): express-import-drops-cjk-font-silently
+- `uac` (1): ps1-run-with-powershell-association-broken
+- `ui` (1): webview-prompt-confirm-blocked
+- `uid` (1): imap-move-uid-stale
+- `upstream` (1): nginx-upstream-dns-startup
+- `utf7` (1): imap-modified-utf7
+- `utf8` (2): edit-garbled-japanese, node-http-chunk-utf8-garbled
+- `vba` (1): vba-http-cache
+- `version` (1): vsix-version-bump
+- `vitest` (2): vitest-filter-bracket-zero-match, wallclock-boundary-test-false-green
+- `vps` (1): nginx-upstream-dns-startup
+- `vsce` (1): vscodeignore-transitive-deps
+- `vscode` (6): pencil-mcp-pipe-multi-window.md, vscode-cli-fullpath, vscode-keybindings-config, vscode-webview-srcdoc-inherits-csp.md, vsix-version-bump, webview-prompt-confirm-blocked
+- `vscode-extension` (2): ecc-agent-not-found, vscode-sdk-stream-stall
+- `vscodeignore` (2): firebase-key-vsix, vscodeignore-transitive-deps
+- `vsix` (3): firebase-key-vsix, vscodeignore-transitive-deps, vsix-version-bump
+- `webview` (2): vscode-webview-srcdoc-inherits-csp.md, webview-prompt-confirm-blocked
+- `windows` (25): artisan-serve-env-passthrough.md, aws-config-japanese-comment, az-query-japanese-key-cp932, az-query-jmespath-cmd-reinterpret, barcode-reader-ime, cp932-unicode-output, firebase-emulator-java-missing, gh-credential-helper-oom-crash, gh-credential-helper-stale-path, gh-json-cp932-parse-failure.md, gitignore-on-other-branch-leaves-you-unprotected, herd-bin-shim-stale-user-path, hook-path-breaks-after-tool-install, msys2-drive-path, npm-ci-lockfile-optional-deps, pencil-mcp-pipe-multi-window.md, powershell-erroractionpreference-native-exit, powershell-missing-property-count-zero, ps1-run-with-powershell-association-broken, robocopy-xd-space-path-not-excluded, sed-i-strips-crlf-git-bash, shadcn-add-case-insensitive-conflict, ssh-cygdrive-path-direct-call, vba-http-cache, vscode-cli-fullpath
+- `winget` (1): firebase-emulator-java-missing
+- `worktree` (1): worktree-agent-destructive
+- `一時障害` (1): gh-credential-helper-oom-crash

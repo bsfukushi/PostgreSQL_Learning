@@ -1,0 +1,1362 @@
+<title>PostgreSQL学習資料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap">
+<style>
+/* レイアウト：左に固定の章メニュー、右に1章ずつの本文。結果表は psql の出力を思わせる等幅の帳票。 */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #1b2330;
+  --muted: #5a6577;
+  --line: #d8dee7;
+  --accent: #2f5690;
+  --accent-soft: #e5ecf6;
+  --claude: #8a4f12;
+  --claude-soft: #fbf2e6;
+  --wrong: #b3261e;
+  --wrong-soft: #fbe9e7;
+  --ok: #1f6f47;
+  --mark: #fff0a8;
+  --null: #8a93a3;
+  --code-bg: #eef1f6;
+  --diagram-bg: #ffffff;
+  --f-display: "Zen Kaku Gothic New", "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+  --f-mono: "JetBrains Mono", "BIZ UDGothic", "MS Gothic", ui-monospace, monospace;
+  --nav-w: 288px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151c; --surface: #191e27; --ink: #e3e7ee; --muted: #9ba5b5; --line: #2b3341;
+    --accent: #93b4e8; --accent-soft: #1e2a3c; --claude: #e3a865; --claude-soft: #2a2117;
+    --wrong: #f08a7f; --wrong-soft: #34191a; --ok: #74c99e; --mark: #5a4b12; --null: #7d8797;
+    --code-bg: #141922; --diagram-bg: #f4f6f9; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151c; --surface: #191e27; --ink: #e3e7ee; --muted: #9ba5b5; --line: #2b3341;
+  --accent: #93b4e8; --accent-soft: #1e2a3c; --claude: #e3a865; --claude-soft: #2a2117;
+  --wrong: #f08a7f; --wrong-soft: #34191a; --ok: #74c99e; --mark: #5a4b12; --null: #7d8797;
+  --code-bg: #141922; --diagram-bg: #f4f6f9; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.85; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- 外枠 ---------- */
+.shell { display: grid; grid-template-columns: var(--nav-w) minmax(0, 1fr); min-height: 100vh; }
+.topbar { display: none; }
+
+/* ---------- 左メニュー ---------- */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto;
+  background: var(--surface); border-right: 1px solid var(--line);
+  padding-block: 20px 40px; padding-inline: 14px; font-size: 14px; line-height: 1.5;
+}
+.brand { display: block; text-decoration: none; color: var(--ink); padding: 0 8px 14px; border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.brand b { display: block; font-family: var(--f-display); font-weight: 900; font-size: 18px; letter-spacing: .02em; }
+.brand small { color: var(--muted); font-family: var(--f-mono); font-size: 11px; letter-spacing: .04em; }
+.toggle { display: flex; align-items: center; gap: 8px; padding: 6px 8px 10px; color: var(--muted); font-size: 13px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+.nav-book { margin: 18px 8px 4px; font-family: var(--f-display); font-weight: 700; font-size: 13px; color: var(--ink); letter-spacing: .06em; }
+.nav-part { margin: 10px 8px 2px; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+.nav ul { list-style: none; margin: 0; padding: 0; }
+.nav li a {
+  display: grid; grid-template-columns: 2.4em 1fr auto; gap: 4px; align-items: baseline;
+  padding: 5px 8px; border-radius: 6px; color: var(--ink); text-decoration: none;
+}
+.nav li a:hover { background: var(--accent-soft); }
+.nav li.todo a { color: var(--muted); }
+.nav li a.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.nav .n { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.nav li.ready .n::after { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: 4px; vertical-align: middle; }
+.nav .done { color: var(--ok); font-weight: 700; visibility: hidden; }
+.nav li.is-done .done { visibility: visible; }
+.nav.only-required li[data-required="false"] { display: none; }
+.legend { margin: 16px 8px 0; color: var(--muted); font-size: 12px; }
+
+/* ---------- 本文 ---------- */
+.main { min-width: 0; padding-block: 40px 80px; padding-inline: 40px; }
+article { max-width: 46rem; margin: 0 auto; }
+.ch-head { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 28px; }
+.crumb { margin: 0 0 6px; color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+.ch-head h1 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(26px, 4vw, 34px); line-height: 1.35; text-wrap: balance; }
+.ch-no { display: block; font-family: var(--f-mono); font-weight: 600; font-size: 14px; color: var(--accent); letter-spacing: .08em; margin-bottom: 4px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.pill { font-size: 12px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.pill.req { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.pill.draft { border-style: dashed; }
+.prereq { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+
+.prose h2 { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.45; margin: 48px 0 14px; text-wrap: balance; }
+.prose h3 { font-size: 17px; margin: 32px 0 8px; }
+.prose p, .prose ul, .prose ol { margin: 0 0 16px; }
+.prose li { margin-bottom: 4px; }
+.prose li > pre, .prose li > .scroll { margin-top: 8px; }
+.prose code { font-family: var(--f-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.prose mark { background: var(--mark); color: inherit; padding: 0 2px; }
+.scroll { overflow-x: auto; margin: 0 0 18px; }
+.prose table { border-collapse: collapse; font-size: 14px; line-height: 1.6; min-width: 100%; }
+.prose th, .prose td { border-bottom: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+.prose th { font-weight: 700; border-bottom: 2px solid var(--line); white-space: nowrap; }
+.prose td[align="right"], .prose th[align="right"] { text-align: right; font-variant-numeric: tabular-nums; }
+
+pre.code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--f-mono); font-size: 13.5px; line-height: 1.7; margin: 0 0 18px; }
+pre.code code { background: none; padding: 0; font-size: inherit; }
+pre.code .kw { color: var(--accent); font-weight: 600; }
+pre.code .cm { color: var(--muted); font-style: italic; }
+pre.code .st { color: var(--ok); }
+pre.code.text { background: var(--surface); }
+
+/* 一言理由 */
+.aside { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; margin: 0 0 18px; font-size: 15px; border-radius: 0 6px 6px 0; }
+.aside.design { border-left-color: var(--ok); }
+.aside p { margin: 0; }
+
+/* 実行結果（psql の出力を思わせる帳票） */
+.result { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0 0 20px; overflow: hidden; }
+.result-head { display: flex; gap: 8px; align-items: center; padding: 6px 12px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--code-bg); }
+.result .scroll { margin: 0; }
+.result table { font-family: var(--f-mono); font-size: 13px; }
+.result th { background: transparent; }
+.result-foot { font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding: 4px 12px 8px; }
+.result.wrong { border-color: var(--wrong); }
+.result.wrong .result-head { background: var(--wrong-soft); }
+.badge-wrong { color: var(--wrong); font-weight: 700; }
+.null { color: var(--null); font-style: italic; font-family: var(--f-mono); font-size: .9em; }
+
+/* 図 */
+.fig { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px 16px; margin: 0 0 22px; overflow-x: auto; }
+.fig-cap { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.fig-row { display: flex; align-items: center; gap: 12px; width: max-content; }
+.fig-arrow { font-family: var(--f-mono); font-size: 22px; color: var(--muted); }
+table.mini { border-collapse: collapse; font-family: var(--f-mono); font-size: 12.5px; min-width: 0; }
+table.mini caption { caption-side: top; text-align: left; font-family: var(--f-body); font-size: 12px; color: var(--muted); padding-bottom: 4px; }
+table.mini th, table.mini td { border: 1px solid var(--line); padding: 3px 8px; white-space: nowrap; }
+table.mini tr.lost td { background: var(--wrong-soft); color: var(--wrong); text-decoration: line-through; }
+table.mini tr.gone td { border-style: dashed; color: var(--wrong); font-family: var(--f-body); }
+table.mini tr.hit td { background: var(--accent-soft); }
+table.mini tr.dup td { background: var(--claude-soft); color: var(--claude); font-weight: 600; }
+figure.diagram { margin: 0 0 22px; background: var(--diagram-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow-x: auto; }
+figure.diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* Claude Code の枠 */
+.box.claude { border: 1px solid var(--claude); background: var(--claude-soft); border-radius: 10px; padding: 16px 18px 6px; margin: 0 0 24px; }
+.box-title { margin: 0 0 10px !important; font-size: 15px !important; color: var(--claude); }
+.box.claude pre.code { background: var(--surface); }
+
+/* 確認問題・豆知識 */
+details.quiz { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0 0 12px; }
+details.quiz summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+details.quiz summary::-webkit-details-marker { display: none; }
+details.quiz .reveal { font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+details.quiz[open] .reveal { visibility: hidden; }
+details.quiz .ans { border-top: 1px dashed var(--line); padding: 12px 14px 2px; }
+details.why { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); margin: 36px 0 24px; }
+details.why summary { cursor: pointer; padding: 12px 0; font-family: var(--f-display); font-weight: 700; font-size: 18px; }
+details.why .why-body { padding-bottom: 8px; }
+.check { border: 1px dashed var(--accent); border-radius: 8px; padding: 10px 14px; margin: 24px 0; }
+.check-label { font-size: 12px; color: var(--accent); font-weight: 700; letter-spacing: .04em; }
+.check p { margin: 4px 0 0; }
+
+/* 用語 */
+.term { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: help; border-bottom: 1px dotted var(--accent); }
+.tip { position: fixed; z-index: 30; max-width: min(320px, calc(100vw - 32px)); background: var(--ink); color: var(--bg); font-size: 13px; line-height: 1.6; padding: 8px 12px; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+
+/* 付録 */
+table.gloss th { white-space: nowrap; }
+ul.checklist { list-style: none; padding: 0; }
+ul.checklist li { border-bottom: 1px solid var(--line); padding: 8px 0; display: grid; grid-template-columns: 4em 1fr; gap: 8px; }
+ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.stub { color: var(--muted); }
+
+/* 章末 */
+.ch-foot { max-width: 46rem; margin: 48px auto 0; display: grid; gap: 16px; }
+.done-btn { justify-self: start; font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--ok); color: var(--ok); background: var(--surface); cursor: pointer; }
+.done-btn[aria-pressed="true"] { background: var(--ok); color: var(--surface); }
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pager a { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; text-decoration: none; color: var(--ink); background: var(--surface); min-width: 0; }
+.pager a small { display: block; color: var(--muted); font-size: 12px; }
+.pager a.next { text-align: right; grid-column: 2; }
+.pager a:hover { border-color: var(--accent); }
+
+/* ---------- スマートフォン ---------- */
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .topbar { display: flex; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; align-items: center; gap: 12px; background: var(--surface); border-bottom: 1px solid var(--line); padding: 8px 16px; }
+  .topbar button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 6px; padding: 4px 12px; }
+  .topbar span { font-family: var(--f-display); font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav { position: fixed; inset: 0 auto 0 0; width: min(88vw, 320px); z-index: 40; transform: translateX(-100%); transition: transform .2s ease; height: 100%; padding-top: calc(20px + env(safe-area-inset-top, 0px)); }
+  .nav.open { transform: none; box-shadow: 0 0 0 100vmax rgba(0,0,0,.35); }
+  .main { padding-block: 24px 64px; padding-inline: 16px; }
+  .prose h2 { margin-top: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .nav { transition: none; } }
+</style>
+
+<div class="topbar"><button type="button" id="menuBtn" aria-controls="nav" aria-expanded="false">目次</button><span id="topTitle">PostgreSQL学習資料</span></div>
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="章の一覧">
+    <a class="brand" href="#about"><b>PostgreSQL学習資料</b><small>PostgreSQL 18 ／ 見本 v0.1</small></a>
+    <label class="toggle"><input type="checkbox" id="onlyReq">必修だけ表示</label>
+    <div class="nav-book">第1冊 基礎＋設計</div>
+<div class="nav-part">はじめに</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch00" data-id="ch00"><span class="n">0</span><span class="t">はじめに（読み方・所要時間・質問テンプレート）</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第1部 考え方</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch01" data-id="ch01"><span class="n">1</span><span class="t">RDBとは何か・用語の固定</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch02" data-id="ch02"><span class="n">2</span><span class="t">テーブル設計の基本</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第2部 道具と環境</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch03" data-id="ch03"><span class="n">3</span><span class="t">pgAdmin4とpsql</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch04" data-id="ch04"><span class="n">4</span><span class="t">サンプルデータを入れる・元に戻す</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch05" data-id="ch05"><span class="n">5</span><span class="t">Claude Codeに頼む前の約束</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第3部 読む力</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch06" data-id="ch06"><span class="n">6</span><span class="t">SELECTを読む</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="ready"><a href="#ch07" data-id="ch07"><span class="n">7</span><span class="t">JOINを読む</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch08" data-id="ch08"><span class="n">8</span><span class="t">書き換える文を読み、やってから戻す</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch09" data-id="ch09"><span class="n">9</span><span class="t">件数・重複・NULLの検算</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第4部 設計を自分で見つける</div>
+<ul>
+<li data-required="true" class="ready"><a href="#ch10" data-id="ch10"><span class="n">10</span><span class="t">設計の5つの問い</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch11" data-id="ch11"><span class="n">11</span><span class="t">事例：ニュース情報</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch12" data-id="ch12"><span class="n">12</span><span class="t">取り込みで起きること</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch13" data-id="ch13"><span class="n">13</span><span class="t">題材が増えたとき</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-book">第2冊 実践＋MCP</div>
+<div class="nav-part">第5部 Claude Codeへの指示</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch14" data-id="ch14"><span class="n">14</span><span class="t">指示の型・完全版</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch15" data-id="ch15"><span class="n">15</span><span class="t">頼む→検証のループ実践</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第6部 初期化とバックアップ</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch16" data-id="ch16"><span class="n">16</span><span class="t">環境の「正」とスナップショット</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第7部 MCPサーバー経由</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch17" data-id="ch17"><span class="n">17</span><span class="t">MCPとは</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch18" data-id="ch18"><span class="n">18</span><span class="t">読み取り専用ロールを作る</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="todo"><a href="#ch19" data-id="ch19"><span class="n">19</span><span class="t">MCP経由で出力する</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-part">第8部 検証</div>
+<ul>
+<li data-required="true" class="todo"><a href="#ch20" data-id="ch20"><span class="n">20</span><span class="t">チェックリストの使い方と失敗の索引</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-book">別冊 深掘り</div>
+<ul>
+<li data-required="false" class="todo"><a href="#ex01" data-id="ex01"><span class="n">別1</span><span class="t">インデックスとEXPLAIN</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#ex02" data-id="ex02"><span class="n">別2</span><span class="t">本文の全文検索</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#ex03" data-id="ex03"><span class="n">別3</span><span class="t">事例：ファイル情報（完全版）</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#ex04" data-id="ex04"><span class="n">別4</span><span class="t">題材が増えたとき（5方式の比較と性能計測）</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#ex05" data-id="ex05"><span class="n">別5</span><span class="t">やり直す理屈（外部キーとTRUNCATE）</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#ex06" data-id="ex06"><span class="n">別6</span><span class="t">PoCの外へ出るとき</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+<div class="nav-book">付録</div>
+<ul>
+<li data-required="false" class="ready"><a href="#apA" data-id="apA"><span class="n">A</span><span class="t">用語集</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#apB" data-id="apB"><span class="n">B</span><span class="t">指示テンプレート</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="ready"><a href="#apC" data-id="apC"><span class="n">C</span><span class="t">チェックリスト1枚版</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="ready"><a href="#apD" data-id="apD"><span class="n">D</span><span class="t">初期化SQL一式</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#apE" data-id="apE"><span class="n">E</span><span class="t">バックアップ命名ルール</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#apF" data-id="apF"><span class="n">F</span><span class="t">データ辞書テンプレート</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="false" class="todo"><a href="#apG" data-id="apG"><span class="n">G</span><span class="t">題材追加チェックリスト</span><span class="done" aria-label="読了">✓</span></a></li>
+</ul>
+    <p class="legend">● 本文あり　✓ 読了</p>
+  </nav>
+  <main class="main" id="main">
+    <article id="page-about" data-id="about"><header class="ch-head"><p class="crumb">見本</p><h1>この見本について</h1></header><div class="prose"><p>これは、PostgreSQL 学習資料の <strong>体裁を確認するための見本</strong> です。本文があるのは次の2章で、残りの章はメニューに並んでいるだけです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>章</th>
+<th>見てほしいところ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#ch07">第7章 JOINを読む</a></td>
+<td>実行結果の表、行が増える・消える図、確認問題、折りたたみの豆知識</td>
+</tr>
+<tr>
+<td><a href="#ch10">第10章 設計の5つの問い</a></td>
+<td>生データから設計を導く流れ、ER図、Claude Code への頼み方</td>
+</tr>
+</tbody>
+</table></div>
+<h2>画面の使い方</h2>
+<ul>
+<li>左のメニューで章を選びます。スマートフォンでは、左上の「目次」ボタンで開きます。</li>
+<li>メニュー上の「必修だけ表示」をオンにすると、任意の章（別冊・付録）が隠れます。</li>
+<li>本文中の点線の付いた語（例：<button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>）にマウスを載せるか、タップすると、用語の説明が出ます。</li>
+<li>確認問題は「答えを見る」で開きます。章の最後の「読み終えた」を押すと、メニューに ✓ が付きます。読了の記録は、このブラウザの中にだけ保存されます。</li>
+</ul>
+<h2>作り方のメモ（資料作成者向け）</h2>
+<ul>
+<li>正は <code>src/</code> 配下の章ごとの Markdown です。<code>python3 build/build.py</code> で、この HTML を作り直します。</li>
+<li>図（ER図）はビルドのときに画像（SVG）にしているので、インターネットにつながっていなくても表示できます。</li>
+<li>付録A（用語集）、付録C（チェックリスト）、付録D（初期化SQL）は、本文と SQL ファイルから自動で作られます。</li>
+<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめたものです（確認は PostgreSQL 16 で行いました。この2章で使う構文は 18 でも同じです）。</li>
+</ul></div></article>
+<article id="page-ch00" data-id="ch00" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ はじめに</p><h1><span class="ch-no">第0章</span>はじめに（読み方・所要時間・質問テンプレート）</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch01" data-id="ch01" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 考え方</p><h1><span class="ch-no">第1章</span>RDBとは何か・用語の固定</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch02" data-id="ch02" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 考え方</p><h1><span class="ch-no">第2章</span>テーブル設計の基本</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch03" data-id="ch03" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第3章</span>pgAdmin4とpsql</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch04" data-id="ch04" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第4章</span>サンプルデータを入れる・元に戻す</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch05" data-id="ch05" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第5章</span>Claude Codeに頼む前の約束</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch06" data-id="ch06" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第6章</span>SELECTを読む</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch07" data-id="ch07" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第7章</span>JOINを読む</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第4章（サンプルデータ）、第6章（SELECTを読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
+<ul>
+<li><button type="button" class="term" data-def="2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。">JOIN</button>（結合）が何をしているかを、「行の動き」で説明できる</li>
+<li>INNER JOIN と LEFT JOIN の違いを、「どの行が消えるか」で説明できる</li>
+<li>Claude Code が書いた JOIN を見て、行が増えていないか、消えていないかを自分で確かめられる</li>
+</ul>
+<h2>1. JOINは「分けた表を、読むときだけ元に戻す」操作</h2>
+<p>第2章で、配信元の名前を記事ごとに書くのをやめ、<code>sources</code>（配信元）テーブルに分けました。記事の側には、名前の代わりに配信元の番号（<code>source_id</code>）だけを持たせています。</p>
+<figure class="diagram"><svg aria-roledescription="er" role="graphics-document document" viewBox="-20.877250611782074 0 398.9989318847656 464" style="max-width: 398.9989318847656px;" xmlns="http://www.w3.org/2000/svg" width="100%" id="mmd-d0"><style>#mmd-d0{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;fill:#000000;}#mmd-d0 .error-icon{fill:#552222;}#mmd-d0 .error-text{fill:#552222;stroke:#552222;}#mmd-d0 .edge-thickness-normal{stroke-width:1px;}#mmd-d0 .edge-thickness-thick{stroke-width:3.5px;}#mmd-d0 .edge-pattern-solid{stroke-dasharray:0;}#mmd-d0 .edge-thickness-invisible{stroke-width:0;fill:none;}#mmd-d0 .edge-pattern-dashed{stroke-dasharray:3;}#mmd-d0 .edge-pattern-dotted{stroke-dasharray:2;}#mmd-d0 .marker{fill:#666;stroke:#666;}#mmd-d0 .marker.cross{stroke:#666;}#mmd-d0 svg{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;}#mmd-d0 p{margin:0;}#mmd-d0 .entityBox{fill:#eee;stroke:#999;}#mmd-d0 .attributeBoxOdd{fill:#ffffff;stroke:#999;}#mmd-d0 .attributeBoxEven{fill:#f2f2f2;stroke:#999;}#mmd-d0 .relationshipLabelBox{fill:hsl(-160, 0%, 93.3333333333%);opacity:0.7;background-color:hsl(-160, 0%, 93.3333333333%);}#mmd-d0 .relationshipLabelBox rect{opacity:0.5;}#mmd-d0 .relationshipLine{stroke:#666;}#mmd-d0 .entityTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mmd-d0 #MD_PARENT_START{fill:#f5f5f5!important;stroke:#666!important;stroke-width:1;}#mmd-d0 #MD_PARENT_END{fill:#f5f5f5!important;stroke:#666!important;stroke-width:1;}#mmd-d0 :root{--mermaid-font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;}</style><g></g><defs><marker orient="auto" markerHeight="240" markerWidth="190" refY="7" refX="0" id="MD_PARENT_START"><path d="M 18,7 L9,13 L1,7 L9,1 Z"></path></marker></defs><defs><marker orient="auto" markerHeight="28" markerWidth="20" refY="7" refX="19" id="MD_PARENT_END"><path d="M 18,7 L9,13 L1,7 L9,1 Z"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="18" refY="9" refX="0" id="ONLY_ONE_START"><path d="M9,0 L9,18 M15,0 L15,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="18" refY="9" refX="18" id="ONLY_ONE_END"><path d="M3,0 L3,18 M9,0 L9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="30" refY="9" refX="0" id="ZERO_OR_ONE_START"><circle r="6" cy="9" cx="21" fill="white" stroke="gray"></circle><path d="M9,0 L9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="30" refY="9" refX="30" id="ZERO_OR_ONE_END"><circle r="6" cy="9" cx="9" fill="white" stroke="gray"></circle><path d="M21,0 L21,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="45" refY="18" refX="18" id="ONE_OR_MORE_START"><path d="M0,18 Q 18,0 36,18 Q 18,36 0,18 M42,9 L42,27" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="45" refY="18" refX="27" id="ONE_OR_MORE_END"><path d="M3,9 L3,27 M9,18 Q27,0 45,18 Q27,36 9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="57" refY="18" refX="18" id="ZERO_OR_MORE_START"><circle r="6" cy="18" cx="48" fill="white" stroke="gray"></circle><path d="M0,18 Q18,0 36,18 Q18,36 0,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="57" refY="18" refX="39" id="ZERO_OR_MORE_END"><circle r="6" cy="18" cx="9" fill="white" stroke="gray"></circle><path d="M21,18 Q39,0 57,18 Q39,36 21,18" fill="none" stroke="gray"></path></marker></defs><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M80.029,87L80.029,95.333C80.029,103.667,80.029,120.333,80.029,137C80.029,153.667,80.029,170.333,80.029,178.667L80.029,187" class="er relationshipLine"></path><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M80.029,276L80.029,284.333C80.029,292.667,80.029,309.333,90.481,326C100.933,342.667,121.838,359.333,132.29,367.667L142.742,376" class="er relationshipLine"></path><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M290.743,265L290.743,275.167C290.743,285.333,290.743,305.667,280.291,324.167C269.839,342.667,248.935,359.333,238.483,367.667L228.031,376" class="er relationshipLine"></path><g transform="translate(29.344345092773438,20 )" id="entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c"><rect height="67" width="101.36981201171875" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(50.684906005859375,12)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c" class="er entityLabel">sources</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="35.81787109375" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="77.5748291015625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-key" class="er entityLabel">PK</text><rect height="21" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-type" class="er entityLabel">text</text><rect height="21" width="35.81787109375" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-name" class="er entityLabel">name</text><rect height="21" width="23.79498291015625" y="46" x="77.5748291015625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-key" class="er entityLabel"></text></g><g transform="translate(20,187 )" id="entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c"><rect height="89" width="120.05850219726562" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(60.02925109863281,12)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c" class="er entityLabel">articles</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="54.506561279296875" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="96.26351928710938" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(101.26351928710938,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-key" class="er entityLabel">PK</text><rect height="22" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-type" class="er entityLabel">integer</text><rect height="22" width="54.506561279296875" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-name" class="er entityLabel">source_id</text><rect height="22" width="23.79498291015625" y="46" x="96.26351928710938" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(101.26351928710938,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-key" class="er entityLabel">FK</text><rect height="21" width="41.7569580078125" y="68" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-type" class="er entityLabel">text</text><rect height="21" width="54.506561279296875" y="68" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-name" class="er entityLabel">title</text><rect height="21" width="23.79498291015625" y="68" x="96.26351928710938" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(101.26351928710938,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-key" class="er entityLabel"></text></g><g transform="translate(127.3443374633789,376 )" id="entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3"><rect height="68" width="116.083984375" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(58.0419921875,12)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3" class="er entityLabel">article_tags</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="51.104095458984375" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-name" class="er entityLabel">article_id</text><rect height="22" width="23.222930908203125" y="24" x="92.86105346679688" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(97.86105346679688,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-key" class="er entityLabel">FK</text><rect height="22" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-type" class="er entityLabel">integer</text><rect height="22" width="51.104095458984375" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-name" class="er entityLabel">tag_id</text><rect height="22" width="23.222930908203125" y="46" x="92.86105346679688" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(97.86105346679688,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-key" class="er entityLabel">FK</text></g><g transform="translate(240.05850219726562,198 )" id="entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8"><rect height="67" width="101.36981201171875" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(50.684906005859375,12)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8" class="er entityLabel">tags</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="35.81787109375" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="77.5748291015625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-key" class="er entityLabel">PK</text><rect height="21" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-type" class="er entityLabel">text</text><rect height="21" width="35.81787109375" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-name" class="er entityLabel">name</text><rect height="21" width="23.79498291015625" y="46" x="77.5748291015625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-key" class="er entityLabel"></text></g><rect height="14" width="161.8125" y="130" x="-0.8772506713867188" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="137" x="80.02899932861328" id="rel1" class="er relationshipLabel">1つの配信元に 0本以上の記事</text><rect height="14" width="150.806640625" y="327.3901062011719" x="21.15581512451172" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="334.3901062011719" x="96.55913543701172" id="rel2" class="er relationshipLabel">1本の記事に 0個以上のタグ</text><rect height="14" width="162.65625" y="322.7565612792969" x="195.46542358398438" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="329.7565612792969" x="276.7935485839844" id="rel3" class="er relationshipLabel">1つのタグが 0本以上の記事に</text></svg></figure>
+<p>記事の一覧に配信元の名前を表示したいときは、<code>articles.source_id</code> と <code>sources.id</code> が同じ行どうしを横に並べます。これが JOIN です。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ分けたのに戻すのか</strong>：保存するときは「1つの事実を1か所にだけ書く」ほうが、表記ゆれや直し漏れが起きません。読むときは人が読みやすい形が必要です。保存と表示で形を変えるために、分けて保存し、読むときに JOIN で戻します。</p></aside>
+<p>JOIN の SQL は、<code>ON</code> の行を最初に読みます。<code>ON</code> には「どの列とどの列が同じなら、同じ行に並べるか」が書いてあります。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> a.id, a.title, s.name <span class="kw">AS</span> source_name
+<span class="kw">FROM</span> articles <span class="kw">AS</span> a
+<span class="kw">INNER</span> <span class="kw">JOIN</span> sources <span class="kw">AS</span> s <span class="kw">ON</span> s.id = a.source_id   <span class="cm">-- ← ここを最初に読む</span>
+<span class="kw">ORDER</span> <span class="kw">BY</span> a.id;</code></pre>
+<p><code>AS a</code> や <code>AS s</code> は、テーブルに付けた短い呼び名（別名）です。<code>a.title</code> は「articles の title 列」と読みます。</p>
+<h2>2. INNER JOIN：相手がいない行は消える</h2>
+<p>上の SQL を実行した結果です。</p>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>source_name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>クラウド利用料、来春から改定へ</td>
+<td>テック日報</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>テック日報</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>経済ウィークリー</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>為替相場、週明けは小動き</td>
+<td>経済ウィークリー</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(4 行)</div></div>
+<p>記事は5本あるのに、結果は4行です。記事5「配信元不明の転載記事」が消えました。エラーは出ていません。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ消えるのか</strong>：INNER JOIN は「両方の表に相手がいる行」だけを残します。記事5の <code>source_id</code> は <button type="button" class="term" data-def="値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。">NULL</button>（不明）で、どの <code>sources.id</code> とも一致しないため、相手がいない行として捨てられます。</p></aside>
+<div class="fig" markdown="0">
+  <div class="fig-cap">図7-1　INNER JOIN で行が消える</div>
+  <div class="fig-row">
+    <table class="mini">
+      <caption>articles（5行）</caption>
+      <tr><th>id</th><th>source_id</th></tr>
+      <tr><td>1</td><td>1</td></tr>
+      <tr><td>2</td><td>1</td></tr>
+      <tr><td>3</td><td>2</td></tr>
+      <tr><td>4</td><td>2</td></tr>
+      <tr class="lost"><td>5</td><td class="null">NULL</td></tr>
+    </table>
+    <div class="fig-arrow" aria-hidden="true">→</div>
+    <table class="mini">
+      <caption>INNER JOIN の結果（4行）</caption>
+      <tr><th>id</th><th>source_name</th></tr>
+      <tr><td>1</td><td>テック日報</td></tr>
+      <tr><td>2</td><td>テック日報</td></tr>
+      <tr><td>3</td><td>経済ウィークリー</td></tr>
+      <tr><td>4</td><td>経済ウィークリー</td></tr>
+      <tr class="gone"><td colspan="2">記事5は相手がいないので消える</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>3. LEFT JOIN：左の表は全部残す</h2>
+<p><code>INNER JOIN</code> を <code>LEFT JOIN</code> に変えるだけで、結果が変わります。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> a.id, a.title, s.name <span class="kw">AS</span> source_name
+<span class="kw">FROM</span> articles <span class="kw">AS</span> a
+<span class="kw">LEFT</span> <span class="kw">JOIN</span> sources <span class="kw">AS</span> s <span class="kw">ON</span> s.id = a.source_id
+<span class="kw">ORDER</span> <span class="kw">BY</span> a.id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>source_name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>クラウド利用料、来春から改定へ</td>
+<td>テック日報</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>テック日報</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>経済ウィークリー</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>為替相場、週明けは小動き</td>
+<td>経済ウィークリー</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>配信元不明の転載記事</td>
+<td><span class="null">NULL</span></td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(5 行)</div></div>
+<p>「左」とは、先に書いた表（<code>FROM</code> の直後の表）のことです。LEFT JOIN は、左の表の行を必ず全部残し、相手がいなければ右側の列を <button type="button" class="term" data-def="値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。">NULL</button> で埋めます。</p>
+<p>どちらを使うかは、「何を全部見たいか」で決まります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>知りたいこと</th>
+<th>左に置く表</th>
+<th>JOIN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>配信元が分かっている記事だけ</td>
+<td>articles</td>
+<td>INNER JOIN</td>
+</tr>
+<tr>
+<td>全記事。配信元が分かれば名前も</td>
+<td>articles</td>
+<td>LEFT JOIN</td>
+</tr>
+<tr>
+<td>全配信元と記事数（0本の配信元も含む）</td>
+<td>sources</td>
+<td>LEFT JOIN</td>
+</tr>
+</tbody>
+</table></div>
+<p>3行目を実行すると、記事が1本もない「地域ニュース栃木」も 0 として出ます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> s.name, <span class="kw">COUNT</span>(a.id) <span class="kw">AS</span> article_count
+<span class="kw">FROM</span> sources <span class="kw">AS</span> s
+<span class="kw">LEFT</span> <span class="kw">JOIN</span> articles <span class="kw">AS</span> a <span class="kw">ON</span> a.source_id = s.id
+<span class="kw">GROUP</span> <span class="kw">BY</span> s.id, s.name
+<span class="kw">ORDER</span> <span class="kw">BY</span> s.id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th>name</th>
+<th style="text-align: right;">article_count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>テック日報</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>経済ウィークリー</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>地域ニュース栃木</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<aside class="aside mech"><p>🔍 <strong>なぜ <code>COUNT(a.id)</code> なのか</strong>：<code>COUNT(*)</code> は「行の数」を数えます。地域ニュース栃木の行は、記事側が NULL で埋まった1行として存在するので、<code>COUNT(*)</code> だと 1 になります。<code>COUNT(a.id)</code> は NULL を数えないので 0 になります。</p></aside>
+<h2>4. 行が増える：1対多のJOIN（この章でいちばん大事）</h2>
+<p>記事にタグを並べてみます。記事とタグは「1本の記事に複数のタグ」がある関係（1対多）です。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> a.id, a.title, t.name <span class="kw">AS</span> tag
+<span class="kw">FROM</span> articles <span class="kw">AS</span> a
+<span class="kw">JOIN</span> article_tags <span class="kw">AS</span> at <span class="kw">ON</span> at.article_id = a.id
+<span class="kw">JOIN</span> tags <span class="kw">AS</span> t <span class="kw">ON</span> t.id = at.tag_id
+<span class="kw">ORDER</span> <span class="kw">BY</span> a.id, t.id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+<th>tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>クラウド利用料、来春から改定へ</td>
+<td>クラウド</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>クラウド利用料、来春から改定へ</td>
+<td>経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>AI</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+<td>経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>AI</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>半導体</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+<td>経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>為替相場、週明けは小動き</td>
+<td>経済</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(8 行)</div></div>
+<p>記事は5本なのに8行になりました。記事3は3回出てきます。（<code>JOIN</code> とだけ書くと <code>INNER JOIN</code> と同じ意味なので、タグのない記事5は消えています。）</p>
+<div class="fig" markdown="0">
+  <div class="fig-cap">図7-2　1対多の JOIN で行が増える（記事3の場合）</div>
+  <div class="fig-row">
+    <table class="mini">
+      <caption>articles（記事3は1行）</caption>
+      <tr><th>id</th><th>title</th></tr>
+      <tr class="hit"><td>3</td><td>半導体工場の…</td></tr>
+    </table>
+    <div class="fig-arrow" aria-hidden="true">×</div>
+    <table class="mini">
+      <caption>article_tags（記事3に3行）</caption>
+      <tr><th>article_id</th><th>tag_id</th></tr>
+      <tr class="hit"><td>3</td><td>1</td></tr>
+      <tr class="hit"><td>3</td><td>3</td></tr>
+      <tr class="hit"><td>3</td><td>4</td></tr>
+    </table>
+    <div class="fig-arrow" aria-hidden="true">→</div>
+    <table class="mini">
+      <caption>結果（記事3が3行）</caption>
+      <tr><th>id</th><th>tag_id</th></tr>
+      <tr class="dup"><td>3</td><td>1</td></tr>
+      <tr class="dup"><td>3</td><td>3</td></tr>
+      <tr class="dup"><td>3</td><td>4</td></tr>
+    </table>
+  </div>
+</div>
+
+<aside class="aside mech"><p>🔍 <strong>なぜ増えるのか</strong>：JOIN は「条件に一致する組み合わせ」を全部作ります。記事3の1行に対して、一致するタグの行が3つあれば、組み合わせは3つです。</p></aside>
+<p>一覧表示ならこれで正しいのですが、<strong>数える</strong>ときに事故が起きます。「配信元ごとの記事数」を、タグまで結合したまま数えた例です。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> s.name, <span class="kw">COUNT</span>(*) <span class="kw">AS</span> article_count
+<span class="kw">FROM</span> articles <span class="kw">AS</span> a
+<span class="kw">JOIN</span> sources <span class="kw">AS</span> s <span class="kw">ON</span> s.id = a.source_id
+<span class="kw">JOIN</span> article_tags <span class="kw">AS</span> at <span class="kw">ON</span> at.article_id = a.id   <span class="cm">-- ← 記事数には不要な結合</span>
+<span class="kw">GROUP</span> <span class="kw">BY</span> s.id, s.name
+<span class="kw">ORDER</span> <span class="kw">BY</span> s.id;</code></pre>
+<div class="result wrong"><div class="result-head"><span class="badge-wrong">誤った結果</span><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th>name</th>
+<th style="text-align: right;">article_count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>テック日報</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr>
+<td>経済ウィークリー</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(2 行)</div></div>
+<p>正しくはどちらも 2 です。エラーにはならず、それらしい数字が返ってきます。これが「エラーにならずに結果がズレる」典型です。</p>
+<p>直し方は2つあります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>直し方</th>
+<th>SQL の変更</th>
+<th>評価</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. 不要な表を結合しない</td>
+<td><code>article_tags</code> の JOIN を消す</td>
+<td><strong>推奨</strong>。増える原因そのものがなくなる</td>
+</tr>
+<tr>
+<td>B. 重複を除いて数える</td>
+<td><code>COUNT(DISTINCT a.id)</code> にする</td>
+<td>件数は合う。ただし原因は残り、<code>SUM</code>（合計）などでは同じ方法で直せない</td>
+</tr>
+</tbody>
+</table></div>
+<p>第6章の「ズレの3分類」に当てはめると、この章で見たものは次のとおりです。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>分類</th>
+<th>この章の例</th>
+<th>気づき方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>行が減る</td>
+<td>INNER JOIN で、配信元不明の記事が消えた</td>
+<td>JOIN 前の件数と比べる</td>
+</tr>
+<tr>
+<td>行が増える</td>
+<td>タグを結合して、記事数が2倍になった</td>
+<td>結果の合計が、元の件数を超えていないか見る</td>
+</tr>
+<tr>
+<td>値が変わる</td>
+<td>LEFT JOIN と <code>COUNT(*)</code> で、0 が 1 になった</td>
+<td>0件のはずの行を1つ確かめる</td>
+</tr>
+</tbody>
+</table></div>
+<h2>5. 手を動かす</h2>
+<p>psql（または pgAdmin4 の Query Tool）で、第4章で作った学習用データベースに接続して実行します。</p>
+<ol>
+<li>
+<p>先に、基準になる件数を数えます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> articles;      <span class="cm">-- 5 になるはず</span>
+<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">FROM</span> article_tags;  <span class="cm">-- 8 になるはず</span></code></pre>
+</li>
+<li>
+<p>第2節（INNER JOIN）と第3節（LEFT JOIN）の SQL を実行し、行数が 4 と 5 になることを確かめます。</p>
+</li>
+<li>第4節の「記事数が 4 になる SQL」を実行し、正しい答え（2）と違うことを確かめます。</li>
+<li>直し方 A と B を自分で書き換え、どちらも 2 になることを確かめます。</li>
+</ol>
+<p>検算は、いつも次の4つの順番で行います。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>手順</th>
+<th>やること</th>
+<th>この章の例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>基準の表の件数を数える</td>
+<td>articles は 5</td>
+</tr>
+<tr>
+<td>②</td>
+<td>JOIN 後の件数を数える</td>
+<td>INNER JOIN で 4</td>
+</tr>
+<tr>
+<td>③</td>
+<td>差の理由を言葉で説明する</td>
+<td>配信元が NULL の記事が1本消えた</td>
+</tr>
+<tr>
+<td>④</td>
+<td>期待していた件数と比べる</td>
+<td>「配信元が分かる記事だけ」なら 4 で正しい</td>
+</tr>
+</tbody>
+</table></div>
+<p>③で理由を説明できないときは、その結果を使わずに、資料作成者に質問してください（質問テンプレートは第0章）。</p>
+<h2>💡 Claude Codeで使うなら</h2>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）で、配信元ごとの記事数を出す SELECT を書いてください。
+- 対象テーブル: sources, articles
+- 記事が0本の配信元も 0 として表示する
+- 配信元が不明（source_id が NULL）の記事は数えない
+- 実行前に SQL を見せ、JOIN の種類（INNER / LEFT）と、どの表を左にしたかを1行で説明する
+- 実行後、articles の総件数と、結果の合計を並べて表示する
+- INSERT / UPDATE / DELETE は実行しない</code></pre>
+<p><strong>出てきたものの検証ポイント</strong></p>
+<ol>
+<li>JOIN の種類と「左の表」が、頼んだ内容（全配信元を出す → sources が左の LEFT JOIN）と一致しているか</li>
+<li>頼んでいない1対多の表（<code>article_tags</code> など）が結合されていないか</li>
+<li><code>COUNT(*)</code> か <code>COUNT(列)</code> か</li>
+<li>結果の合計（2＋2＋0＝4）と総件数（5）の差を説明できるか。差の1は配信元不明の記事です</li>
+</ol>
+<p><strong>起きがちな失敗と、その理由</strong></p>
+<ul>
+<li><strong>関係しそうな表まで結合して、件数が増える</strong>：「念のため」に関連する表を広く結合した SQL が出てくることがあります。頼み方に「使う表」を書いておくと防げます。</li>
+<li><strong>LEFT JOIN にしたのに、相手のいない行が消える</strong>：右の表の列を <code>WHERE</code> で絞ると、結果が INNER JOIN と同じになります（理由は下の豆知識）。</li>
+<li><strong><code>DISTINCT</code> を付けて「直しました」と報告される</strong>：件数は合いますが、余計な結合は残っています。どの表を結合したかを、必ず SQL で確かめてください。</li>
+</ul></section>
+<h2>確認問題</h2>
+<details class="quiz"><summary><span class="q">Q1. Claude Code が「配信元ごとの記事数」として「テック日報 4、経済ウィークリー 4」を返しました。articles の総件数は 5 です。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>結果の合計は 8 で、記事の総数 5 を超えています。1対多の表を結合して行が増えていると考え、SQL の中に <code>article_tags</code> などの結合が入っていないかを確かめます。</p></div></details>
+<details class="quiz"><summary><span class="q">Q2. LEFT JOIN で配信元ごとの記事数を出したら、記事が1本もない「地域ニュース栃木」が 1 になりました。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>COUNT(*)</code> で数えていないかを疑います。LEFT JOIN では、相手がいない配信元も NULL で埋まった1行として残るので、<code>COUNT(*)</code> は 1 を返します。<code>COUNT(a.id)</code> にすると 0 になります。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. 「全配信元を表示し、10月2日以降の記事があれば並べて」と頼んだら、地域ニュース栃木が結果に出てきませんでした。SQL は LEFT JOIN でした。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>記事の公開日時の条件が <code>WHERE</code> に書かれていないかを疑います。右の表の列を <code>WHERE</code> で絞ると、相手がいない行（NULL の行）が落ちます。条件を <code>ON</code> に移すと、地域ニュース栃木が残ります。</p></div></details>
+<details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>🔍 LEFT JOIN に WHERE を付けると、なぜ INNER JOIN と同じになるのか</h3>
+<p>SQL は、考え方の順番として「<code>FROM</code> と <code>JOIN</code> で表を作る → <code>WHERE</code> で行を絞る」と進みます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> s.name, a.title
+<span class="kw">FROM</span> sources <span class="kw">AS</span> s
+<span class="kw">LEFT</span> <span class="kw">JOIN</span> articles <span class="kw">AS</span> a <span class="kw">ON</span> a.source_id = s.id
+<span class="kw">WHERE</span> a.published_at &gt;= <span class="st">'2026-10-02 00:00+09'</span>   <span class="cm">-- ← ここで NULL の行が落ちる</span>
+<span class="kw">ORDER</span> <span class="kw">BY</span> s.id, a.id;</code></pre>
+<p>LEFT JOIN の時点では、地域ニュース栃木の行は記事側が NULL のまま残っています。ところが <code>WHERE</code> では、<code>NULL &gt;= 日時</code> は「真」でも「偽」でもなく「不明」になります。<code>WHERE</code> は「真」の行だけを残すので、この行は落ちます（第9章の NULL の三値論理）。結果は2行です。</p>
+<p>条件を <code>ON</code> に書くと、意味が「どの記事を相手にするか」に変わり、左の表の行は残ります。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> s.name, a.title
+<span class="kw">FROM</span> sources <span class="kw">AS</span> s
+<span class="kw">LEFT</span> <span class="kw">JOIN</span> articles <span class="kw">AS</span> a <span class="kw">ON</span> a.source_id = s.id
+                       <span class="kw">AND</span> a.published_at &gt;= <span class="st">'2026-10-02 00:00+09'</span>
+<span class="kw">ORDER</span> <span class="kw">BY</span> s.id, a.id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th>name</th>
+<th>title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>テック日報</td>
+<td>社内AIの導入率が過半数に</td>
+</tr>
+<tr>
+<td>経済ウィークリー</td>
+<td>半導体工場の新設計画を発表</td>
+</tr>
+<tr>
+<td>地域ニュース栃木</td>
+<td><span class="null">NULL</span></td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<p>日時を <code>'2026-10-02 00:00+09'</code> のようにタイムゾーン付きで書いているのは、接続先の設定によって「10月2日0時」の意味が変わらないようにするためです（第2章）。</p>
+<h3>🧭 RIGHT JOIN をあまり使わない理由</h3>
+<p><code>A RIGHT JOIN B</code> は、<code>B LEFT JOIN A</code> と同じ結果になります。左を基準に読む習慣にそろえたほうが読み間違いが減るので、多くの現場では LEFT JOIN だけを使います。Claude Code への頼み方に「RIGHT JOIN は使わず、LEFT JOIN で書くこと」と入れてもかまいません。</p>
+<h3>🔍 「全部の組み合わせを作ってから絞る」という考え方</h3>
+<p>JOIN は、「左の表と右の表の、すべての組み合わせを作り、<code>ON</code> の条件に合うものだけを残す」と考えると、行が増える理由も減る理由も説明できます。すべての組み合わせを作る操作には <code>CROSS JOIN</code>（直積）という名前があります。</p>
+<p>実際の PostgreSQL は、本当にすべての組み合わせを作るような無駄はせず、データの量に応じて効率のよい方法を選びます。どの方法を選んだかを見る方法は、別冊1（インデックスと EXPLAIN）で扱います。</p>
+<p>この資料で扱うのはここまでです。さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/tutorial-join.html">テーブル間の結合（チュートリアル）</a> と <a href="https://www.postgresql.org/docs/18/queries-table-expressions.html">テーブル式</a> を参照してください。</p></div></details>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</p></div></div></article>
+<article id="page-ch08" data-id="ch08" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第8章</span>書き換える文を読み、やってから戻す</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch09" data-id="ch09" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第3部 読む力</p><h1><span class="ch-no">第9章</span>件数・重複・NULLの検算</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch10" data-id="ch10" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第4部 設計を自分で見つける</p><h1><span class="ch-no">第10章</span>設計の5つの問い</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第2章（テーブル設計の基本）、第7章（JOINを読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
+<ul>
+<li>初めて見る外部データから、テーブルの分け方、<button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>、NULL を許すかどうかを、自分で決める手順が分かる</li>
+<li>第4章で入れたサンプルのテーブルが、なぜあの形なのかを説明できる</li>
+<li>Claude Code が出した設計案を、5つの問いで評価できる</li>
+</ul>
+<h2>1. 覚えるのは「答え」ではなく「問い」</h2>
+<p>正しい設計は、データの中身と、そのデータで何をしたいかによって変わります。ニュースとファイル情報では答えが違いますし、同じニュースでも「記事を一覧したい」のか「取得の履歴を追いたい」のかで変わります。</p>
+<p>そこでこの資料では、設計の答えを覚えるのではなく、どんなデータにも使える <strong>5つの問い</strong> を覚えます。問いに順番に答えると、設計が決まります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>問い</th>
+<th>決まるもの</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1行は何を表すか</td>
+<td>テーブルの<button type="button" class="term" data-def="表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。">粒度</button>（何を1件と数えるか）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>何で「同じもの」と判定するか</td>
+<td><button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>、<button type="button" class="term" data-def="指定した列に、同じ値が2回入らないようにする決まり。">UNIQUE制約</button></td>
+</tr>
+<tr>
+<td>3</td>
+<td>1つのものに、複数あるものはあるか</td>
+<td>表を分けるか、<button type="button" class="term" data-def="多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。">中間テーブル</button>を作るか</td>
+</tr>
+<tr>
+<td>4</td>
+<td>あとで変わるか。変わったら履歴は要るか</td>
+<td>上書きするか、履歴を残すか、削除の扱い</td>
+</tr>
+<tr>
+<td>5</td>
+<td>欠けることはあるか。何で検索したいか</td>
+<td>NULL を許すか、<button type="button" class="term" data-def="検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。">インデックス</button>を付けるか</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜこの順番なのか</strong>：問い1が決まらないと、問い2の「同じもの」が何の話か決まりません。後ろの問いほど、前の答えに頼っています。</p></aside>
+<h2>2. 材料：取得したニュースの生データ</h2>
+<p>ニュースサイトから記事の情報を取得したら、次の6行が届いたとします（記事も配信元も架空です）。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">#</th>
+<th>取得日時</th>
+<th>タイトル</th>
+<th>URL</th>
+<th>配信元</th>
+<th>公開日時</th>
+<th>タグ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>10/01 10:00</td>
+<td>クラウド利用料、来春から改定へ</td>
+<td><code>…/tech/1001</code></td>
+<td>テック日報</td>
+<td>10/01 09:00</td>
+<td>クラウド, 経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>10/02 10:00</td>
+<td>社内AIの導入率が過半数に</td>
+<td><code>…/tech/1002?utm_source=rss</code></td>
+<td>テック日報</td>
+<td>10/02 08:30</td>
+<td>AI, 経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>10/02 13:00</td>
+<td>半導体工場の新設計画を発表</td>
+<td><code>…/econ/2001</code></td>
+<td>経済ウ<mark>イ</mark>ークリー</td>
+<td>10/02 12:00</td>
+<td>AI, 半導体, 経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>10/02 15:00</td>
+<td>社内AIの導入率が過半数に</td>
+<td><code>…/tech/1002</code></td>
+<td>テック日報</td>
+<td>10/02 08:30</td>
+<td>AI, 経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>10/03 13:00</td>
+<td>為替相場、週明けは小動き</td>
+<td><code>…/econ/2002</code></td>
+<td>経済ウィークリー</td>
+<td>（空欄）</td>
+<td>経済</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>10/03 19:00</td>
+<td>配信元不明の転載記事</td>
+<td><code>…/misc/9001</code></td>
+<td>（空欄）</td>
+<td>10/03 18:00</td>
+<td>（なし）</td>
+</tr>
+</tbody>
+</table></div>
+<p>URL の先頭 <code>https://example.com</code> は省略しています。この表を見ながら、5つの問いに答えていきます。</p>
+<h2>3. 5つの問いに答える</h2>
+<h3>問い1　1行は何を表すか</h3>
+<p>生データの1行は「1回の取得」です。2行目と4行目は、同じ記事を2回取得したものです。つまり <strong>取得は6回、記事は5本</strong> です。</p>
+<p>ここで「記事の一覧を作りたい」のであれば、テーブルの1行は <strong>1本の記事</strong> にします。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>選んだ答え</th>
+<th>代償と最悪ケース</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1行＝1本の記事</td>
+<td>「いつ何回取得したか」は残らない。必要なら取得履歴の表を別に作る（問い4）</td>
+</tr>
+<tr>
+<td>1行＝1回の取得</td>
+<td>記事数を数えるたびに重複を除く必要がある。忘れると記事数が6になる</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside mech"><p>🔍 <strong>なぜ最初に決めるのか</strong>：1行が何かを決めないまま作ると、「記事」と「取得」が混ざった表になります。数えた結果が記事数なのか取得回数なのか、誰にも分からなくなります。</p></aside>
+<h3>問い2　何で「同じもの」と判定するか</h3>
+<p>2行目と4行目を同じ記事だと判定するには、どの項目を見ればよいでしょうか。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>候補</th>
+<th>このデータでの結果</th>
+<th>判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>タイトル</td>
+<td>2行目と4行目は一致する</td>
+<td>別の記事が同じタイトルになることがあり、安全ではない</td>
+</tr>
+<tr>
+<td>URL（そのまま）</td>
+<td><code>?utm_source=rss</code> の有無で <strong>別物になる</strong></td>
+<td>このままでは重複が入る</td>
+</tr>
+<tr>
+<td>URL（<button type="button" class="term" data-def="同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。">正規化</button>したもの）</td>
+<td>計測用の <code>?utm_…</code> を取り除けば一致する</td>
+<td><strong>採用</strong>。正規化のルールを決めて文書に残す</td>
+</tr>
+</tbody>
+</table></div>
+<p>決まったこと：<code>url</code> 列に <button type="button" class="term" data-def="指定した列に、同じ値が2回入らないようにする決まり。">UNIQUE制約</button> を付け、保存する前に正規化します。行を区別する番号として、別に <code>id</code>（<button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>）も持たせます。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ URL があるのに id を別に作るのか</strong>：URL は長く、サイトの引っ越しで変わることもあります。他の表から参照するときは、変わらない短い番号のほうが扱いやすいからです。</p></aside>
+<h3>問い3　1つのものに、複数あるものはあるか</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>1本の記事に対して</th>
+<th>決まったこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>配信元</td>
+<td>1つ</td>
+<td>記事の表に <code>source_id</code> を持たせる。名前は <code>sources</code> に分ける</td>
+</tr>
+<tr>
+<td>タグ</td>
+<td>0個以上（記事3は3つ）</td>
+<td><code>article_tags</code>（<button type="button" class="term" data-def="多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。">中間テーブル</button>）を作る</td>
+</tr>
+</tbody>
+</table></div>
+<p>配信元を分けるのは、3行目の「経済ウ<strong>イ</strong>ークリー」のような表記ゆれを1か所で直せるようにするためです。タグを中間テーブルにすると、第7章で見たとおり、JOIN で行が増えることにも注意が必要になります。</p>
+<h3>問い4　あとで変わるか。変わったら履歴は要るか</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>変わりうるもの</th>
+<th>決まったこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>記事が取り下げられる</td>
+<td>行は削除せず、<code>status</code> を <code>hidden</code> にする</td>
+</tr>
+<tr>
+<td>タイトルが訂正される</td>
+<td>今回は上書きする（訂正前のタイトルは要らないと決めた）</td>
+</tr>
+<tr>
+<td>同じ記事を何度も取得する</td>
+<td><code>fetched_at</code>（最後に取得した日時）を上書きする。取得履歴が必要になったら表を足す</td>
+</tr>
+</tbody>
+</table></div>
+<h3>問い5　欠けることはあるか。何で検索したいか</h3>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>欠けるか</th>
+<th>決まったこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公開日時</td>
+<td>5行目は空欄</td>
+<td><code>published_at</code> は NULL を許す。取得日時で埋めない（事実と違う値になるため）</td>
+</tr>
+<tr>
+<td>配信元</td>
+<td>6行目は空欄</td>
+<td><code>source_id</code> は NULL を許す。第7章の INNER JOIN で消えた記事がこれ</td>
+</tr>
+<tr>
+<td>タイトル、URL</td>
+<td>必ずある</td>
+<td><code>NOT NULL</code> にする</td>
+</tr>
+</tbody>
+</table></div>
+<p>検索に使いそうなのは、公開日時の範囲、配信元、タグです。これはインデックスの候補として控えておきます（詳しくは別冊1）。</p>
+<h2>4. 答えを並べると、第4章のテーブルになる</h2>
+<p>5つの問いの答えをまとめると、第4章で入れたサンプルのテーブルになります。</p>
+<figure class="diagram"><svg aria-roledescription="er" role="graphics-document document" viewBox="0 0 570.21875 572" style="max-width: 570.21875px;" xmlns="http://www.w3.org/2000/svg" width="100%" id="mmd-d1"><style>#mmd-d1{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;fill:#000000;}#mmd-d1 .error-icon{fill:#552222;}#mmd-d1 .error-text{fill:#552222;stroke:#552222;}#mmd-d1 .edge-thickness-normal{stroke-width:1px;}#mmd-d1 .edge-thickness-thick{stroke-width:3.5px;}#mmd-d1 .edge-pattern-solid{stroke-dasharray:0;}#mmd-d1 .edge-thickness-invisible{stroke-width:0;fill:none;}#mmd-d1 .edge-pattern-dashed{stroke-dasharray:3;}#mmd-d1 .edge-pattern-dotted{stroke-dasharray:2;}#mmd-d1 .marker{fill:#666;stroke:#666;}#mmd-d1 .marker.cross{stroke:#666;}#mmd-d1 svg{font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;font-size:16px;}#mmd-d1 p{margin:0;}#mmd-d1 .entityBox{fill:#eee;stroke:#999;}#mmd-d1 .attributeBoxOdd{fill:#ffffff;stroke:#999;}#mmd-d1 .attributeBoxEven{fill:#f2f2f2;stroke:#999;}#mmd-d1 .relationshipLabelBox{fill:hsl(-160, 0%, 93.3333333333%);opacity:0.7;background-color:hsl(-160, 0%, 93.3333333333%);}#mmd-d1 .relationshipLabelBox rect{opacity:0.5;}#mmd-d1 .relationshipLine{stroke:#666;}#mmd-d1 .entityTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mmd-d1 #MD_PARENT_START{fill:#f5f5f5!important;stroke:#666!important;stroke-width:1;}#mmd-d1 #MD_PARENT_END{fill:#f5f5f5!important;stroke:#666!important;stroke-width:1;}#mmd-d1 :root{--mermaid-font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;}</style><g></g><defs><marker orient="auto" markerHeight="240" markerWidth="190" refY="7" refX="0" id="MD_PARENT_START"><path d="M 18,7 L9,13 L1,7 L9,1 Z"></path></marker></defs><defs><marker orient="auto" markerHeight="28" markerWidth="20" refY="7" refX="19" id="MD_PARENT_END"><path d="M 18,7 L9,13 L1,7 L9,1 Z"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="18" refY="9" refX="0" id="ONLY_ONE_START"><path d="M9,0 L9,18 M15,0 L15,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="18" refY="9" refX="18" id="ONLY_ONE_END"><path d="M3,0 L3,18 M9,0 L9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="30" refY="9" refX="0" id="ZERO_OR_ONE_START"><circle r="6" cy="9" cx="21" fill="white" stroke="gray"></circle><path d="M9,0 L9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="18" markerWidth="30" refY="9" refX="30" id="ZERO_OR_ONE_END"><circle r="6" cy="9" cx="9" fill="white" stroke="gray"></circle><path d="M21,0 L21,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="45" refY="18" refX="18" id="ONE_OR_MORE_START"><path d="M0,18 Q 18,0 36,18 Q 18,36 0,18 M42,9 L42,27" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="45" refY="18" refX="27" id="ONE_OR_MORE_END"><path d="M3,9 L3,27 M9,18 Q27,0 45,18 Q27,36 9,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="57" refY="18" refX="18" id="ZERO_OR_MORE_START"><circle r="6" cy="18" cx="48" fill="white" stroke="gray"></circle><path d="M0,18 Q18,0 36,18 Q18,36 0,18" fill="none" stroke="gray"></path></marker></defs><defs><marker orient="auto" markerHeight="36" markerWidth="57" refY="18" refX="39" id="ZERO_OR_MORE_END"><circle r="6" cy="18" cx="9" fill="white" stroke="gray"></circle><path d="M21,18 Q39,0 57,18 Q39,36 21,18" fill="none" stroke="gray"></path></marker></defs><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M159.512,109L159.512,117.333C159.512,125.667,159.512,142.333,159.512,159C159.512,175.667,159.512,192.333,159.512,200.667L159.512,209" class="er relationshipLine"></path><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M159.512,384L159.512,392.333C159.512,400.667,159.512,417.333,176.049,434.484C192.587,451.634,225.663,469.268,242.2,478.085L258.738,486.903" class="er relationshipLine"></path><path style="stroke: gray; fill: none;" marker-start="url(#ONLY_ONE_START)" marker-end="url(#ZERO_OR_MORE_END)" d="M474.621,330L474.621,347.333C474.621,364.667,474.621,399.333,458.083,425.484C441.545,451.634,408.47,469.268,391.932,478.085L375.394,486.903" class="er relationshipLine"></path><g transform="translate(61.084442138671875,20 )" id="entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c"><rect height="89" width="196.85418701171875" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(98.42709350585938,12)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c" class="er entityLabel">sources</text><rect height="22" width="64.921875" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="58.311492919921875" y="24" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="123.23336791992188" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(128.23336791992188,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-key" class="er entityLabel">PK</text><rect height="22" width="49.825836181640625" y="24" x="147.02835083007812" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(152.02835083007812,35)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-1-comment" class="er entityLabel"></text><rect height="21" width="64.921875" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-type" class="er entityLabel">text</text><rect height="21" width="58.311492919921875" y="46" x="64.921875" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-name" class="er entityLabel">name</text><rect height="21" width="23.79498291015625" y="46" x="123.23336791992188" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(128.23336791992188,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-key" class="er entityLabel"></text><rect height="21" width="49.825836181640625" y="46" x="147.02835083007812" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(152.02835083007812,56.5)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-2-comment" class="er entityLabel">UNIQUE</text><rect height="22" width="64.921875" y="67" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,78)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-3-type" class="er entityLabel">timestamptz</text><rect height="22" width="58.311492919921875" y="67" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,78)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-3-name" class="er entityLabel">created_at</text><rect height="22" width="23.79498291015625" y="67" x="123.23336791992188" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(128.23336791992188,78)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-3-key" class="er entityLabel"></text><rect height="22" width="49.825836181640625" y="67" x="147.02835083007812" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(152.02835083007812,78)" y="0" x="0" id="text-entity-sources-2453f8db-368b-57f8-9ec8-efd7c4e65e3c-attr-3-comment" class="er entityLabel"></text></g><g transform="translate(20,209 )" id="entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c"><rect height="175" width="279.0230712890625" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(139.51153564453125,12)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c" class="er entityLabel">articles</text><rect height="22" width="64.921875" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="67.94683837890625" y="24" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="132.86871337890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-key" class="er entityLabel">PK</text><rect height="22" width="122.359375" y="24" x="156.6636962890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,35)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-1-comment" class="er entityLabel"></text><rect height="22" width="64.921875" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-type" class="er entityLabel">integer</text><rect height="22" width="67.94683837890625" y="46" x="64.921875" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-name" class="er entityLabel">source_id</text><rect height="22" width="23.79498291015625" y="46" x="132.86871337890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-key" class="er entityLabel">FK</text><rect height="22" width="122.359375" y="46" x="156.6636962890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,57)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-2-comment" class="er entityLabel">NULL可（問い5）</text><rect height="21" width="64.921875" y="68" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-type" class="er entityLabel">text</text><rect height="21" width="67.94683837890625" y="68" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-name" class="er entityLabel">title</text><rect height="21" width="23.79498291015625" y="68" x="132.86871337890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-key" class="er entityLabel"></text><rect height="21" width="122.359375" y="68" x="156.6636962890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,78.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-3-comment" class="er entityLabel">NOT NULL</text><rect height="21" width="64.921875" y="89" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,99.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-4-type" class="er entityLabel">text</text><rect height="21" width="67.94683837890625" y="89" x="64.921875" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,99.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-4-name" class="er entityLabel">url</text><rect height="21" width="23.79498291015625" y="89" x="132.86871337890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,99.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-4-key" class="er entityLabel"></text><rect height="21" width="122.359375" y="89" x="156.6636962890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,99.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-4-comment" class="er entityLabel">UNIQUE（問い2）</text><rect height="22" width="64.921875" y="110" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,121)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-5-type" class="er entityLabel">timestamptz</text><rect height="22" width="67.94683837890625" y="110" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,121)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-5-name" class="er entityLabel">published_at</text><rect height="22" width="23.79498291015625" y="110" x="132.86871337890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,121)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-5-key" class="er entityLabel"></text><rect height="22" width="122.359375" y="110" x="156.6636962890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,121)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-5-comment" class="er entityLabel">NULL可（問い5）</text><rect height="22" width="64.921875" y="132" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,143)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-6-type" class="er entityLabel">timestamptz</text><rect height="22" width="67.94683837890625" y="132" x="64.921875" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,143)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-6-name" class="er entityLabel">fetched_at</text><rect height="22" width="23.79498291015625" y="132" x="132.86871337890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,143)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-6-key" class="er entityLabel"></text><rect height="22" width="122.359375" y="132" x="156.6636962890625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,143)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-6-comment" class="er entityLabel">上書き（問い4）</text><rect height="21" width="64.921875" y="154" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,164.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-7-type" class="er entityLabel">text</text><rect height="21" width="67.94683837890625" y="154" x="64.921875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(69.921875,164.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-7-name" class="er entityLabel">status</text><rect height="21" width="23.79498291015625" y="154" x="132.86871337890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(137.86871337890625,164.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-7-key" class="er entityLabel"></text><rect height="21" width="122.359375" y="154" x="156.6636962890625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(161.6636962890625,164.5)" y="0" x="0" id="text-entity-articles-ae2b103f-02ee-5376-b1e0-b2ce7db4f62c-attr-7-comment" class="er entityLabel">active / hidden（問い4）</text></g><g transform="translate(258.73819732666016,484 )" id="entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3"><rect height="68" width="116.65603637695312" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(58.32801818847656,12)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3" class="er entityLabel">article_tags</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="51.104095458984375" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-name" class="er entityLabel">article_id</text><rect height="22" width="23.79498291015625" y="24" x="92.86105346679688" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(97.86105346679688,35)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-1-key" class="er entityLabel">PK</text><rect height="22" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-type" class="er entityLabel">integer</text><rect height="22" width="51.104095458984375" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-name" class="er entityLabel">tag_id</text><rect height="22" width="23.79498291015625" y="46" x="92.86105346679688" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(97.86105346679688,57)" y="0" x="0" id="text-entity-articletags-45434bec-aa12-57af-b2e4-98173cdac3e3-attr-2-key" class="er entityLabel">PK</text></g><g transform="translate(399.0230712890625,263 )" id="entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8"><rect height="67" width="151.19564819335938" y="0" x="0" class="er entityBox"></rect><text style="dominant-baseline: middle; text-anchor: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" transform="translate(75.59782409667969,12)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8" class="er entityLabel">tags</text><rect height="22" width="41.7569580078125" y="24" x="0" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-type" class="er entityLabel">integer</text><rect height="22" width="35.81787109375" y="24" x="41.7569580078125" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-name" class="er entityLabel">id</text><rect height="22" width="23.79498291015625" y="24" x="77.5748291015625" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-key" class="er entityLabel">PK</text><rect height="22" width="49.825836181640625" y="24" x="101.36981201171875" class="er attributeBoxOdd"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(106.36981201171875,35)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-1-comment" class="er entityLabel"></text><rect height="21" width="41.7569580078125" y="46" x="0" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(5,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-type" class="er entityLabel">text</text><rect height="21" width="35.81787109375" y="46" x="41.7569580078125" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(46.7569580078125,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-name" class="er entityLabel">name</text><rect height="21" width="23.79498291015625" y="46" x="77.5748291015625" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(82.5748291015625,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-key" class="er entityLabel"></text><rect height="21" width="49.825836181640625" y="46" x="101.36981201171875" class="er attributeBoxEven"></rect><text style="dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 10.2px;" transform="translate(106.36981201171875,56.5)" y="0" x="0" id="text-entity-tags-6d8c4510-222a-5f9e-b73d-d896901739b8-attr-2-comment" class="er entityLabel">UNIQUE</text></g><rect height="14" width="110.203125" y="152" x="104.41043090820312" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="159" x="159.51199340820312" id="rel4" class="er relationshipLabel">問い3：配信元は1つ</text><rect height="14" width="103.8125" y="441.4256896972656" x="140.6802978515625" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="448.4256896972656" x="192.5865478515625" id="rel5" class="er relationshipLabel">問い3：タグは複数</text><rect height="14" width="61.5625" y="420.9412536621094" x="425.6827697753906" class="er relationshipLabelBox"></rect><text style="text-anchor: middle; dominant-baseline: middle; font-family: &quot;BIZ UDPGothic&quot;, &quot;Hiragino Sans&quot;, &quot;Yu Gothic UI&quot;, &quot;Noto Sans JP&quot;, sans-serif; font-size: 12px;" y="427.9412536621094" x="456.4640197753906" id="rel6" class="er relationshipLabel">記事とタグ</text></svg></figure>
+<h2>5. 手を動かす</h2>
+<ol>
+<li>
+<p>psql で次のコマンドを実行し、articles テーブルの定義を表示します。</p>
+<pre class="code text"><code>\d articles</code></pre>
+<p>表示される主な行と、どの問いの答えかの対応は次のとおりです。（日本語の環境では、見出しが日本語で表示されることがあります。）</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>表示</th>
+<th>意味</th>
+<th>問い</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"articles_pkey" PRIMARY KEY, btree (id)</code></td>
+<td>id が主キー</td>
+<td>問い2</td>
+</tr>
+<tr>
+<td><code>"articles_url_key" UNIQUE CONSTRAINT, btree (url)</code></td>
+<td>同じ URL は入らない</td>
+<td>問い2</td>
+</tr>
+<tr>
+<td><code>published_at</code> の Nullable 欄が空</td>
+<td>NULL を許す</td>
+<td>問い5</td>
+</tr>
+<tr>
+<td><code>FOREIGN KEY (source_id) REFERENCES sources(id)</code></td>
+<td>存在しない配信元は入らない</td>
+<td>問い3</td>
+</tr>
+<tr>
+<td><code>CHECK (status = ANY (ARRAY['active'::text, 'hidden'::text]))</code></td>
+<td>status は2種類だけ</td>
+<td>問い4</td>
+</tr>
+</tbody>
+</table></div>
+</li>
+<li>
+<p>次はファイル情報の生データです。問い1と問い2に、自分で答えてから答え合わせをしてください。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">#</th>
+<th>パス</th>
+<th style="text-align: right;">サイズ</th>
+<th>更新日</th>
+<th>中身のハッシュ（先頭8文字）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td><code>C:\Share\企画\提案書_v1.docx</code></td>
+<td style="text-align: right;">48 KB</td>
+<td>10/01</td>
+<td><code>3f2a9c1e</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td><code>C:\Share\企画\提案書_v1.docx</code></td>
+<td style="text-align: right;">52 KB</td>
+<td>10/05</td>
+<td><code>8b7d0e44</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td><code>C:\Share\共有\提案書_コピー.docx</code></td>
+<td style="text-align: right;">48 KB</td>
+<td>10/01</td>
+<td><code>3f2a9c1e</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><button type="button" class="term" data-def="データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。">ハッシュ</button>は、ファイルの中身から計算した指紋のような値で、中身が同じなら同じ値になります。</p>
+</li>
+</ol>
+<details class="quiz"><summary><span class="q">答え合わせ（問い1と問い2）</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><strong>問い1</strong>：1行は「あるパスにあるファイルの、ある時点の状態」です。1行目と2行目は、同じファイルを別の日に調べた結果です。「ファイルの一覧」が欲しいのか、「変化の履歴」が欲しいのかで、表の粒度が変わります。</p>
+<p><strong>問い2</strong>：パスで判定すると、1行目と3行目は別のファイルです。ハッシュで判定すると、同じ中身なので同じものです。「どこに何があるか」を知りたいならパス、「同じ中身の重複を見つけたい」ならハッシュが合います。両方を知りたい場合は、表を分ける設計になります（別冊3で扱います）。</p>
+<p>Windows のパスは、大文字と小文字を区別しません（<code>C:\share</code> と <code>C:\Share</code> は同じ場所）。一方、PostgreSQL の UNIQUE 制約は区別するので、パスで判定する場合は、保存する前に表記をそろえる必要があります。</p></div></details>
+<h2>💡 Claude Codeで使うなら</h2>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><pre class="code text"><code>PostgreSQL 18 で、次のニュースデータを保存するテーブル設計案を出してください。
+（ここに生データを数行貼る）
+
+設計案を出す前に、次の5つの問いに対するあなたの仮定を、表で示してください。
+1. 1行は何を表すか
+2. 何で「同じもの」と判定するか
+3. 1つのものに複数あるものは何か
+4. あとで変わるもの、履歴が必要なもの
+5. 欠ける項目と、検索に使う項目
+
+- 自信がない問いには「要確認」と書く
+- CREATE TABLE は案として表示するだけで、実行しない</code></pre>
+<p><strong>出てきたものの検証ポイント</strong></p>
+<ol>
+<li>仮定の表を、自分の答えと1問ずつ比べる。違うところは、どちらが目的に合うかを決めてから設計に進む</li>
+<li><code>CREATE TABLE</code> の中で、主キーと UNIQUE が問い2、NOT NULL の有無が問い5、中間テーブルが問い3と一致しているか</li>
+<li>「要確認」が付いた問いを放置していないか</li>
+</ol>
+<p><strong>起きがちな失敗と、その理由</strong></p>
+<ul>
+<li><strong>タグを1つの列に「AI,経済」とまとめて入れる案が出る</strong>：問い3を飛ばしています。タグで絞り込んだり数えたりするときに、文字列を分解する必要が出て、間違いの元になります。</li>
+<li><strong>URL をそのまま UNIQUE にする</strong>：計測用の付加情報が付いた URL が別物として入り、重複が残ります。</li>
+<li><strong>公開日時を NOT NULL にする</strong>：欠けたデータの取り込みが失敗するか、空欄を取得日時で埋めて事実と違うデータになります。</li>
+<li><strong>そもそも仮定を示さずに、いきなり CREATE TABLE を出す</strong>：Claude Code はデータから仮定を推測して設計を完成させるので、仮定を明示させないと、どこで判断したのかが見えません。頼み方の「仮定を表で示して」はそのためです。</li>
+</ul></section>
+<h2>確認問題</h2>
+<details class="quiz"><summary><span class="q">Q1. Claude Code の設計案が articles(id, url, title, source_name text, tags text) でした。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>source_name</code> を記事の表に直接書いている点と、<code>tags</code> を1つの文字列の列にしている点を疑います。どちらも問い3（1つに複数あるか、表記をそろえられるか）の答えが反映されていません。</p></div></details>
+<details class="quiz"><summary><span class="q">Q2. 生データ6行を取り込んだら、articles の件数が 6 になりました。記事は5本のはずです。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>問い2を疑います。URL を正規化せずに UNIQUE にしたため、<code>?utm_source=rss</code> 付きの URL が別の記事として入った可能性があります。または、問い1で1行を「1回の取得」にしてしまっていないかを確かめます。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. 設計案で published_at が NOT NULL になっていて、「空欄のときは取得日時を入れる」と説明されました。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>問い5を疑います。公開日時は欠けることがあるデータなので、NULL を許すのが自然です。取得日時で埋めると、「公開日時」の列に事実と違う値が入り、公開日での並べ替えや絞り込みが間違います。</p></div></details>
+<details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>📜 「正規化」はどこから来たのか</h3>
+<p>表を分けて「1つの事実を1か所に」書く考え方は、IBM の研究者だったエドガー・F・コッド（Edgar F. Codd）が1970年に発表した関係モデル（relational model）と、その後の論文で整理されました。「リレーショナル（relational）」は、数学の「関係（relation）」という言葉から来ていて、表そのものを指します。テーブル同士のつながりのことではありません。</p>
+<h3>🧭 「粒度」を最初に決めるのは、分析の世界でも同じ</h3>
+<p>データ分析用のテーブル設計でも、最初の手順は「1行が何を表すか」（grain：粒度）を決めることだとされています。粒度が混ざると、どの集計も信用できなくなるからです。</p>
+<h3>🔍 URL の正規化でよく使うルール</h3>
+<p>よく使われるのは、次のようなルールです。どれを採用するかは目的によって決め、決めたルールはデータ辞書（付録F）に書いておきます。</p>
+<ul>
+<li>スキーム（<code>https</code>）とホスト名を小文字にそろえる</li>
+<li><code>?utm_source=…</code> のような計測用の付加情報を取り除く</li>
+<li><code>#</code> 以降（ページ内の位置）を取り除く</li>
+<li>末尾の <code>/</code> の有無をそろえる</li>
+</ul>
+<p>この資料で扱うのはここまでです。制約の詳しい書き方は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/ddl-constraints.html">制約</a> を参照してください。</p></div></details>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ 設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</p></div></div></article>
+<article id="page-ch11" data-id="ch11" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第4部 設計を自分で見つける</p><h1><span class="ch-no">第11章</span>事例：ニュース情報</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch12" data-id="ch12" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第4部 設計を自分で見つける</p><h1><span class="ch-no">第12章</span>取り込みで起きること</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch13" data-id="ch13" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第4部 設計を自分で見つける</p><h1><span class="ch-no">第13章</span>題材が増えたとき</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch14" data-id="ch14" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第5部 Claude Codeへの指示</p><h1><span class="ch-no">第14章</span>指示の型・完全版</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch15" data-id="ch15" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第5部 Claude Codeへの指示</p><h1><span class="ch-no">第15章</span>頼む→検証のループ実践</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch16" data-id="ch16" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第6部 初期化とバックアップ</p><h1><span class="ch-no">第16章</span>環境の「正」とスナップショット</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch17" data-id="ch17" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第7部 MCPサーバー経由</p><h1><span class="ch-no">第17章</span>MCPとは</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch18" data-id="ch18" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第7部 MCPサーバー経由</p><h1><span class="ch-no">第18章</span>読み取り専用ロールを作る</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch19" data-id="ch19" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第7部 MCPサーバー経由</p><h1><span class="ch-no">第19章</span>MCP経由で出力する</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch20" data-id="ch20" hidden><header class="ch-head"><p class="crumb">第2冊 実践＋MCP ／ 第8部 検証</p><h1><span class="ch-no">第20章</span>チェックリストの使い方と失敗の索引</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex01" data-id="ex01" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別1</span>インデックスとEXPLAIN</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex02" data-id="ex02" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別2</span>本文の全文検索</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex03" data-id="ex03" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別3</span>事例：ファイル情報（完全版）</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex04" data-id="ex04" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別4</span>題材が増えたとき（5方式の比較と性能計測）</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex05" data-id="ex05" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別5</span>やり直す理屈（外部キーとTRUNCATE）</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ex06" data-id="ex06" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別6</span>PoCの外へ出るとき</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr></table></div></div></article>
+<article id="page-apB" data-id="apB" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録B</span>指示テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
+<article id="page-apD" data-id="apD" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録D</span>初期化SQL一式</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>第4章で実行する初期化 SQL です。<code>99_reset.sql</code> → <code>01_schema.sql</code> → <code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p><h2>01_schema.sql</h2><pre class="code sql"><code><span class="cm">-- =============================================================</span>
+<span class="cm">-- 01_schema.sql  学習用サンプル：ニュース情報（第4章で実行）</span>
+<span class="cm">-- 対象: PostgreSQL 18（構文はPostgreSQL 16以降で共通）</span>
+<span class="cm">-- この環境は「壊してよい学習用」です。本番DBでは実行しないこと。</span>
+<span class="cm">-- =============================================================</span>
+
+<span class="cm">-- 配信元（1行 = 1つの配信元）</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> sources (
+    id          integer <span class="kw">GENERATED</span> <span class="kw">ALWAYS</span> <span class="kw">AS</span> <span class="kw">IDENTITY</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    name        text        <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">UNIQUE</span>,
+    created_at  timestamptz <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> now()
+);
+
+<span class="cm">-- 記事（1行 = 1本の記事）</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> articles (
+    id            integer <span class="kw">GENERATED</span> <span class="kw">ALWAYS</span> <span class="kw">AS</span> <span class="kw">IDENTITY</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    source_id     integer <span class="kw">REFERENCES</span> sources(id),   <span class="cm">-- 配信元が分からない記事は NULL</span>
+    title         text        <span class="kw">NOT</span> <span class="kw">NULL</span>,
+    url           text        <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">UNIQUE</span>,
+    published_at  timestamptz,                       <span class="cm">-- 公開日時が取れないことがある</span>
+    fetched_at    timestamptz <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> now(),
+    status        text        <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'active'</span>
+                  <span class="kw">CHECK</span> (status <span class="kw">IN</span> (<span class="st">'active'</span>, <span class="st">'hidden'</span>))
+);
+
+<span class="cm">-- タグ（1行 = 1つのタグ）</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> tags (
+    id    integer <span class="kw">GENERATED</span> <span class="kw">ALWAYS</span> <span class="kw">AS</span> <span class="kw">IDENTITY</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    name  text <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">UNIQUE</span>
+);
+
+<span class="cm">-- 記事とタグの対応（1行 = 「この記事にこのタグが付いている」という事実）</span>
+<span class="kw">CREATE</span> <span class="kw">TABLE</span> article_tags (
+    article_id  integer <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">REFERENCES</span> articles(id),
+    tag_id      integer <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">REFERENCES</span> tags(id),
+    <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (article_id, tag_id)
+);
+</code></pre><h2>02_seed.sql</h2><pre class="code sql"><code><span class="cm">-- =============================================================</span>
+<span class="cm">-- 02_seed.sql  サンプルデータ（記事・配信元はすべて架空です）</span>
+<span class="cm">-- 01_schema.sql の直後に実行すると、id は 1 から順に振られます。</span>
+<span class="cm">-- =============================================================</span>
+
+<span class="kw">INSERT</span> <span class="kw">INTO</span> sources (name) <span class="kw">VALUES</span>
+    (<span class="st">'テック日報'</span>),          <span class="cm">-- id = 1</span>
+    (<span class="st">'経済ウィークリー'</span>),    <span class="cm">-- id = 2</span>
+    (<span class="st">'地域ニュース栃木'</span>);    <span class="cm">-- id = 3（まだ記事が1本もない配信元）</span>
+
+<span class="kw">INSERT</span> <span class="kw">INTO</span> articles (source_id, title, url, published_at, fetched_at) <span class="kw">VALUES</span>
+    (1,    <span class="st">'クラウド利用料、来春から改定へ'</span>,   <span class="st">'https://example.com/tech/1001'</span>, <span class="st">'2026-10-01 09:00+09'</span>, <span class="st">'2026-10-01 10:00+09'</span>),  <span class="cm">-- id = 1</span>
+    (1,    <span class="st">'社内AIの導入率が過半数に'</span>,         <span class="st">'https://example.com/tech/1002'</span>, <span class="st">'2026-10-02 08:30+09'</span>, <span class="st">'2026-10-02 10:00+09'</span>),  <span class="cm">-- id = 2</span>
+    (2,    <span class="st">'半導体工場の新設計画を発表'</span>,       <span class="st">'https://example.com/econ/2001'</span>, <span class="st">'2026-10-02 12:00+09'</span>, <span class="st">'2026-10-02 13:00+09'</span>),  <span class="cm">-- id = 3</span>
+    (2,    <span class="st">'為替相場、週明けは小動き'</span>,         <span class="st">'https://example.com/econ/2002'</span>, <span class="kw">NULL</span>,                   <span class="st">'2026-10-03 13:00+09'</span>),  <span class="cm">-- id = 4（公開日時が不明）</span>
+    (<span class="kw">NULL</span>, <span class="st">'配信元不明の転載記事'</span>,             <span class="st">'https://example.com/misc/9001'</span>, <span class="st">'2026-10-03 18:00+09'</span>, <span class="st">'2026-10-03 19:00+09'</span>); <span class="cm">-- id = 5（配信元が不明）</span>
+
+<span class="kw">INSERT</span> <span class="kw">INTO</span> tags (name) <span class="kw">VALUES</span>
+    (<span class="st">'AI'</span>),        <span class="cm">-- id = 1</span>
+    (<span class="st">'クラウド'</span>),  <span class="cm">-- id = 2</span>
+    (<span class="st">'半導体'</span>),    <span class="cm">-- id = 3</span>
+    (<span class="st">'経済'</span>);      <span class="cm">-- id = 4</span>
+
+<span class="kw">INSERT</span> <span class="kw">INTO</span> article_tags (article_id, tag_id) <span class="kw">VALUES</span>
+    (1, 2), (1, 4),          <span class="cm">-- 記事1：クラウド、経済</span>
+    (2, 1), (2, 4),          <span class="cm">-- 記事2：AI、経済</span>
+    (3, 1), (3, 3), (3, 4),  <span class="cm">-- 記事3：AI、半導体、経済</span>
+    (4, 4);                  <span class="cm">-- 記事4：経済</span>
+                             <span class="cm">-- 記事5：タグなし</span>
+</code></pre><h2>99_reset.sql</h2><pre class="code sql"><code><span class="cm">-- =============================================================</span>
+<span class="cm">-- 99_reset.sql  学習用テーブルをすべて消す（元に戻すときに使う）</span>
+<span class="cm">-- 実行後に 01_schema.sql → 02_seed.sql の順で流すと初期状態に戻ります。</span>
+<span class="cm">-- 消える順番に注意：参照している側（子）から先に消す。</span>
+<span class="cm">-- =============================================================</span>
+<span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="kw">IF</span> <span class="kw">EXISTS</span> article_tags;
+<span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="kw">IF</span> <span class="kw">EXISTS</span> tags;
+<span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="kw">IF</span> <span class="kw">EXISTS</span> articles;
+<span class="kw">DROP</span> <span class="kw">TABLE</span> <span class="kw">IF</span> <span class="kw">EXISTS</span> sources;
+</code></pre></div></article>
+<article id="page-apE" data-id="apE" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録E</span>バックアップ命名ルール</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-apF" data-id="apF" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録F</span>データ辞書テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-apG" data-id="apG" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録G</span>題材追加チェックリスト</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+    <div class="ch-foot" id="chFoot"></div>
+  </main>
+</div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script>
+(function () {
+  var ORDER = ["about", "ch00", "ch01", "ch02", "ch03", "ch04", "ch05", "ch06", "ch07", "ch08", "ch09", "ch10", "ch11", "ch12", "ch13", "ch14", "ch15", "ch16", "ch17", "ch18", "ch19", "ch20", "ex01", "ex02", "ex03", "ex04", "ex05", "ex06", "apA", "apB", "apC", "apD", "apE", "apF", "apG"];
+  var NAMES = {"about": "この見本について", "ch00": "はじめに（読み方・所要時間・質問テンプレート）", "ch01": "RDBとは何か・用語の固定", "ch02": "テーブル設計の基本", "ch03": "pgAdmin4とpsql", "ch04": "サンプルデータを入れる・元に戻す", "ch05": "Claude Codeに頼む前の約束", "ch06": "SELECTを読む", "ch07": "JOINを読む", "ch08": "書き換える文を読み、やってから戻す", "ch09": "件数・重複・NULLの検算", "ch10": "設計の5つの問い", "ch11": "事例：ニュース情報", "ch12": "取り込みで起きること", "ch13": "題材が増えたとき", "ch14": "指示の型・完全版", "ch15": "頼む→検証のループ実践", "ch16": "環境の「正」とスナップショット", "ch17": "MCPとは", "ch18": "読み取り専用ロールを作る", "ch19": "MCP経由で出力する", "ch20": "チェックリストの使い方と失敗の索引", "ex01": "インデックスとEXPLAIN", "ex02": "本文の全文検索", "ex03": "事例：ファイル情報（完全版）", "ex04": "題材が増えたとき（5方式の比較と性能計測）", "ex05": "やり直す理屈（外部キーとTRUNCATE）", "ex06": "PoCの外へ出るとき", "apA": "用語集", "apB": "指示テンプレート", "apC": "チェックリスト1枚版", "apD": "初期化SQL一式", "apE": "バックアップ命名ルール", "apF": "データ辞書テンプレート", "apG": "題材追加チェックリスト"};
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var done = {};
+  try { done = JSON.parse(store.get('pgl-done') || '{}') || {}; } catch (e) { done = {}; }
+
+  var nav = document.getElementById('nav');
+  var foot = document.getElementById('chFoot');
+  var menuBtn = document.getElementById('menuBtn');
+  var topTitle = document.getElementById('topTitle');
+
+  function markDone() {
+    nav.querySelectorAll('li').forEach(function (li) {
+      var a = li.querySelector('a');
+      li.classList.toggle('is-done', !!done[a.dataset.id]);
+    });
+  }
+
+  function show(id) {
+    if (ORDER.indexOf(id) < 0) id = 'about';
+    document.querySelectorAll('main article').forEach(function (a) { a.hidden = a.dataset.id !== id; });
+    nav.querySelectorAll('a[data-id]').forEach(function (a) {
+      var on = a.dataset.id === id;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    var i = ORDER.indexOf(id);
+    var prev = ORDER[i - 1], next = ORDER[i + 1];
+    var html = '';
+    if (id !== 'about') {
+      html += '<button type="button" class="done-btn" id="doneBtn" aria-pressed="' + (!!done[id]) + '">' +
+              (done[id] ? '✓ 読み終えた' : '読み終えた') + '</button>';
+    }
+    html += '<div class="pager">' +
+      (prev ? '<a class="prev" href="#' + prev + '"><small>← 前へ</small>' + NAMES[prev] + '</a>' : '') +
+      (next ? '<a class="next" href="#' + next + '"><small>次へ →</small>' + NAMES[next] + '</a>' : '') +
+      '</div>';
+    foot.innerHTML = html;
+    var btn = document.getElementById('doneBtn');
+    if (btn) btn.addEventListener('click', function () {
+      done[id] = !done[id];
+      store.set('pgl-done', JSON.stringify(done));
+      btn.setAttribute('aria-pressed', String(!!done[id]));
+      btn.textContent = done[id] ? '✓ 読み終えた' : '読み終えた';
+      markDone();
+    });
+    topTitle.textContent = NAMES[id] || 'PostgreSQL学習資料';
+    nav.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    window.scrollTo(0, 0);
+  }
+
+  function route() { show((location.hash || '#about').slice(1)); }
+  window.addEventListener('hashchange', route);
+
+  // 必修だけ表示
+  var only = document.getElementById('onlyReq');
+  only.checked = store.get('pgl-only-req') === '1';
+  nav.classList.toggle('only-required', only.checked);
+  only.addEventListener('change', function () {
+    nav.classList.toggle('only-required', only.checked);
+    store.set('pgl-only-req', only.checked ? '1' : '0');
+  });
+
+  // スマートフォンの目次
+  menuBtn.addEventListener('click', function () {
+    var open = !nav.classList.contains('open');
+    nav.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { nav.classList.remove('open'); hideTip(); }
+  });
+
+  // 用語の説明
+  var tip = document.getElementById('tip');
+  var tipOwner = null;
+  function showTip(el) {
+    tip.textContent = el.dataset.def;
+    tip.hidden = false;
+    var r = el.getBoundingClientRect();
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(Math.max(16, r.left), window.innerWidth - w - 16);
+    var top = r.bottom + 6;
+    if (top + h > window.innerHeight - 8) top = r.top - h - 6;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tipOwner = el;
+  }
+  function hideTip() { tip.hidden = true; tipOwner = null; }
+  document.addEventListener('mouseover', function (e) { var t = e.target.closest && e.target.closest('.term'); if (t) showTip(t); });
+  document.addEventListener('mouseout', function (e) { var t = e.target.closest && e.target.closest('.term'); if (t) hideTip(); });
+  document.addEventListener('focusin', function (e) { if (e.target.classList && e.target.classList.contains('term')) showTip(e.target); });
+  document.addEventListener('focusout', function (e) { if (e.target.classList && e.target.classList.contains('term')) hideTip(); });
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('.term');
+    if (t) { if (tipOwner === t) hideTip(); else showTip(t); }
+    else if (tipOwner) hideTip();
+  });
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  markDone();
+  route();
+})();
+</script>

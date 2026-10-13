@@ -1,0 +1,67 @@
+# 目次 v0.7（A案：本冊2冊＋別冊）。id は不変。番号やタイトルを変えても id は変えない。
+# required: true=必修 / false=任意。file があれば本文あり、なければ「準備中」。
+books:
+  - title: 第1冊 基礎＋設計
+    parts:
+      - title: はじめに
+        chapters:
+          - {id: ch00, num: "0", title: "はじめに（読み方・所要時間・質問テンプレート）", required: true}
+      - title: 第1部 考え方
+        chapters:
+          - {id: ch01, num: "1", title: "RDBとは何か・用語の固定", required: true}
+          - {id: ch02, num: "2", title: "テーブル設計の基本", required: true}
+      - title: 第2部 道具と環境
+        chapters:
+          - {id: ch03, num: "3", title: "pgAdmin4とpsql", required: true}
+          - {id: ch04, num: "4", title: "サンプルデータを入れる・元に戻す", required: true}
+          - {id: ch05, num: "5", title: "Claude Codeに頼む前の約束", required: true}
+      - title: 第3部 読む力
+        chapters:
+          - {id: ch06, num: "6", title: "SELECTを読む", required: true}
+          - {id: ch07, num: "7", title: "JOINを読む", required: true, file: vol1/v1_07_join.md}
+          - {id: ch08, num: "8", title: "書き換える文を読み、やってから戻す", required: true}
+          - {id: ch09, num: "9", title: "件数・重複・NULLの検算", required: true}
+      - title: 第4部 設計を自分で見つける
+        chapters:
+          - {id: ch10, num: "10", title: "設計の5つの問い", required: true, file: vol1/v1_10_five-questions.md}
+          - {id: ch11, num: "11", title: "事例：ニュース情報", required: true}
+          - {id: ch12, num: "12", title: "取り込みで起きること", required: true}
+          - {id: ch13, num: "13", title: "題材が増えたとき", required: true}
+  - title: 第2冊 実践＋MCP
+    parts:
+      - title: 第5部 Claude Codeへの指示
+        chapters:
+          - {id: ch14, num: "14", title: "指示の型・完全版", required: true}
+          - {id: ch15, num: "15", title: "頼む→検証のループ実践", required: true}
+      - title: 第6部 初期化とバックアップ
+        chapters:
+          - {id: ch16, num: "16", title: "環境の「正」とスナップショット", required: true}
+      - title: 第7部 MCPサーバー経由
+        chapters:
+          - {id: ch17, num: "17", title: "MCPとは", required: true}
+          - {id: ch18, num: "18", title: "読み取り専用ロールを作る", required: true}
+          - {id: ch19, num: "19", title: "MCP経由で出力する", required: true}
+      - title: 第8部 検証
+        chapters:
+          - {id: ch20, num: "20", title: "チェックリストの使い方と失敗の索引", required: true}
+  - title: 別冊 深掘り
+    parts:
+      - title: 別冊
+        chapters:
+          - {id: ex01, num: "別1", title: "インデックスとEXPLAIN", required: false}
+          - {id: ex02, num: "別2", title: "本文の全文検索", required: false}
+          - {id: ex03, num: "別3", title: "事例：ファイル情報（完全版）", required: false}
+          - {id: ex04, num: "別4", title: "題材が増えたとき（5方式の比較と性能計測）", required: false}
+          - {id: ex05, num: "別5", title: "やり直す理屈（外部キーとTRUNCATE）", required: false}
+          - {id: ex06, num: "別6", title: "PoCの外へ出るとき", required: false}
+  - title: 付録
+    parts:
+      - title: 付録
+        chapters:
+          - {id: apA, num: "A", title: "用語集", required: false, generated: glossary}
+          - {id: apB, num: "B", title: "指示テンプレート", required: false}
+          - {id: apC, num: "C", title: "チェックリスト1枚版", required: false, generated: checklist}
+          - {id: apD, num: "D", title: "初期化SQL一式", required: false, generated: sql}
+          - {id: apE, num: "E", title: "バックアップ命名ルール", required: false}
+          - {id: apF, num: "F", title: "データ辞書テンプレート", required: false}
+          - {id: apG, num: "G", title: "題材追加チェックリスト", required: false}
