@@ -23,3 +23,10 @@ Claude Code
 
 ## 記事ネタ候補
 - 
+
+---
+
+## 追記（同日）: GitHub リモート登録
+- `https://github.com/bsfukushi/PostgreSQL_Learning`（public）に push した
+- main 直接運用・pr-flow 対象外と決定（CLAUDE.md「Git 運用」に記載）
+- クラウドセッションでは autoMemoryDirectory が効かず、学習用DBも無い。SQL照合は PC で行う

@@ -29,6 +29,13 @@
 - `psql` は PATH に無い。`"C:/Program Files/PostgreSQL/<版>/bin/psql.exe"` をフルパスで呼ぶ
 - 初期化SQLを流す前に、接続先（ホスト・DB名・ロール）を出力して1行で示してから実行する（`command-target-check.md`）
 
+### Git 運用（グローバルの pr-flow の例外）
+
+- リモートは `https://github.com/bsfukushi/PostgreSQL_Learning`（public。スマホの Claude Code から操作するため）
+- **main 直接運用。pr-flow の対象外**（Issue・ブランチ・PR・Codex レビューは使わない）。コミット＆push は確認なしで行う
+- 2026-10-14 ともさん決定。一人で作る資料で、CI も無いため
+- public なので、コミットする前に、パスワード・接続情報・個人の環境パスが含まれていないことを確かめる
+
 ### バージョン管理ルール
 
 セマンティックバージョニング（major.minor.patch）で資料の成長を可視化する。
