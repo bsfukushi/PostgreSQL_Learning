@@ -75,7 +75,7 @@ PostgreSQL_Learning/
 - [x] 記憶管理システム初期化（2026-10-14）
 - [x] GitHub リモート登録（bsfukushi/PostgreSQL_Learning、public、main 直接運用）
 - [ ] `pip install markdown pyyaml pymdown-extensions` / `cd build && npm i`
-- [ ] v18 の学習用DBを用意し、初期化SQLを流す
+- [ ] v18 の学習用DBを用意し、初期化SQLを流す（PC で行う。クラウドは照合しない：SPEC「SQL照合の正」）
 - [ ] `py build/build.py` でビルドが通ることを確認
 - [ ] 見本2章を v18 で照合
 

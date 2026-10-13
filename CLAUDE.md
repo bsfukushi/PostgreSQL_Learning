@@ -29,6 +29,12 @@
 - `psql` は PATH に無い。`"C:/Program Files/PostgreSQL/<版>/bin/psql.exe"` をフルパスで呼ぶ
 - 初期化SQLを流す前に、接続先（ホスト・DB名・ロール）を出力して1行で示してから実行する（`command-target-check.md`）
 
+### クラウドセッション（スマホの Claude Code）
+
+- **執筆とビルドだけ行う。SQL照合はしない**（照合の正は PC の v18。`.spec/SPEC.md`「SQL照合の正」）
+- クラウドには PostgreSQL 16 しか無く、`apt.postgresql.org` はネットワーク設定で拒否されるため v18 を入れられない
+- クラウドで書いた章は TODO の「SQL照合」を未完了のまま残し、PC のセッションで照合する
+
 ### Git 運用（グローバルの pr-flow の例外）
 
 - リモートは `https://github.com/bsfukushi/PostgreSQL_Learning`（public。スマホの Claude Code から操作するため）
