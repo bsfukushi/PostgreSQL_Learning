@@ -12,6 +12,7 @@
 - 始める: `/init-session`（HANDOFF・伝言・TODO・メモリ目次を読み、今日やることを提案する）
 - 終える: `/handoff`（HANDOFF.md に追記・TODO 更新・メモリ保存の確認）
 - 知見は auto memory（= `.agent/memory/`。`.claude/settings.local.json` の `autoMemoryDirectory`）に 1 件 1 ファイルで保存し、`tags` を付ける
+- 章を書く前に `.spec/XREF.md`（章のつながり台帳）のその章の節を読み、書いたら新しく作った約束（「第△章で扱う」など）を足す
 - 方針・目次の経緯は `docs/2026-10-14_pg-learning-material-handoff-v1.md`（壁打ちの記録）。確定事項は `.spec/SPEC.md` に移してあるので、普段はそちらを見る
 
 ---
