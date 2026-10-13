@@ -317,21 +317,22 @@ SELECT id, title FROM articles ORDER BY id LIMIT 3;
 ## 💡 Claude Codeで使うなら
 
 :::claude 頼み方の例
-Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、表の形を確かめるときと、CSV に出すときの例を載せておきます。
+Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、表の形を確かめるときと、CSV に出すときの例を載せておきます。第4章の作業フォルダ（`C:\pglearn\`）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（`sql-checker`）は `CLAUDE.md` に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。
 
 ```text
-PostgreSQL 18 の学習用DB（pglearn）で、articles 表の列を確かめてください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
+PostgreSQL 18 の学習用DBで、articles 表の列を確かめてください。
+① 目的: articles にどんな列があり、どの列に NULL が入りうるかを知りたい
+③ 使う表: articles
 - psql の \d articles の結果を、加工せずにそのまま見せる
-- 表の中身は変更しない
 ```
 
 ```text
-PostgreSQL 18 の学習用DB（pglearn）から、記事の id・タイトル・公開日時を CSV に出してください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
+PostgreSQL 18 の学習用DBから、記事の id・タイトル・公開日時を CSV に出してください。
+① 目的: 記事の一覧を Excel で見たい。全件を id の順に出す
+③ 使う表: articles
 - psql の \copy を使い、C:/pglearn/out/articles.csv に出す。1行目は列名
 - 実行前に、\copy の行をそのまま見せる
-- 実行後に、COPY のあとに表示された行数と、articles の件数を並べて見せる
+- b として、COPY のあとに表示された行数と、articles の件数を並べる
 ```
 
 **出てきたものの検証ポイント**

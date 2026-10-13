@@ -743,16 +743,17 @@ postgres=#</code></pre>
 <li>pgAdmin4 で <code>pglearn</code> の4つの表を見つけ、<code>articles</code> の中身を表示して、<code>source_id</code> が <code>[null]</code> の行を見つけます。確認したら、pgAdmin4 を閉じます。</li>
 </ol>
 <h2>💡 Claude Codeで使うなら</h2>
-<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、表の形を確かめるときと、CSV に出すときの例を載せておきます。</p>
-<pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）で、articles 表の列を確かめてください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
-- psql の \d articles の結果を、加工せずにそのまま見せる
-- 表の中身は変更しない</code></pre>
-<pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）から、記事の id・タイトル・公開日時を CSV に出してください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、表の形を確かめるときと、CSV に出すときの例を載せておきます。第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、articles 表の列を確かめてください。
+① 目的: articles にどんな列があり、どの列に NULL が入りうるかを知りたい
+③ 使う表: articles
+- psql の \d articles の結果を、加工せずにそのまま見せる</code></pre>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBから、記事の id・タイトル・公開日時を CSV に出してください。
+① 目的: 記事の一覧を Excel で見たい。全件を id の順に出す
+③ 使う表: articles
 - psql の \copy を使い、C:/pglearn/out/articles.csv に出す。1行目は列名
 - 実行前に、\copy の行をそのまま見せる
-- 実行後に、COPY のあとに表示された行数と、articles の件数を並べて見せる</code></pre>
+- b として、COPY のあとに表示された行数と、articles の件数を並べる</code></pre>
 <p><strong>出てきたものの検証ポイント</strong></p>
 <ol>
 <li>表の形の説明が、<code>\d</code> の結果（実物）と一致しているか</li>
@@ -1126,14 +1127,15 @@ DELETE FROM articles WHERE id = 5;</code></pre>
 </ol>
 <p>手順4で「戻せる」ことを一度体験しておくと、以降の章で安心して試せます。</p>
 <h2>💡 Claude Codeで使うなら</h2>
-<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、リセットを頼むときの例を載せておきます。</p>
-<pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）を、軽いリセットで最初の状態に戻してください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、リセットを頼むときの例を載せておきます。第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBを、軽いリセットで最初の状態に戻してください。
+① 目的: 練習で変えたデータを、最初の状態に戻したい
+③ 使う表: sources, articles, tags, article_tags
 - C:\pglearn\sql\ の 99_reset.sql → 01_schema.sql → 02_seed.sql の順に流す
 - psql には -v ON_ERROR_STOP=1 を付ける
 - 実行前に、実行するコマンドを3行とも見せる
-- 実行後、sources / articles / tags / article_tags の件数を表示する（3・5・4・8 になるはず）
-- pglearn 以外のデータベースには接続しない</code></pre>
+- a として、4つの表の件数を表示する（3・5・4・8 になるはず）</code></pre>
+<p>ファイルを流すのは書く役（<code>learner</code>）ですが、件数を数え直すのは検証役（<code>reviewer</code>）です。2つのロールが別々に数えた件数がそろえば、リセットの結果を、書いた本人の報告だけに頼らずに確かめられます。</p>
 <p><strong>出てきたものの検証ポイント</strong></p>
 <ol>
 <li>実行するコマンドの <code>-d</code> が <code>pglearn</code>、<code>-U</code> が <code>learner</code> になっているか</li>
@@ -2039,7 +2041,7 @@ claude</code></pre>
 </tbody>
 </table></div>
 <h2>5. 手を動かす</h2>
-<p>psql（または pgAdmin4 の Query Tool）で、第3章で作った学習用データベースに接続して実行します。</p>
+<p>psql で、第3章で作った学習用データベースに <code>learner</code> で接続して実行します。</p>
 <ol>
 <li>
 <p>先に、基準になる件数を数えます。</p>
@@ -2086,19 +2088,20 @@ claude</code></pre>
 </table></div>
 <p>③で理由を説明できないときは、その結果を使わずに、資料作成者に質問してください（質問テンプレートは第0章）。</p>
 <h2>💡 Claude Codeで使うなら</h2>
-<section class="box claude"><h3 class="box-title">頼み方の例</h3><pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）で、配信元ごとの記事数を出す SELECT を書いてください。
-- 対象テーブル: sources, articles
-- 記事が0本の配信元も 0 として表示する
-- 配信元が不明（source_id が NULL）の記事は数えない
-- 実行前に SQL を見せ、JOIN の種類（INNER / LEFT）と、どの表を左にしたかを1行で説明する
-- 実行後、articles の総件数と、結果の合計を並べて表示する
-- INSERT / UPDATE / DELETE は実行しない</code></pre>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、配信元ごとの記事数を出してください。
+① 目的: 配信元ごとの記事数を知りたい。記事が0本の配信元も 0 として表示する。配信元が不明（source_id が NULL）の記事は数えない
+③ 使う表: sources, articles
+- 実行前に、JOIN の種類（INNER / LEFT）と、どの表を左にしたかを1行で説明する
+- b として、結果の合計と articles の総件数を並べ、差の理由を書く
+- d として、記事が0本の配信元の行を見せる</code></pre>
 <p><strong>出てきたものの検証ポイント</strong></p>
 <ol>
 <li>JOIN の種類と「左の表」が、頼んだ内容（全配信元を出す → sources が左の LEFT JOIN）と一致しているか</li>
 <li>頼んでいない1対多の表（<code>article_tags</code> など）が結合されていないか</li>
 <li><code>COUNT(*)</code> か <code>COUNT(列)</code> か</li>
 <li>結果の合計（2＋2＋0＝4）と総件数（5）の差を説明できるか。差の1は配信元不明の記事です</li>
+<li>検証役の報告で、c（別解）が「一致」か、f（依頼とのずれ）に頼んでいない結合や条件が挙がっていないか</li>
 </ol>
 <p><strong>起きがちな失敗と、その理由</strong></p>
 <ul>
@@ -2490,10 +2493,13 @@ claude</code></pre>
 <p><strong>問い2</strong>：パスで判定すると、1行目と3行目は別のファイルです。ハッシュで判定すると、同じ中身なので同じものです。「どこに何があるか」を知りたいならパス、「同じ中身の重複を見つけたい」ならハッシュが合います。両方を知りたい場合は、表を分ける設計になります（別冊3で扱います）。</p>
 <p>Windows のパスは、大文字と小文字を区別しません（<code>C:\share</code> と <code>C:\Share</code> は同じ場所）。一方、PostgreSQL の UNIQUE 制約は区別するので、パスで判定する場合は、保存する前に表記をそろえる必要があります。</p></div></details>
 <h2>💡 Claude Codeで使うなら</h2>
-<section class="box claude"><h3 class="box-title">頼み方の例</h3><pre class="code text"><code>PostgreSQL 18 で、次のニュースデータを保存するテーブル設計案を出してください。
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 で、次のニュースデータを保存するテーブル設計案を出してください。
+① 目的: ニュースを保存し、公開日時・配信元・タグで検索できるようにしたい
+③ 使う表: なし（新しく設計する）。生データは次のとおり
 （ここに生データを数行貼る）
 
-設計案を出す前に、次の5つの問いに対するあなたの仮定を、表で示してください。
+e（前提）として、設計案を出す前に、次の5つの問いに対するあなたの仮定を、表で示してください。
 1. 1行は何を表すか
 2. 何で「同じもの」と判定するか
 3. 1つのものに複数あるものは何か
@@ -2502,6 +2508,7 @@ claude</code></pre>
 
 - 自信がない問いには「要確認」と書く
 - CREATE TABLE は案として表示するだけで、実行しない</code></pre>
+<p>設計案は実行しないので、検証役は呼ばれません。その代わりに、e（前提）を5つの問いの形で出させて、あなたが1問ずつ確かめます。</p>
 <p><strong>出てきたものの検証ポイント</strong></p>
 <ol>
 <li>仮定の表を、自分の答えと1問ずつ比べる。違うところは、どちらが目的に合うかを決めてから設計に進む</li>

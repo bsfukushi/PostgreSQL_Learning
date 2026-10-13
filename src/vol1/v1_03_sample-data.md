@@ -265,17 +265,19 @@ WHERE d.datname = current_database();
 ## 💡 Claude Codeで使うなら
 
 :::claude 頼み方の例
-Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、リセットを頼むときの例を載せておきます。
+Claude Code を使い始めるのは第4章からです。第4章を終えたあとで、リセットを頼むときの例を載せておきます。第4章の作業フォルダ（`C:\pglearn\`）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（`sql-checker`）は `CLAUDE.md` に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。
 
 ```text
-PostgreSQL 18 の学習用DB（pglearn）を、軽いリセットで最初の状態に戻してください。
-- 接続: ホスト localhost、ロール learner、データベース pglearn
+PostgreSQL 18 の学習用DBを、軽いリセットで最初の状態に戻してください。
+① 目的: 練習で変えたデータを、最初の状態に戻したい
+③ 使う表: sources, articles, tags, article_tags
 - C:\pglearn\sql\ の 99_reset.sql → 01_schema.sql → 02_seed.sql の順に流す
 - psql には -v ON_ERROR_STOP=1 を付ける
 - 実行前に、実行するコマンドを3行とも見せる
-- 実行後、sources / articles / tags / article_tags の件数を表示する（3・5・4・8 になるはず）
-- pglearn 以外のデータベースには接続しない
+- a として、4つの表の件数を表示する（3・5・4・8 になるはず）
 ```
+
+ファイルを流すのは書く役（`learner`）ですが、件数を数え直すのは検証役（`reviewer`）です。2つのロールが別々に数えた件数がそろえば、リセットの結果を、書いた本人の報告だけに頼らずに確かめられます。
 
 **出てきたものの検証ポイント**
 
