@@ -36,3 +36,7 @@ CREATE TABLE article_tags (
     tag_id      integer NOT NULL REFERENCES tags(id),
     PRIMARY KEY (article_id, tag_id)
 );
+
+-- 検証用ロール reviewer に、読む権限だけを与える（第4章）
+-- 権限は表ごとに付くので、表を作り直すたびにここで与え直す。reviewer は第4章で作っておくこと。
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO reviewer;

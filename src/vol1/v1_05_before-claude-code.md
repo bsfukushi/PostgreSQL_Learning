@@ -42,15 +42,16 @@ flowchart LR
 
 ## 2. 約束1：接続は `learner` で
 
-第4章で、ロールを2つ使い分けました。
+第4章で、ロールを3つ作りました。
 
-| | `postgres` | `learner` |
-|---|---|---|
-| 種類 | [[スーパーユーザー]]（何でもできる） | 学習用のふつうのロール |
-| `pglearn` の表を作る・消す | できる | できる（`pglearn` の持ち主なので） |
-| ほかのデータベースを消す | できる | できない |
-| ロールを作る・消す | できる | できない |
-| Claude Code に使わせる | **使わせない** | 使わせる |
+| | `postgres` | `learner` | `reviewer` |
+|---|---|---|---|
+| 種類 | [[スーパーユーザー]]（何でもできる） | 学習用のふつうのロール | 検証用のふつうのロール |
+| `pglearn` の表を読む | できる | できる | できる |
+| `pglearn` の表を書き換える・作る・消す | できる | できる（`pglearn` の持ち主なので） | できない |
+| ほかのデータベースを消す | できる | できない | できない |
+| ロールを作る・消す | できる | できない | できない |
+| Claude Code に使わせる | **使わせない** | SQL を書いて実行する役に使わせる | 検証する役に使わせる |
 
 `learner` でも、`pglearn` の中の表は消せます。それでも困らないのは、第4章のリセットで、数分あれば元に戻せるからです。
 
@@ -73,18 +74,21 @@ SELECT current_user, current_database();
 ```sql
 SELECT rolname, rolsuper, rolcreatedb, rolcreaterole
 FROM pg_roles
-WHERE rolname IN ('learner', 'postgres')
+WHERE rolname IN ('learner', 'postgres', 'reviewer')
 ORDER BY rolname;
 ```
 
-:::result 2
+:::result 3
 | rolname | rolsuper | rolcreatedb | rolcreaterole |
 |---|---|---|---|
 | learner | f | f | f |
 | postgres | t | t | t |
+| reviewer | f | f | f |
 :::
 
 psql は、正しい（true）を `t`、正しくない（false）を `f` と表示します。`rolsuper` がスーパーユーザーかどうか、`rolcreatedb` がデータベースを作れるか、`rolcreaterole` がロールを作れるかです。
+
+`learner` と `reviewer` は、この表では同じに見えます。違いは「どの表に何をしてよいか」という、表ごとの権限にあります。`reviewer` には、`pglearn` の表を読む権限だけを与えてあります（第4章）。
 
 > 🔍 **MCP サーバーを読み取り専用にすれば安全、ではない理由**：第2冊で、Claude Code から MCP サーバー経由でデータベースを読む方法を扱います。MCP サーバーを読み取り専用にしても、Claude Code はコマンドとして psql を直接実行できます。そのとき psql が `postgres` で接続できる状態なら、MCP の制限とは関係なく何でもできてしまいます。だから、psql が使うロールの側を `learner` に絞っておきます。
 
@@ -100,23 +104,24 @@ psql は、正しい（true）を `t`、正しくない（false）を `f` と表
 
 1. エクスプローラーのアドレス欄に `%APPDATA%` と入力して開きます（`C:\Users\あなたの名前\AppData\Roaming` が開きます）。
 2. その中に `postgresql` という名前のフォルダを作ります（すでにあれば、そのまま使います）。
-3. メモ帳を開き、次の1行を書きます。最後の `パスワード` の部分は、第4章で決めた `learner` のパスワードに置き換えます。
+3. メモ帳を開き、次の2行を書きます。最後の `パスワード` の部分は、第4章で決めた、それぞれのロールのパスワードに置き換えます。
 
     ```text
-    localhost:5432:pglearn:learner:パスワード
+    localhost:5432:pglearn:learner:learnerのパスワード
+    localhost:5432:pglearn:reviewer:reviewerのパスワード
     ```
 
 4. 「名前を付けて保存」で、ファイルの種類を「すべてのファイル」にし、`pgpass.conf` という名前で、手順2のフォルダに保存します。
 
-1行の意味は次のとおりです。コロン（`:`）で5つに区切ります。
+1行が1つのロールの分です。1行の意味は次のとおりです。コロン（`:`）で5つに区切ります。
 
 | 位置 | 書いた値 | 意味 |
 |---|---|---|
 | 1 | `localhost` | 接続先のホスト |
 | 2 | `5432` | ポート番号（インストールのときに変えた人は、その番号） |
 | 3 | `pglearn` | データベース |
-| 4 | `learner` | ロール |
-| 5 | パスワード | `learner` のパスワード |
+| 4 | `learner` または `reviewer` | ロール |
+| 5 | パスワード | そのロールのパスワード |
 
 `postgres` の行は書きません。書かなければ、`postgres` で接続しようとしたときは、これまでどおりパスワードを聞かれます。
 
@@ -148,7 +153,7 @@ pgpass.conf を作ったあとも、次のことはしないでください。
 
 Claude Code が「接続できないので、パスワードを教えてください」と言ってきたら、教えずに、pgpass.conf と `-w` のエラーを自分で確かめてください。
 
-pgpass.conf にはパスワードがそのままの文字で書かれています。だから、書くのは学習用の `learner` だけにしておきます。
+pgpass.conf にはパスワードがそのままの文字で書かれています。だから、書くのは学習用の `learner` と `reviewer` だけにしておきます。
 
 ## 4. 約束3：指示の最小型で頼む
 

@@ -784,7 +784,12 @@ postgres=#</code></pre>
 <tr>
 <td>ロール（接続するユーザー）</td>
 <td><code>learner</code></td>
-<td>学習用。<code>pglearn</code> の持ち主</td>
+<td>学習用。<code>pglearn</code> の持ち主。表を作る・書き換える・消すことができる</td>
+</tr>
+<tr>
+<td>ロール（接続するユーザー）</td>
+<td><code>reviewer</code></td>
+<td>検証用。<code>pglearn</code> の表を<strong>読むことしかできない</strong></td>
 </tr>
 <tr>
 <td>初期化SQL</td>
@@ -793,7 +798,7 @@ postgres=#</code></pre>
 </tr>
 </tbody>
 </table></div>
-<p>PostgreSQL をインストールしたときに作られた <code>postgres</code> というロールは、何でもできる特別なロール（<button type="button" class="term" data-def="すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。">スーパーユーザー</button>）です。<code>postgres</code> を使うのは、この章の最初の「作る」作業だけにします。練習は <code>learner</code> で行います。</p>
+<p>PostgreSQL をインストールしたときに作られた <code>postgres</code> というロールは、何でもできる特別なロール（<button type="button" class="term" data-def="すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。">スーパーユーザー</button>）です。<code>postgres</code> を使うのは、この章の最初の「作る」作業だけにします。練習は <code>learner</code> で行います。<code>reviewer</code> は、第5章で「Claude Code が書いた SQL を、別のモデルに検証させる」ときに使います。</p>
 <aside class="aside design"><p>🧭 <strong>なぜ専用のロールを作るのか</strong>：<code>postgres</code> で練習すると、打ち間違い1つで学習用以外のデータベースまで消せてしまいます。<code>learner</code> は <code>pglearn</code> の持ち主なので、その中では表を作ることも消すこともできますが、ほかのデータベースの表は消せません。壊れてもよい範囲に、操作できる範囲を合わせておくのが目的です。理由は第5章でも詳しく扱います。</p></aside>
 <h3>初期化SQLの3つのファイル</h3>
 <p>付録Dに、3つのファイルの中身がそのまま載っています。それぞれ、次のことをします。</p>
@@ -813,7 +818,7 @@ postgres=#</code></pre>
 </tr>
 <tr>
 <td><code>01_schema.sql</code></td>
-<td>4つの表を作る（中身は空）</td>
+<td>4つの表を作り（中身は空）、<code>reviewer</code> に読む権限を与える</td>
 <td>2番目</td>
 </tr>
 <tr>
@@ -828,9 +833,11 @@ postgres=#</code></pre>
 <h2>2. 学習用のデータベースとロールを作る（最初の1回だけ）</h2>
 <p>第3章の方法で、<code>postgres</code> ロールで psql を起動します。</p>
 <pre class="code text"><code>psql -h localhost -U postgres -d postgres</code></pre>
-<p>インストールのときに決めた <code>postgres</code> のパスワードを入力すると、<code>postgres=#</code> と表示されます。行の先頭の <code>postgres</code> は、いま接続しているデータベースの名前です。ここで次の3行を、1行ずつ実行します。</p>
+<p>インストールのときに決めた <code>postgres</code> のパスワードを入力すると、<code>postgres=#</code> と表示されます。行の先頭の <code>postgres</code> は、いま接続しているデータベースの名前です。ここで次の5行を、1行ずつ実行します。</p>
 <pre class="code text"><code>CREATE ROLE learner LOGIN;
 \password learner
+CREATE ROLE reviewer LOGIN;
+\password reviewer
 CREATE DATABASE pglearn OWNER learner;</code></pre>
 <div class="scroll"><table>
 <thead>
@@ -850,14 +857,24 @@ CREATE DATABASE pglearn OWNER learner;</code></pre>
 </tr>
 <tr>
 <td>3行目</td>
+<td>ログインできるロール <code>reviewer</code> を作る</td>
+</tr>
+<tr>
+<td>4行目</td>
+<td><code>reviewer</code> のパスワードを決める</td>
+</tr>
+<tr>
+<td>5行目</td>
 <td>データベース <code>pglearn</code> を作り、持ち主を <code>learner</code> にする</td>
 </tr>
 </tbody>
 </table></div>
-<p><code>learner</code> のパスワードは、<code>postgres</code> のパスワードとは別のものにしてください。第5章で、このパスワードを PC の中のファイルに保存します。</p>
+<p>3つのロール（<code>postgres</code>・<code>learner</code>・<code>reviewer</code>）のパスワードは、すべて別のものにしてください。第5章で、<code>learner</code> と <code>reviewer</code> のパスワードを PC の中のファイルに保存します。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ <code>CREATE ROLE ... PASSWORD '...'</code> と書かないのか</strong>：SQL の中にパスワードを書くと、psql の入力履歴などに、そのままの文字で残ることがあります。<code>\password</code> は、入力したパスワードを psql の中で暗号化してからサーバーへ送るので、平文が残りません。</p>
-<p>🔍 <strong>なぜ持ち主を <code>learner</code> にするのか</strong>：PostgreSQL 15 以降は、データベースの持ち主でないロールは、そのデータベースの中に表を作れません。持ち主を <code>learner</code> にしておくと、<code>learner</code> だけで初期化SQLを流せます。</p></aside>
-<p>終わったら <code>\q</code> で psql を終了します。この先、<code>postgres</code> で接続するのは、第3節の「完全リセット」をするときだけです。</p>
+<p>🔍 <strong>なぜ持ち主を <code>learner</code> にするのか</strong>：PostgreSQL 15 以降は、データベースの持ち主でないロールは、そのデータベースの中に表を作れません。持ち主を <code>learner</code> にしておくと、<code>learner</code> だけで初期化SQLを流せます。</p>
+<p>🧭 <strong>なぜ読むだけのロールを作るのか</strong>：第5章では、Claude Code が書いた SQL を、別のモデルに検証させます。検証役も SQL を実行しますが、検証役がうっかりデータを書き換えてしまうと、検証そのものが信用できなくなります。<code>reviewer</code> は、表を読む権限しか持たないので、書き換える SQL を実行しても PostgreSQL がエラーで止めます。「気をつける」ではなく、「できない」状態にしておきます。</p>
+<p>🔍 <strong>読む権限は、いつ与えるのか</strong>：この時点では、まだ表がありません。読む権限は表ごとに与えるもので、表を消して作り直すと、権限も一緒に消えます。そこで、表を作る <code>01_schema.sql</code> の最後で、毎回 <code>reviewer</code> に読む権限を与えるようにしてあります。リセットのたびに、権限も元どおりになります。</p></aside>
+<p>終わったら <code>\q</code> で psql を終了します。この先、<code>postgres</code> で接続するのは、第4節の「完全リセット」をするときだけです。</p>
 <h2>3. サンプルデータを入れる</h2>
 <h3>ファイルを置く</h3>
 <p>付録Dの3つのファイルを、次のフォルダに保存します。</p>
@@ -990,6 +1007,7 @@ CREATE DATABASE pglearn OWNER learner;
 <p>第3節の3行（3つのファイル）を流し、件数が 3・5・4・8 になることを確かめます。</p>
 </li>
 </ol>
+<p>ロール（<code>learner</code> と <code>reviewer</code>）は、データベースの外にあるので、<code>DROP DATABASE</code> では消えません。作り直す必要はありません。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ pgAdmin4 を閉じるのか</strong>：だれか（pgAdmin4 や、別の画面の psql）が <code>pglearn</code> に接続していると、<code>DROP DATABASE</code> は「ほかのユーザーが使用中」というエラーで止まります。消してよいかどうかを PostgreSQL は判断できないので、使用中のデータベースは消さないようにできています。</p></aside>
 <p><code>DROP DATABASE</code> は、指定したデータベースの中身をすべて消し、元に戻す方法はありません。必ず <code>pglearn</code> と書いてあることを確かめてから実行してください。</p>
 <h2>5. 全員の設定を揃える</h2>
@@ -1074,7 +1092,14 @@ CREATE DATABASE pglearn OWNER learner;
 <li>
 <p>軽いリセットをして、件数が 3・5・4・8 に戻ることを確かめます。</p>
 </li>
-<li>第5節の SQL を実行し、結果を資料作成者に送ります。</li>
+<li>
+<p><code>reviewer</code> で接続し、読めるが書き換えられないことを確かめます。</p>
+<pre class="code text"><code>psql -h localhost -U reviewer -d pglearn</code></pre>
+<pre class="code text"><code>SELECT COUNT(*) FROM articles;
+DELETE FROM articles WHERE id = 5;</code></pre>
+<p>1行目は <code>5</code> が表示され、2行目は <code>permission denied for table articles</code>（表 articles への権限がない）というエラーになります。エラーになれば成功です。
+6. 第5節の SQL を実行し、結果を資料作成者に送ります。</p>
+</li>
 </ol>
 <p>手順4で「戻せる」ことを一度体験しておくと、以降の章で安心して試せます。</p>
 <h2>💡 Claude Codeで使うなら</h2>
@@ -1152,13 +1177,14 @@ CREATE DATABASE pglearn OWNER learner;
 </table></div>
 <aside class="aside design"><p>🧭 <strong>なぜ Claude Code を触る前に約束を決めるのか</strong>：Claude Code は、頼まれたことを速く、それらしく実行します。間違いがあっても、エラーにならずに進むことがあります。後から気をつけるより、先に「間違えても壊れない範囲」と「確かめる場所」を決めておくほうが、確実に事故を防げます。</p></aside>
 <h2>2. 約束1：接続は <code>learner</code> で</h2>
-<p>第4章で、ロールを2つ使い分けました。</p>
+<p>第4章で、ロールを3つ作りました。</p>
 <div class="scroll"><table>
 <thead>
 <tr>
 <th></th>
 <th><code>postgres</code></th>
 <th><code>learner</code></th>
+<th><code>reviewer</code></th>
 </tr>
 </thead>
 <tbody>
@@ -1166,26 +1192,37 @@ CREATE DATABASE pglearn OWNER learner;
 <td>種類</td>
 <td><button type="button" class="term" data-def="すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。">スーパーユーザー</button>（何でもできる）</td>
 <td>学習用のふつうのロール</td>
+<td>検証用のふつうのロール</td>
 </tr>
 <tr>
-<td><code>pglearn</code> の表を作る・消す</td>
+<td><code>pglearn</code> の表を読む</td>
+<td>できる</td>
+<td>できる</td>
+<td>できる</td>
+</tr>
+<tr>
+<td><code>pglearn</code> の表を書き換える・作る・消す</td>
 <td>できる</td>
 <td>できる（<code>pglearn</code> の持ち主なので）</td>
+<td>できない</td>
 </tr>
 <tr>
 <td>ほかのデータベースを消す</td>
 <td>できる</td>
+<td>できない</td>
 <td>できない</td>
 </tr>
 <tr>
 <td>ロールを作る・消す</td>
 <td>できる</td>
 <td>できない</td>
+<td>できない</td>
 </tr>
 <tr>
 <td>Claude Code に使わせる</td>
 <td><strong>使わせない</strong></td>
-<td>使わせる</td>
+<td>SQL を書いて実行する役に使わせる</td>
+<td>検証する役に使わせる</td>
 </tr>
 </tbody>
 </table></div>
@@ -1210,7 +1247,7 @@ CREATE DATABASE pglearn OWNER learner;
 <p><code>current_user</code> が接続しているロール、<code>current_database</code> が接続しているデータベースです。2つのロールの違いは、次の SQL で見られます。</p>
 <pre class="code sql"><code><span class="kw">SELECT</span> rolname, rolsuper, rolcreatedb, rolcreaterole
 <span class="kw">FROM</span> pg_roles
-<span class="kw">WHERE</span> rolname <span class="kw">IN</span> (<span class="st">'learner'</span>, <span class="st">'postgres'</span>)
+<span class="kw">WHERE</span> rolname <span class="kw">IN</span> (<span class="st">'learner'</span>, <span class="st">'postgres'</span>, <span class="st">'reviewer'</span>)
 <span class="kw">ORDER</span> <span class="kw">BY</span> rolname;</code></pre>
 <div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
 <thead>
@@ -1234,9 +1271,16 @@ CREATE DATABASE pglearn OWNER learner;
 <td>t</td>
 <td>t</td>
 </tr>
+<tr>
+<td>reviewer</td>
+<td>f</td>
+<td>f</td>
+<td>f</td>
+</tr>
 </tbody>
-</table></div><div class="result-foot">(2 行)</div></div>
+</table></div><div class="result-foot">(3 行)</div></div>
 <p>psql は、正しい（true）を <code>t</code>、正しくない（false）を <code>f</code> と表示します。<code>rolsuper</code> がスーパーユーザーかどうか、<code>rolcreatedb</code> がデータベースを作れるか、<code>rolcreaterole</code> がロールを作れるかです。</p>
+<p><code>learner</code> と <code>reviewer</code> は、この表では同じに見えます。違いは「どの表に何をしてよいか」という、表ごとの権限にあります。<code>reviewer</code> には、<code>pglearn</code> の表を読む権限だけを与えてあります（第4章）。</p>
 <aside class="aside mech"><p>🔍 <strong>MCP サーバーを読み取り専用にすれば安全、ではない理由</strong>：第2冊で、Claude Code から MCP サーバー経由でデータベースを読む方法を扱います。MCP サーバーを読み取り専用にしても、Claude Code はコマンドとして psql を直接実行できます。そのとき psql が <code>postgres</code> で接続できる状態なら、MCP の制限とは関係なく何でもできてしまいます。だから、psql が使うロールの側を <code>learner</code> に絞っておきます。</p></aside>
 <h2>3. 約束2：パスワードは PC のファイルに置く</h2>
 <h3>何もしないと、Claude Code は止まる</h3>
@@ -1247,14 +1291,15 @@ CREATE DATABASE pglearn OWNER learner;
 <li>エクスプローラーのアドレス欄に <code>%APPDATA%</code> と入力して開きます（<code>C:\Users\あなたの名前\AppData\Roaming</code> が開きます）。</li>
 <li>その中に <code>postgresql</code> という名前のフォルダを作ります（すでにあれば、そのまま使います）。</li>
 <li>
-<p>メモ帳を開き、次の1行を書きます。最後の <code>パスワード</code> の部分は、第4章で決めた <code>learner</code> のパスワードに置き換えます。</p>
-<pre class="code text"><code>localhost:5432:pglearn:learner:パスワード</code></pre>
+<p>メモ帳を開き、次の2行を書きます。最後の <code>パスワード</code> の部分は、第4章で決めた、それぞれのロールのパスワードに置き換えます。</p>
+<pre class="code text"><code>localhost:5432:pglearn:learner:learnerのパスワード
+localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 </li>
 <li>
 <p>「名前を付けて保存」で、ファイルの種類を「すべてのファイル」にし、<code>pgpass.conf</code> という名前で、手順2のフォルダに保存します。</p>
 </li>
 </ol>
-<p>1行の意味は次のとおりです。コロン（<code>:</code>）で5つに区切ります。</p>
+<p>1行が1つのロールの分です。1行の意味は次のとおりです。コロン（<code>:</code>）で5つに区切ります。</p>
 <div class="scroll"><table>
 <thead>
 <tr>
@@ -1281,13 +1326,13 @@ CREATE DATABASE pglearn OWNER learner;
 </tr>
 <tr>
 <td>4</td>
-<td><code>learner</code></td>
+<td><code>learner</code> または <code>reviewer</code></td>
 <td>ロール</td>
 </tr>
 <tr>
 <td>5</td>
 <td>パスワード</td>
-<td><code>learner</code> のパスワード</td>
+<td>そのロールのパスワード</td>
 </tr>
 </tbody>
 </table></div>
@@ -1324,7 +1369,7 @@ CREATE DATABASE pglearn OWNER learner;
 </tbody>
 </table></div>
 <p>Claude Code が「接続できないので、パスワードを教えてください」と言ってきたら、教えずに、pgpass.conf と <code>-w</code> のエラーを自分で確かめてください。</p>
-<p>pgpass.conf にはパスワードがそのままの文字で書かれています。だから、書くのは学習用の <code>learner</code> だけにしておきます。</p>
+<p>pgpass.conf にはパスワードがそのままの文字で書かれています。だから、書くのは学習用の <code>learner</code> と <code>reviewer</code> だけにしておきます。</p>
 <h2>4. 約束3：指示の最小型で頼む</h2>
 <p>Claude Code への頼み方は、毎回、次の6項目を入れます。この資料では、これを<strong>指示の最小型</strong>と呼びます。</p>
 <div class="scroll"><table>
@@ -2351,6 +2396,10 @@ CREATE DATABASE pglearn OWNER learner;
     tag_id      integer <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">REFERENCES</span> tags(id),
     <span class="kw">PRIMARY</span> <span class="kw">KEY</span> (article_id, tag_id)
 );
+
+<span class="cm">-- 検証用ロール reviewer に、読む権限だけを与える（第4章）</span>
+<span class="cm">-- 権限は表ごとに付くので、表を作り直すたびにここで与え直す。reviewer は第4章で作っておくこと。</span>
+GRANT <span class="kw">SELECT</span> <span class="kw">ON</span> ALL TABLES <span class="kw">IN</span> SCHEMA public TO reviewer;
 </code></pre><h2>02_seed.sql</h2><pre class="code sql"><code><span class="kw">SET</span> client_encoding = <span class="st">'UTF8'</span>;  <span class="cm">-- このファイルは UTF-8。PC の設定に関係なく正しく読ませる（第4章）</span>
 <span class="cm">-- =============================================================</span>
 <span class="cm">-- 02_seed.sql  サンプルデータ（記事・配信元はすべて架空です）</span>
