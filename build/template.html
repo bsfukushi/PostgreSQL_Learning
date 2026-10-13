@@ -110,6 +110,9 @@ pre.code .kw { color: var(--accent); font-weight: 600; }
 pre.code .cm { color: var(--muted); font-style: italic; }
 pre.code .st { color: var(--ok); }
 pre.code.text { background: var(--surface); }
+.result.error .result-head { background: var(--surface); }
+.badge-error { font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 0 8px; }
+.result.error pre.code { margin: 0; border: none; border-radius: 0; }
 .copy-note { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-bottom: none; border-radius: 8px 8px 0 0; padding: 5px 12px; }
 .copy-note + pre.code { border-top-left-radius: 0; border-top-right-radius: 0; }
 

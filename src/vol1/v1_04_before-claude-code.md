@@ -169,7 +169,7 @@ Claude Code への頼み方は、毎回、次の6項目を入れます。この�
 | ① | 目的 | 配信元ごとの記事数を知りたい |
 | ② | 接続先 | localhost、ロール learner、データベース pglearn |
 | ③ | 使う表 | sources, articles |
-| ④ | してよいこと・いけないこと | SELECT だけ。INSERT / UPDATE / DELETE はしない |
+| ④ | してよいこと・いけないこと | SELECT だけ。INSERT / UPDATE / DELETE はしない。表の形（制約など）は変えない |
 | ⑤ | 実行前に見せるもの | SQL と、どういう考えで書いたかの1行説明 |
 | ⑥ | 実行後に見せるもの | 結果と**検証材料**（下の表）、検証役の報告 |
 
@@ -206,7 +206,7 @@ Claude Code は、あなたの PC でコマンドを実行する前に、「こ�
 |---|---|
 | `-U` の後ろ | 書く役なら `learner`、検証役なら `reviewer` か。`postgres` なら断る |
 | `-d` の後ろ | `pglearn` か |
-| SQL の最初の単語 | `SELECT` か。`DELETE` `UPDATE` `DROP` `TRUNCATE` なら、頼んだ覚えがあるか。`WITH` で始まるときは、中に `DELETE` `UPDATE` `INSERT` が無いか |
+| SQL の最初の単語 | `SELECT` か。`DELETE` `UPDATE` `DROP` `TRUNCATE` `ALTER` なら、頼んだ覚えがあるか。`WITH` で始まるときは、中に `DELETE` `UPDATE` `INSERT` が無いか |
 | `-f` の後ろ（あれば） | 流すファイルの名前と場所が正しいか |
 
 > 🔍 **なぜ `WITH` のときは中まで見るのか**：`WITH` で始まる SQL は、長い SQL を段に分けて書く形です（読み方は第9章）。ふつうは `SELECT` の組み合わせですが、段の中に `DELETE` などを書くこともでき、最後が `SELECT` で終わっていてもデータが変わります。最初の単語だけでは、読むか変えるかを判断できない形です。
@@ -317,7 +317,7 @@ PostgreSQL 18 の学習用DBで、…してください。
 
 ```text
 ② 接続先: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
-④ SELECT だけ実行する。INSERT / UPDATE / DELETE / DROP / TRUNCATE はしない
+④ SELECT だけ実行する。INSERT / UPDATE / DELETE / DROP / TRUNCATE / ALTER はしない
 ⑤ 実行前に SQL と、どういう考えで書いたかを1行で見せる
 ⑥ 実行後に、検証材料 a・b・d・e を出し、sql-checker エージェントに検証させてから報告する
 ```

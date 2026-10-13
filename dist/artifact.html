@@ -110,6 +110,9 @@ pre.code .kw { color: var(--accent); font-weight: 600; }
 pre.code .cm { color: var(--muted); font-style: italic; }
 pre.code .st { color: var(--ok); }
 pre.code.text { background: var(--surface); }
+.result.error .result-head { background: var(--surface); }
+.badge-error { font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 0 8px; }
+.result.error pre.code { margin: 0; border: none; border-radius: 0; }
 .copy-note { font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-bottom: none; border-radius: 8px 8px 0 0; padding: 5px 12px; }
 .copy-note + pre.code { border-top-left-radius: 0; border-top-right-radius: 0; }
 
@@ -218,7 +221,7 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 </ul>
 <div class="nav-part">第2部 表と SQL を読む</div>
 <ul>
-<li data-required="true" class="todo"><a href="#ch02" data-id="ch02"><span class="n">5</span><span class="t">表の形を読む（テーブル設計の基本）</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="ready"><a href="#ch02" data-id="ch02"><span class="n">5</span><span class="t">表の形を読む（テーブル設計の基本）</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="todo"><a href="#ch06" data-id="ch06"><span class="n">6</span><span class="t">SELECTを読む</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="ready"><a href="#ch07" data-id="ch07"><span class="n">7</span><span class="t">JOINを読む</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="todo"><a href="#ch08" data-id="ch08"><span class="n">8</span><span class="t">書き換える文を読み、やってから戻す</span><span class="done" aria-label="読了">✓</span></a></li>
@@ -292,7 +295,11 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 </tr>
 <tr>
 <td><a href="#ch05">第4章 Claude Codeに頼む前の約束</a></td>
-<td>接続するロール、パスワードの置き場所、指示の最小型</td>
+<td>接続ロール、パスワードの置き場所、指示の最小型、別のモデルによる検証</td>
+</tr>
+<tr>
+<td><a href="#ch02">第5章 表の形を読む</a></td>
+<td>型・タイムゾーン・制約、エラーは表が守ってくれた印</td>
 </tr>
 <tr>
 <td><a href="#ch07">第7章 JOINを読む</a></td>
@@ -316,7 +323,7 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 <li>正は <code>src/</code> 配下の章ごとの Markdown です。<code>python3 build/build.py</code> で、この HTML を作り直します。</li>
 <li>図（ER図）はビルドのときに画像（SVG）にしているので、インターネットにつながっていなくても表示できます。</li>
 <li>付録A（用語集）、付録C（チェックリスト）、付録D（初期化SQL）は、本文と SQL ファイルから自動で作られます。</li>
-<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第2章・第3章・第4章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
+<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第2〜5章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
 </ul></div></article>
 <article id="page-ch00" data-id="ch00" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ はじめに</p><h1><span class="ch-no">第0章</span>はじめに（読み方・所要時間・質問テンプレート）</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch01" data-id="ch01" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 準備：考え方と道具</p><h1><span class="ch-no">第1章</span>RDBとは何か・用語の固定</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
@@ -462,12 +469,12 @@ postgres=#</code></pre>
 <tr>
 <td>読む SQL</td>
 <td>中身を読んで、結果が正しいかを疑う練習の対象</td>
-<td>帯が付かない（第6章から登場）</td>
+<td>帯が付かない（第5章から登場）</td>
 </tr>
 </tbody>
 </table></div>
 <p>第2〜4章の SQL は、すべて「写して実行する SQL」です。いまは中身を読めなくてかまいません。帯に書いてある章で、読み方を説明します。</p>
-<aside class="aside design"><p>🧭 <strong>なぜ読み方より先に実行させるのか</strong>：SQL を読む練習には、練習用のデータと、それを動かす道具が先に要ります（学ぶ順＝手を動かせる順）。道具を整える第2〜4章では、確かめるための SQL を「意味だけ」で使い、読み方は道具がそろった第6章から順に説明します。</p></aside>
+<aside class="aside design"><p>🧭 <strong>なぜ読み方より先に実行させるのか</strong>：SQL を読む練習には、練習用のデータと、それを動かす道具が先に要ります（学ぶ順＝手を動かせる順）。道具を整える第2〜4章では、確かめるための SQL を「意味だけ」で使い、読み方は道具がそろった第5章から順に説明します。</p></aside>
 <h3>SQL は <code>;</code> で終わる</h3>
 <p>プロンプトで、次の SQL を実行します。</p>
 <div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第6章）</div><pre class="code sql"><code><span class="kw">SELECT</span> version();</code></pre>
@@ -1428,7 +1435,7 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 <tr>
 <td>④</td>
 <td>してよいこと・いけないこと</td>
-<td>SELECT だけ。INSERT / UPDATE / DELETE はしない</td>
+<td>SELECT だけ。INSERT / UPDATE / DELETE はしない。表の形（制約など）は変えない</td>
 </tr>
 <tr>
 <td>⑤</td>
@@ -1518,7 +1525,7 @@ localhost:5432:pglearn:reviewer:reviewerのパスワード</code></pre>
 </tr>
 <tr>
 <td>SQL の最初の単語</td>
-<td><code>SELECT</code> か。<code>DELETE</code> <code>UPDATE</code> <code>DROP</code> <code>TRUNCATE</code> なら、頼んだ覚えがあるか。<code>WITH</code> で始まるときは、中に <code>DELETE</code> <code>UPDATE</code> <code>INSERT</code> が無いか</td>
+<td><code>SELECT</code> か。<code>DELETE</code> <code>UPDATE</code> <code>DROP</code> <code>TRUNCATE</code> <code>ALTER</code> なら、頼んだ覚えがあるか。<code>WITH</code> で始まるときは、中に <code>DELETE</code> <code>UPDATE</code> <code>INSERT</code> が無いか</td>
 </tr>
 <tr>
 <td><code>-f</code> の後ろ（あれば）</td>
@@ -1666,7 +1673,7 @@ claude</code></pre>
 （その章で足す検証材料があれば、ここに書く）</code></pre>
 <p>ひな形の外（別のフォルダ）で頼むときは、②④⑤⑥も書きます。</p>
 <pre class="code text"><code>② 接続先: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
-④ SELECT だけ実行する。INSERT / UPDATE / DELETE / DROP / TRUNCATE はしない
+④ SELECT だけ実行する。INSERT / UPDATE / DELETE / DROP / TRUNCATE / ALTER はしない
 ⑤ 実行前に SQL と、どういう考えで書いたかを1行で見せる
 ⑥ 実行後に、検証材料 a・b・d・e を出し、sql-checker エージェントに検証させてから報告する</code></pre>
 <p><strong>出てきたものの検証ポイント</strong></p>
@@ -1698,7 +1705,344 @@ claude</code></pre>
 <p><code>reviewer</code> のような読むだけのロールは、第2冊の MCP サーバー（第17〜19章）でも使います。権限を細かく決める方法（<code>GRANT</code> / <code>REVOKE</code>）は、第18章で扱います。</p>
 <p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/libpq-pgpass.html">パスワードファイル</a> と <a href="https://www.postgresql.org/docs/18/role-attributes.html">ロールの属性</a> を参照してください。</p></div></details>
 <div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ 許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</p></div></div></article>
-<article id="page-ch02" data-id="ch02" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第5章</span>表の形を読む（テーブル設計の基本）</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch02" data-id="ch02" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第5章</span>表の形を読む（テーブル設計の基本）</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第2章（pgAdmin4とpsql）、第3章（サンプルデータ）、第4章（Claude Codeに頼む前の約束）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
+<ul>
+<li><code>CREATE TABLE</code> や <code>\d</code> を読んで、その表に「何が入り、何が入らないか」を説明できる</li>
+<li>日時をタイムゾーン付きで保存する理由と、タイムゾーンを書かない日時で起きるズレを説明できる</li>
+<li>エラーが出たときに、「表の決まりごとが守ってくれた」のか「頼み方がおかしい」のかを見分けられる</li>
+<li>Claude Code に表の形を調べさせ、検証役の結果と <code>\d</code> の実物で確かめられる</li>
+</ul>
+<h2>1. 表の形は「決まりごとの集まり」</h2>
+<p>第3章で作った <code>articles</code>（記事）の表は、次の <code>CREATE TABLE</code> で作られています（<code>01_schema.sql</code> の一部）。</p>
+<pre class="code sql"><code><span class="kw">CREATE</span> <span class="kw">TABLE</span> articles (
+    id            integer <span class="kw">GENERATED</span> <span class="kw">ALWAYS</span> <span class="kw">AS</span> <span class="kw">IDENTITY</span> <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    source_id     integer <span class="kw">REFERENCES</span> sources(id),   <span class="cm">-- 配信元が分からない記事は NULL</span>
+    title         text        <span class="kw">NOT</span> <span class="kw">NULL</span>,
+    url           text        <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">UNIQUE</span>,
+    published_at  timestamptz,                       <span class="cm">-- 公開日時が取れないことがある</span>
+    fetched_at    timestamptz <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> now(),
+    status        text        <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">'active'</span>
+                  <span class="kw">CHECK</span> (status <span class="kw">IN</span> (<span class="st">'active'</span>, <span class="st">'hidden'</span>))
+);</code></pre>
+<p>1行が1つの列です。列の名前のあとに、「何の種類の値が入るか（<strong>型</strong>）」と「どんな値なら入れてよいか（<strong><button type="button" class="term" data-def="表に入れてよい値の決まりごと。主キー・UNIQUE・NOT NULL・外部キー・CHECK など。決まりに合わない値はエラーで止められる。">制約</button></strong>）」が並んでいます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>列</th>
+<th>型</th>
+<th>制約</th>
+<th>読み方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td><code>integer</code>（整数）</td>
+<td>IDENTITY、PRIMARY KEY</td>
+<td>番号は PostgreSQL が振る。重複も NULL もない</td>
+</tr>
+<tr>
+<td><code>source_id</code></td>
+<td><code>integer</code></td>
+<td>REFERENCES sources(id)</td>
+<td>配信元の番号。<code>sources</code> に無い番号は入らない。NULL は入る</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td><code>text</code>（文字）</td>
+<td>NOT NULL</td>
+<td>タイトルは必ずある</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td><code>text</code></td>
+<td>NOT NULL、UNIQUE</td>
+<td>URL は必ずあり、同じ URL は2回入らない</td>
+</tr>
+<tr>
+<td><code>published_at</code></td>
+<td><code>timestamptz</code>（タイムゾーン付きの日時）</td>
+<td>なし</td>
+<td>公開日時。NULL は入る</td>
+</tr>
+<tr>
+<td><code>fetched_at</code></td>
+<td><code>timestamptz</code></td>
+<td>NOT NULL、DEFAULT now()</td>
+<td>取得日時。書かなければ、入れた時刻が入る</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>text</code></td>
+<td>NOT NULL、DEFAULT、CHECK</td>
+<td><code>active</code> か <code>hidden</code> のどちらかだけ</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>\d articles</code>（第2章）で見えるのも、この同じ決まりごとです。<code>CREATE TABLE</code> は「作るときの文」、<code>\d</code> は「いまの実物」なので、食い違ったときは <code>\d</code> が正しいと考えます。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ表の形を読めるようになる必要があるのか</strong>：Claude Code が出す SQL の結果は、表の形に左右されます。たとえば「配信元ごとの記事数」が合わないとき、原因が SQL にあるのか、<code>source_id</code> に NULL が入りうるという表の形にあるのかは、表の形を読めないと切り分けられません。</p></aside>
+<p>この章では、決まりごとを4つに分けて読みます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>節</th>
+<th>決まりごと</th>
+<th>守ってくれること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>型</td>
+<td>数字として比べるか、文字として比べるか</td>
+</tr>
+<tr>
+<td>3</td>
+<td>日時とタイムゾーン</td>
+<td>「いつ」がずれないこと</td>
+</tr>
+<tr>
+<td>4</td>
+<td>主キーと IDENTITY</td>
+<td>1行を必ず1つに特定できること</td>
+</tr>
+<tr>
+<td>5</td>
+<td>NOT NULL・UNIQUE・外部キー</td>
+<td>欠けてはいけない値が欠けない、重複しない、存在しない相手を指さない</td>
+</tr>
+</tbody>
+</table></div>
+<h2>2. 型：数字か、文字か</h2>
+<p>同じ「10」と「9」でも、型によって比べ方が変わります。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> <span class="st">'10'</span> &lt; <span class="st">'9'</span> <span class="kw">AS</span> text_compare, 10 &lt; 9 <span class="kw">AS</span> integer_compare;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th>text_compare</th>
+<th>integer_compare</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>f</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(1 行)</div></div>
+<p>引用符で囲んだ <code>'10'</code> は文字なので、辞書の順番のように1文字目から比べます。<code>'1'</code> は <code>'9'</code> より前なので、「10 は 9 より小さい」（<code>t</code>）になります。引用符のない <code>10</code> は整数なので、ふつうに「10 は 9 より小さくない」（<code>f</code>）です。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ型が大事なのか</strong>：番号や金額を <code>text</code> で持つと、並べ替えたときに「1, 10, 2, 3…」のような順番になり、<code>&gt;</code> で絞ったときの結果も変わります。エラーにはならず、値の比べ方だけが静かに変わるので、第6章で扱う「値が変わる」ズレの原因になります。Claude Code が作った表で、数字のはずの列が <code>text</code> になっていないかは、<code>\d</code> の <code>Type</code> で確かめられます。</p></aside>
+<h2>3. 日時とタイムゾーン：「いつ」をずらさない</h2>
+<h3>タイムゾーン付きで保存する</h3>
+<p><code>published_at</code> の型 <code>timestamptz</code> は、「世界のどこで見ても同じ1つの瞬間」を保存します。表示するときは、接続している人の設定（第3章で確かめた <code>timezone</code>）の時刻に直して見せます。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> id, published_at, published_at AT TIME ZONE <span class="st">'UTC'</span> <span class="kw">AS</span> utc_wall_clock
+<span class="kw">FROM</span> articles
+<span class="kw">WHERE</span> id <span class="kw">IN</span> (1, 2)
+<span class="kw">ORDER</span> <span class="kw">BY</span> id;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>published_at</th>
+<th>utc_wall_clock</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>2026-10-01 09:00:00+09</td>
+<td>2026-10-01 00:00:00</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>2026-10-02 08:30:00+09</td>
+<td>2026-10-01 23:30:00</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(2 行)</div></div>
+<p><code>published_at</code> の末尾の <code>+09</code> は、「日本時間（UTC より9時間進んでいる）で表示している」という印です。<code>AT TIME ZONE 'UTC'</code> は、同じ瞬間を UTC（世界の基準の時刻）の時計で読むとどうなるかを表示します。記事2は、日本では10月2日の朝ですが、UTC ではまだ10月1日です。</p>
+<aside class="aside design"><p>🧭 <strong>なぜタイムゾーン付きで保存するのか</strong>：ニュースの配信元には、海外のサービスや、UTC で時刻を返すシステムもあります。時刻だけを保存すると、「9時」が日本の9時なのか UTC の9時なのかが分からなくなります。タイムゾーン付きで保存しておけば、どこから来た時刻でも、同じ1本の時間の線の上に並べられます。</p></aside>
+<h3>タイムゾーンを書かない日時は、設定で意味が変わる</h3>
+<p>SQL の中で日時を書くときも、タイムゾーンを書かないと、接続している人の設定で解釈されます。psql で、自分の接続だけ設定を UTC に変えて試します（この設定は、psql を終えると元に戻ります）。</p>
+<pre class="code text"><code>SET TimeZone = 'UTC';
+SELECT COUNT(*) FROM articles WHERE published_at &gt;= '2026-10-02 00:00';
+SELECT COUNT(*) FROM articles WHERE published_at &gt;= '2026-10-02 00:00+09';
+RESET TimeZone;</code></pre>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>書き方</th>
+<th>意味</th>
+<th style="text-align: right;">件数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>'2026-10-02 00:00'</code></td>
+<td><strong>UTC の</strong>10月2日0時（＝日本時間の10月2日9時）以降</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td><code>'2026-10-02 00:00+09'</code></td>
+<td>日本時間の10月2日0時以降</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table></div>
+<p>同じ「10月2日以降」のつもりでも、タイムゾーンを書かないと件数が変わります。記事2（日本時間の10月2日8時30分）が、片方では入り、片方では入りません。</p>
+<aside class="aside mech"><p>🔍 <strong>Claude Code の結果と自分の結果が9時間ずれる理由</strong>：Claude Code も、あなたの PC の psql で接続するので、ふだんは同じ設定になります。ただし、環境変数や接続の設定が違う場面（第2冊の MCP サーバーなど）では、設定が UTC になっていることがあります。だから、この資料では日時を <code>'2026-10-02 00:00+09'</code> のように、いつもタイムゾーン付きで書きます（第7章の例もこの書き方です）。</p></aside>
+<h2>4. 主キーと IDENTITY：1行を必ず1つに特定する</h2>
+<h3>主キー</h3>
+<p><code>id</code> の <code>PRIMARY KEY</code> は、<button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>の印です。主キーの列は、重複も NULL も許されないので、<code>id</code> が分かれば行が必ず1つに決まります。</p>
+<h3>番号は PostgreSQL が振る</h3>
+<p><code>GENERATED ALWAYS AS IDENTITY</code> は、「番号は PostgreSQL が順に振る。人が指定してはいけない」という決まりです。番号を指定して入れようとすると、エラーになります。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code sql"><code><span class="kw">INSERT</span> <span class="kw">INTO</span> tags (id, name) <span class="kw">VALUES</span> (10, <span class="st">'テスト'</span>);</code></pre>
+<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span><span>実行結果</span></div><pre class="code text"><code>ERROR:  cannot insert a non-DEFAULT value into column "id"
+DETAIL:  Column "id" is an identity column defined as GENERATED ALWAYS.</code></pre><div class="result-foot">（エラー。データは変わらない）</div></div>
+<p>「<code>id</code> は IDENTITY（GENERATED ALWAYS）の列なので、値を指定して入れられない」という意味です。番号を振っている部品が、第2章の <code>\d</code> で見えた <code>tags_id_seq</code> などの<button type="button" class="term" data-def="番号を順に渡す部品。IDENTITY の列は、これを使って番号を振る。渡した番号は、INSERT が失敗しても戻らない。">シーケンス</button>です。</p>
+<aside class="aside mech"><p>🔍 <strong>番号は欠けることがある</strong>：シーケンスは、INSERT のたびに次の番号を渡します。INSERT が途中でエラーになっても、渡した番号は返ってきません。そのため、失敗した INSERT のあとに成功した INSERT は、番号が1つ飛びます（例：<code>tags</code> の id が 4 の次に 6 になる）。番号に欠けがあっても、データが消えたとは限りません。「id が連続しているか」で件数を確かめず、<code>COUNT(*)</code> で数えます。</p>
+<p>🔍 <strong>リセットすると、番号は 1 から振り直される</strong>：第3章の軽いリセットは、表ごと消して作り直します。シーケンスも作り直されるので、番号は 1 からになります。本文の SQL が「配信元の id が 1 ならテック日報」という前提で書けるのは、このためです。</p></aside>
+<h2>5. NOT NULL・UNIQUE・外部キー：入れてはいけない値を止める</h2>
+<h3>NOT NULL：欠けてはいけない</h3>
+<p><code>title</code> は <code>NOT NULL</code> なので、タイトルの無い記事は入りません。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code sql"><code><span class="kw">INSERT</span> <span class="kw">INTO</span> articles (source_id, title, url) <span class="kw">VALUES</span> (1, <span class="kw">NULL</span>, <span class="st">'https://example.com/test/1'</span>);</code></pre>
+<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span><span>実行結果</span></div><pre class="code text"><code>ERROR:  null value in column "title" of relation "articles" violates not-null constraint</code></pre><div class="result-foot">（エラー。データは変わらない）</div></div>
+<h3>UNIQUE：重複してはいけない</h3>
+<p><code>tags</code> の <code>name</code> は <button type="button" class="term" data-def="指定した列に、同じ値が2回入らないようにする決まり。">UNIQUE制約</button>付きなので、同じ名前のタグは2つ作れません。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code sql"><code><span class="kw">INSERT</span> <span class="kw">INTO</span> tags (name) <span class="kw">VALUES</span> (<span class="st">'AI'</span>);</code></pre>
+<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span><span>実行結果</span></div><pre class="code text"><code>ERROR:  duplicate key value violates unique constraint "tags_name_key"
+DETAIL:  Key (name)=(AI) already exists.</code></pre><div class="result-foot">（エラー。データは変わらない）</div></div>
+<h3>外部キー：存在しない相手を指してはいけない</h3>
+<p><code>articles.source_id</code> は、<code>sources.id</code> を指す<button type="button" class="term" data-def="別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。">外部キー</button>です。<code>sources</code> に無い番号（99）を指す記事は入りません。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code sql"><code><span class="kw">INSERT</span> <span class="kw">INTO</span> articles (source_id, title, url) <span class="kw">VALUES</span> (99, <span class="st">'テスト'</span>, <span class="st">'https://example.com/test/2'</span>);</code></pre>
+<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span><span>実行結果</span></div><pre class="code text"><code>ERROR:  insert or update on table "articles" violates foreign key constraint "articles_source_id_fkey"
+DETAIL:  Key (source_id)=(99) is not present in table "sources".</code></pre><div class="result-foot">（エラー。データは変わらない）</div></div>
+<p>逆に、記事から指されている配信元を消そうとしても、止まります。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code sql"><code><span class="kw">DELETE</span> <span class="kw">FROM</span> sources <span class="kw">WHERE</span> id = 1;</code></pre>
+<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span><span>実行結果</span></div><pre class="code text"><code>ERROR:  update or delete on table "sources" violates foreign key constraint "articles_source_id_fkey" on table "articles"
+DETAIL:  Key (id)=(1) is still referenced from table "articles".</code></pre><div class="result-foot">（エラー。データは変わらない）</div></div>
+<p>「配信元1は、まだ articles から参照されている」という意味です。第3章のリセットで、参照している側（<code>article_tags</code>）から順に消していたのは、このエラーを避けるためです。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ配信元を別の表に分けたのか</strong>：記事ごとに配信元の名前を書くと、「経済ウィークリー」と「経済ウイークリー」のような表記ゆれが起き、配信元ごとに数えたときに別々に数えられてしまいます。名前は <code>sources</code> に1回だけ書き、記事には番号（<code>source_id</code>）だけを持たせれば、表記ゆれは起きません。外部キーは、その番号が実在する配信元を指していることを保証します。この考え方を、生データから自分で導く手順は第10章で扱います。</p></aside>
+<h3>親を消したら、子はどうなるか（ON DELETE）</h3>
+<p>外部キーには、「指されている行（親）を消そうとしたとき、指している行（子）をどうするか」を決める設定があります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>設定</th>
+<th>親を消すと</th>
+<th>この資料のサンプル</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>書かない（NO ACTION）</td>
+<td>子がいれば、エラーで止まる</td>
+<td><strong>これ</strong>（上のエラー）</td>
+</tr>
+<tr>
+<td><code>ON DELETE CASCADE</code></td>
+<td>子も<strong>一緒に消える</strong></td>
+<td>使っていない</td>
+</tr>
+<tr>
+<td><code>ON DELETE SET NULL</code></td>
+<td>子の外部キーの列が NULL になる</td>
+<td>使っていない</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜ CASCADE を使わないのか</strong>：<code>CASCADE</code> だと、配信元を1つ消しただけで、その配信元の記事が何本も、エラーも出ずに消えます。1行消すつもりが、何行も減る ― 第6章で扱う「行が減る」ズレが、データそのものに起きる形です。止まってくれる設定のほうが、何が消えるかを人が確かめてから進められます。</p></aside>
+<h3>エラーは「表が守ってくれた」印</h3>
+<p>この節のエラーは、どれも、決まりに合わないデータを PostgreSQL が止めてくれたものです。エラーになったとき、データは何も変わっていません。</p>
+<p>困るのは、エラーを消すために決まりごとのほうを外してしまうことです。UNIQUE を外せば重複したタグが入り、外部キーを外せば存在しない配信元を指す記事が入ります。どちらも、あとで数えたときに、エラーにならずに結果がずれる原因になります。</p>
+<h2>6. 手を動かす</h2>
+<h3>psql で</h3>
+<ol>
+<li><code>learner</code> で <code>pglearn</code> に接続し、<code>\d sources</code> を実行します。一番下の <code>Referenced by:</code> に、「<code>articles</code> の <code>source_id</code> から指されている」ことが書かれているのを確かめます。</li>
+<li>第2節〜第5節の SQL を順に実行し、結果やエラーの文章を読みます。エラーの SQL は、何度実行してもデータを変えません。</li>
+<li>
+<p>次の2行を実行し、<code>tags</code> の id が 4 の次が 5 ではなく 6 になることを確かめます（1行目は UNIQUE のエラーになり、番号を1つ使います）。</p>
+<div class="copy-note">📋 写して実行する SQL（いまは中身を読まなくてかまいません。読み方は第8章）</div><pre class="code text"><code>INSERT INTO tags (name) VALUES ('AI');
+INSERT INTO tags (name) VALUES ('テスト') RETURNING id;</code></pre>
+</li>
+<li>
+<p>手順3でデータを変えたので、第3章の軽いリセットで元に戻します。</p>
+</li>
+</ol>
+<p>PC の設定によっては、エラーの文章が日本語で表示されます。意味は同じです。</p>
+<h3>Claude Code で（書く役 → 検証役 → あなた）</h3>
+<p><code>C:\pglearn\</code> で Claude Code を起動し、次のとおりに頼みます。第4章で決めた流れを、初めて通しで使います。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、articles 表の決まりごとを一覧にしてください。
+① 目的: articles の列ごとに、型・NULL を許すか・制約（主キー、UNIQUE、外部キー、CHECK）を知りたい
+③ 使う表: articles
+- b として、psql の \d articles の結果を加工せずに並べる
+- 表の形は変えない（ALTER TABLE はしない）</code></pre>
+<p>返ってきたら、次の順に確かめます。</p>
+<ol>
+<li><strong><code>/tasks</code></strong>：<code>sql-checker</code> が Sonnet で動いたか</li>
+<li><strong>一覧と <code>\d</code> の実物</strong>：書く役の一覧が、b の <code>\d articles</code> と1列ずつ一致しているか。特に <code>source_id</code> と <code>published_at</code> が「NULL を許す」になっているか</li>
+<li><strong>検証役の報告</strong>：c（検証役が別の方法で調べた結果）が「一致」か</li>
+<li><strong>e（前提）</strong>：「制約」の意味を、頼んだとおりに解釈しているか</li>
+</ol>
+<h2>💡 Claude Codeで使うなら</h2>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>第4章の作業フォルダ（<code>C:\pglearn\</code>）で頼むときの形です。接続先・してはいけないこと・検証材料 a・b・d・e・検証役（<code>sql-checker</code>）は <code>CLAUDE.md</code> に書いてあるので、依頼に書くのは①目的と③使う表、それにこの章で足すことだけです。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DBで、10月2日以降（日本時間）に公開された記事を一覧にしてください。
+① 目的: 10月2日 0時（日本時間）以降に公開された記事の id・タイトル・公開日時を知りたい
+③ 使う表: articles
+- 日時は、タイムゾーン付き（+09）で書く
+- d として、公開日時が NULL の記事が結果に入らないことと、その記事の id を示す</code></pre>
+<p><strong>この章で足す検証材料</strong></p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>記号</th>
+<th>足すもの</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>b</td>
+<td>表の形を説明させたら、<code>\d</code> の結果を加工せずに並べさせる</td>
+<td>説明と実物を、あなたが見比べられる</td>
+</tr>
+<tr>
+<td>d</td>
+<td>NULL を許す列（<code>source_id</code>・<code>published_at</code>）が絡むときは、NULL の行がどう扱われたか</td>
+<td>NULL の行は、条件によって静かに消える</td>
+</tr>
+<tr>
+<td>e</td>
+<td>日時を書いた SQL では、どのタイムゾーンで解釈したか</td>
+<td>書かないと、設定によって9時間ずれる</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>出てきたものの検証ポイント</strong></p>
+<ol>
+<li>SQL の中の日時に <code>+09</code> などのタイムゾーンが付いているか</li>
+<li>結果の件数（3）が、自分で数えた件数と合うか。公開日時が NULL の記事4が入っていないか</li>
+<li>表の形を変える SQL（<code>ALTER TABLE</code>）が実行されていないか</li>
+</ol>
+<p><strong>起きがちな失敗と、その理由</strong></p>
+<ul>
+<li><strong>「UNIQUE 制約のエラーが出たので、制約を外して登録しました」と報告される</strong>：Claude Code は、頼まれた目的（登録する）を果たすために、障害になっている決まりごとを外そうとすることがあります。決まりごとを外すと、重複や存在しない相手を指すデータが入り、あとの集計がずれます。<code>ALTER TABLE</code> で制約を外す提案が出たら、許可せずに、「どのデータが決まりに合わなかったか」を報告させます。</li>
+<li><strong>件数が自分の結果と1件違う</strong>：日時のタイムゾーンが書かれていないことがあります。境目の時刻の近くにある記事（記事2など）が、入ったり入らなかったりします。</li>
+<li><strong>id の欠けを見て「データが消えています」と報告される</strong>：失敗した INSERT でも番号は進むので、欠けは消えた証拠になりません。<code>COUNT(*)</code> と a（基準の件数）で確かめます。</li>
+</ul></section>
+<h2>確認問題</h2>
+<details class="quiz"><summary><span class="q">Q1. Claude Code が「記事の登録で、URL の UNIQUE 制約のエラーが出たため、制約を外してから登録しました」と報告しました。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>制約を外したことを疑います。エラーは「同じ URL の記事がもう入っている」という知らせで、データは変わっていませんでした。制約を外して登録すると、同じ記事が2行になり、記事数を数えたときに増えます。まず、すでに入っている同じ URL の記事を見せてもらい、本当に別の記事なのかを確かめます。</p></div></details>
+<details class="quiz"><summary><span class="q">Q2. Claude Code の結果では、記事1の公開日時が <code>2026-10-01 00:00:00+00</code> と表示されました。あなたの psql では <code>2026-10-01 09:00:00+09</code> です。データが違うのでしょうか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>データは同じです。どちらも同じ瞬間を、違うタイムゾーンで表示しているだけです（<code>+00</code> は UTC、<code>+09</code> は日本時間）。ただし、Claude Code の接続が UTC になっているので、タイムゾーンを書かない日時で絞ると、件数がずれます。SQL の日時に <code>+09</code> が付いているかを確かめます。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. 「配信元を1つ消して」と頼んだら、Claude Code が「外部キーのエラーで消せなかったので、ON DELETE CASCADE に変更してから消しました」と報告しました。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>外部キーの設定を CASCADE に変えたことを疑います。CASCADE では、その配信元の記事も一緒に、エラーも出ずに消えます。記事の件数（a）が減っていないかを確かめ、減っていれば第3章のリセットで戻します。本当は、消す前に「この配信元を指している記事が何本あるか」を確かめて、記事をどうするかを決める必要があります。</p></div></details>
+<details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>🔍 <code>timestamptz</code> は、タイムゾーンの名前を保存していない</h3>
+<p>名前から「タイムゾーンも一緒に保存している」と思われがちですが、実際に保存しているのは「1つの瞬間」だけです。入れるときに、書かれたタイムゾーン（無ければ接続の設定）を使って瞬間に直し、表示するときに、接続の設定の時刻に直します。「どの国の記事か」を残したいときは、タイムゾーンの名前を別の列に持たせます。</p>
+<p>タイムゾーンの無い <code>timestamp</code> という型もあります。こちらは「時計の針の位置」だけを保存するので、どこの時刻なのかが分かりません。この資料では使いません。</p>
+<h3>🧭 <code>serial</code> と書かれていたら</h3>
+<p>古い書き方では、番号を振る列を <code>id serial</code> と書きます。動きはほぼ同じですが、番号を人が指定して入れることもできてしまいます。Claude Code が <code>serial</code> で表を作ってきたら、<code>GENERATED ALWAYS AS IDENTITY</code> で書き直すように頼んでかまいません。</p>
+<h3>🔍 CHECK 制約</h3>
+<p><code>status</code> の <code>CHECK (status IN ('active', 'hidden'))</code> は、「この2つの値しか入れてはいけない」という決まりです。<code>'Active'</code>（大文字）や <code>'非表示'</code> のような表記ゆれを入口で止められます。</p>
+<p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/ddl-constraints.html">制約</a>、<a href="https://www.postgresql.org/docs/18/datatype-datetime.html">日付／時刻データ型</a>、<a href="https://www.postgresql.org/docs/18/ddl-identity-columns.html">識別列</a> を参照してください。</p></div></details>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ エラーが出たとき、決まりごと（制約）を外すのではなく、どのデータが決まりに合わなかったかを確かめたか</p></div></div></article>
 <article id="page-ch06" data-id="ch06" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第6章</span>SELECTを読む</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch07" data-id="ch07" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 表と SQL を読む</p><h1><span class="ch-no">第7章</span>JOINを読む</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第3章（サンプルデータ）、第6章（SELECTを読む）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
 <ul>
@@ -2554,9 +2898,9 @@ e（前提）として、設計案を出す前に、次の5つの問いに対す
 <article id="page-ex04" data-id="ex04" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別4</span>題材が増えたとき（5方式の比較と性能計測）</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ex05" data-id="ex05" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別5</span>やり直す理屈（外部キーとTRUNCATE）</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ex06" data-id="ex06" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別6</span>PoCの外へ出るとき</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr><tr><th>データベース</th><td>表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。</td></tr><tr><th>ロール</th><td>PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。</td></tr><tr><th>スーパーユーザー</th><td>すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。</td></tr><tr><th>文字コード</th><td>文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。</td></tr><tr><th>照合順序</th><td>文字を並べるときの順番のルール。大文字と小文字、ひらがなとカタカナのどれを先にするかなどが決まる。英語では collation。</td></tr><tr><th>トランザクション</th><td>複数の変更を「全部成功するか、何もしないか」の1つのまとまりとして扱う仕組み。</td></tr><tr><th>pgpass</th><td>psql などが接続するときに、パスワードを聞かずに読みにいくファイル。Windows では %APPDATA%\postgresql\pgpass.conf。</td></tr></table></div></div></article>
+<article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr><tr><th>データベース</th><td>表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。</td></tr><tr><th>ロール</th><td>PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。</td></tr><tr><th>スーパーユーザー</th><td>すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。</td></tr><tr><th>文字コード</th><td>文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。</td></tr><tr><th>照合順序</th><td>文字を並べるときの順番のルール。大文字と小文字、ひらがなとカタカナのどれを先にするかなどが決まる。英語では collation。</td></tr><tr><th>トランザクション</th><td>複数の変更を「全部成功するか、何もしないか」の1つのまとまりとして扱う仕組み。</td></tr><tr><th>pgpass</th><td>psql などが接続するときに、パスワードを聞かずに読みにいくファイル。Windows では %APPDATA%\postgresql\pgpass.conf。</td></tr><tr><th>制約</th><td>表に入れてよい値の決まりごと。主キー・UNIQUE・NOT NULL・外部キー・CHECK など。決まりに合わない値はエラーで止められる。</td></tr><tr><th>シーケンス</th><td>番号を順に渡す部品。IDENTITY の列は、これを使って番号を振る。渡した番号は、INSERT が失敗しても戻らない。</td></tr></table></div></div></article>
 <article id="page-apB" data-id="apB" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録B</span>指示テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">2章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">3章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">4章</span>許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
+<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">2章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">3章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">4章</span>許可する前に <code>-U</code>・<code>-d</code> を読み、報告を読む前に検証役が別のモデル（<code>/tasks</code> で Sonnet）で動いて「一致」したかを確かめたか</li><li><span class="from">5章</span>エラーが出たとき、決まりごと（制約）を外すのではなく、どのデータが決まりに合わなかったかを確かめたか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
 <article id="page-apD" data-id="apD" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録D</span>初期化SQL一式</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>第3章で実行する初期化 SQL です。<code>99_reset.sql</code> → <code>01_schema.sql</code> → <code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p><h2>01_schema.sql</h2><pre class="code sql"><code><span class="kw">SET</span> client_encoding = <span class="st">'UTF8'</span>;  <span class="cm">-- このファイルは UTF-8。PC の設定に関係なく正しく読ませる（第4章）</span>
 <span class="cm">-- =============================================================</span>
 <span class="cm">-- 01_schema.sql  学習用サンプル：ニュース情報（第4章で実行）</span>

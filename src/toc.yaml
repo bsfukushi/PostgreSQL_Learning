@@ -14,7 +14,7 @@ books:
           - {id: ch05, num: "4", title: "Claude Codeに頼む前の約束", required: true, file: vol1/v1_04_before-claude-code.md}
       - title: 第2部 表と SQL を読む
         chapters:
-          - {id: ch02, num: "5", title: "表の形を読む（テーブル設計の基本）", required: true}
+          - {id: ch02, num: "5", title: "表の形を読む（テーブル設計の基本）", required: true, file: vol1/v1_05_table-shape.md}
           - {id: ch06, num: "6", title: "SELECTを読む", required: true}
           - {id: ch07, num: "7", title: "JOINを読む", required: true, file: vol1/v1_07_join.md}
           - {id: ch08, num: "8", title: "書き換える文を読み、やってから戻す", required: true}

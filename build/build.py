@@ -19,7 +19,9 @@ Markdown の独自記法（章テンプレート v2 に対応）:
     ```mermaid             … ビルド時に SVG へ変換（オフラインでも表示できる）
     ```sql copy=6          … 「写して実行する SQL（読み方は第6章）」の帯を付ける。=N を省くと第6章。
                              sql 以外（```text copy=8 など）にも付けられる。
-                             第6章より前の章で、copy の付いていない ```sql ブロックは警告になる（付け忘れ防止）
+                             第5章より前の章で、copy の付いていない ```sql ブロックは警告になる（付け忘れ防止）
+    ```sql show            … 表示するだけの SQL（verify_sql.py は実行しない）。CREATE TABLE を読ませる場面など
+    :::result error        … 直前の SQL がエラーになるのが正しい結果。中にエラーの文章を書く。verify_sql.py はエラーなら OK
 """
 from __future__ import annotations
 
@@ -109,30 +111,39 @@ class Renderer:
         out = self._post(out)
         return out
 
-    COPY_DEFAULT_CHAPTER = 6
+    COPY_DEFAULT_CHAPTER = 6   # copy の =N を省いたときの「読み方は第N章」
+    READ_START_CHAPTER = 5     # 「読む SQL」が初めて出てくる章。これより前の章の ```sql には copy が必要
     COPY_SENTINEL = "@@COPY:{}@@"
 
     def _copy_fences(self, text: str) -> str:
-        """```lang copy[=N] を ```lang に戻し、コードの1行目に目印を入れる（_post で帯に置き換える）。
-        第6章より前の章の ```sql に copy が無ければ警告する。"""
+        """コードブロックの指定（```lang copy[=N] / ```sql show）を処理する。
+        copy: ```lang に戻し、コードの1行目に目印を入れる（_post で帯に置き換える）。
+        show: 表示だけ（verify_sql.py が実行しない）。見た目は通常のコードブロック。
+        「読む SQL」が始まる章（READ_START_CHAPTER）より前の章で、copy も show も無い ```sql は警告する。"""
         out = []
         in_fence = False
         for line in text.split("\n"):
             m = re.match(r"^(\s*)```(\w+)(.*)$", line)
             if not in_fence and m:
                 in_fence = True
-                indent, lang, rest = m.group(1), m.group(2), m.group(3).strip()
-                cm = re.fullmatch(r"copy(?:=(\d+))?", rest)
-                if rest and not cm:
-                    warnings.append(f"{self.chapter_id}: 不明なコードブロックの指定 ```{lang} {rest}")
-                if cm:
-                    out.append(f"{indent}```{lang}")
-                    out.append(indent + self.COPY_SENTINEL.format(cm.group(1) or self.COPY_DEFAULT_CHAPTER))
-                    continue
-                if (lang == "sql" and self.chapter_num is not None
-                        and self.chapter_num < self.COPY_DEFAULT_CHAPTER):
-                    warnings.append(f"{self.chapter_id}: 第{self.COPY_DEFAULT_CHAPTER}章より前の章の ```sql に copy がありません")
-                out.append(line)
+                indent, lang, rest = m.group(1), m.group(2), m.group(3).split()
+                copy_ch = None
+                marked = False
+                for tok in rest:
+                    cm = re.fullmatch(r"copy(?:=(\d+))?", tok)
+                    if cm:
+                        copy_ch = cm.group(1) or str(self.COPY_DEFAULT_CHAPTER)
+                        marked = True
+                    elif tok == "show" and lang == "sql":
+                        marked = True
+                    else:
+                        warnings.append(f"{self.chapter_id}: 不明なコードブロックの指定 ```{lang} {tok}")
+                if (lang == "sql" and not marked and self.chapter_num is not None
+                        and self.chapter_num < self.READ_START_CHAPTER):
+                    warnings.append(f"{self.chapter_id}: 第{self.READ_START_CHAPTER}章より前の章の ```sql に copy がありません")
+                out.append(f"{indent}```{lang}")
+                if copy_ch:
+                    out.append(indent + self.COPY_SENTINEL.format(copy_ch))
                 continue
             if in_fence and line.strip().startswith("```"):
                 in_fence = False
@@ -177,6 +188,10 @@ class Renderer:
 
     def _render_container(self, kind: str, arg: str, inner: str) -> str:
         inner_html = self.render(inner)
+        if kind == "result" and arg.split()[:1] == ["error"]:
+            return (f'<div class="result error"><div class="result-head"><span class="badge-error">エラーになる</span>'
+                    f'<span>実行結果</span></div>{inner_html}'
+                    f'<div class="result-foot">（エラー。データは変わらない）</div></div>')
         if kind == "result":
             parts = arg.split()
             rows = parts[0] if parts else "?"
