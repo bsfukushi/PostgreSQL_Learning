@@ -73,6 +73,7 @@ PostgreSQL_Learning/
 
 ### Step 1-0: 作業環境
 - [x] 記憶管理システム初期化（2026-10-14）
+- [x] GitHub リモート登録（bsfukushi/PostgreSQL_Learning、public、main 直接運用）
 - [ ] `pip install markdown pyyaml pymdown-extensions` / `cd build && npm i`
 - [ ] v18 の学習用DBを用意し、初期化SQLを流す
 - [ ] `py build/build.py` でビルドが通ることを確認
