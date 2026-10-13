@@ -1388,7 +1388,7 @@ CREATE DATABASE pglearn OWNER learner;
 </tr>
 <tr>
 <td>SQL の最初の単語</td>
-<td><code>SELECT</code> か。<code>DELETE</code> <code>UPDATE</code> <code>DROP</code> <code>TRUNCATE</code> なら、頼んだ覚えがあるか</td>
+<td><code>SELECT</code> か。<code>DELETE</code> <code>UPDATE</code> <code>DROP</code> <code>TRUNCATE</code> なら、頼んだ覚えがあるか。<code>WITH</code> で始まるときは、中に <code>DELETE</code> <code>UPDATE</code> <code>INSERT</code> が無いか</td>
 </tr>
 <tr>
 <td><code>-f</code> の後ろ（あれば）</td>
@@ -1396,6 +1396,7 @@ CREATE DATABASE pglearn OWNER learner;
 </tr>
 </tbody>
 </table></div>
+<aside class="aside mech"><p>🔍 <strong>なぜ <code>WITH</code> のときは中まで見るのか</strong>：<code>WITH</code> で始まる SQL は、長い SQL を段に分けて書く形です（読み方は第9章）。ふつうは <code>SELECT</code> の組み合わせですが、段の中に <code>DELETE</code> などを書くこともでき、最後が <code>SELECT</code> で終わっていてもデータが変わります。最初の単語だけでは、読むか変えるかを判断できない形です。</p></aside>
 <p>許可の選択肢には、「今後は同じ種類のコマンドを確認しない」という意味のものが出ることがあります。psql について、これは選ばないでください。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ psql の「今後は確認しない」を選ばないのか</strong>：psql は、<code>SELECT</code> も <code>DELETE</code> も同じ <code>psql</code> というコマンドで実行します。一度「確認しない」にすると、あとで <code>DELETE</code> を含むコマンドが出てきたときにも、尋ねられずに実行されます。読む機会そのものがなくなります。</p></aside>
 <h2>6. 手を動かす</h2>
