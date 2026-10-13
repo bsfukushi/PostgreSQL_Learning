@@ -1,4 +1,4 @@
-# 作業フォルダ C:\pglearn での約束（PostgreSQL 学習資料・第5章）
+# 作業フォルダ C:\pglearn での約束（PostgreSQL 学習資料・第4章）
 
 このフォルダは PostgreSQL の学習用です。ここで起動した Claude Code は、次の約束を守ってください。
 

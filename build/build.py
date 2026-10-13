@@ -322,7 +322,7 @@ def build():
             for f in sorted((SRC / "sql").glob("*.sql")):
                 code = html.escape(f.read_text(encoding="utf-8"), quote=False)
                 parts.append(f'<h2>{f.name}</h2><pre class="code sql"><code>{highlight_sql(code)}</code></pre>')
-            bodies[ch["id"]] = head + ('<div class="prose"><p>第4章で実行する初期化 SQL です。'
+            bodies[ch["id"]] = head + ('<div class="prose"><p>第3章で実行する初期化 SQL です。'
                                        '<code>99_reset.sql</code> → <code>01_schema.sql</code> → '
                                        '<code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p>'
                                        + "".join(parts) + "</div>")

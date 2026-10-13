@@ -9,14 +9,14 @@ books:
       - title: 第1部 考え方
         chapters:
           - {id: ch01, num: "1", title: "RDBとは何か・用語の固定", required: true}
-          - {id: ch02, num: "2", title: "テーブル設計の基本", required: true}
       - title: 第2部 道具と環境
         chapters:
-          - {id: ch03, num: "3", title: "pgAdmin4とpsql", required: true, file: vol1/v1_03_psql-pgadmin.md}
-          - {id: ch04, num: "4", title: "サンプルデータを入れる・元に戻す", required: true, file: vol1/v1_04_sample-data.md}
-          - {id: ch05, num: "5", title: "Claude Codeに頼む前の約束", required: true, file: vol1/v1_05_before-claude-code.md}
+          - {id: ch03, num: "2", title: "pgAdmin4とpsql", required: true, file: vol1/v1_02_psql-pgadmin.md}
+          - {id: ch04, num: "3", title: "サンプルデータを入れる・元に戻す", required: true, file: vol1/v1_03_sample-data.md}
+          - {id: ch05, num: "4", title: "Claude Codeに頼む前の約束", required: true, file: vol1/v1_04_before-claude-code.md}
       - title: 第3部 読む力
         chapters:
+          - {id: ch02, num: "5", title: "テーブル設計の基本", required: true}   # 2026-10-14 第2章から移動（仮の部。部の構成は未決）
           - {id: ch06, num: "6", title: "SELECTを読む", required: true}
           - {id: ch07, num: "7", title: "JOINを読む", required: true, file: vol1/v1_07_join.md}
           - {id: ch08, num: "8", title: "書き換える文を読み、やってから戻す", required: true}
