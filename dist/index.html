@@ -216,7 +216,7 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 </ul>
 <div class="nav-part">第2部 道具と環境</div>
 <ul>
-<li data-required="true" class="todo"><a href="#ch03" data-id="ch03"><span class="n">3</span><span class="t">pgAdmin4とpsql</span><span class="done" aria-label="読了">✓</span></a></li>
+<li data-required="true" class="ready"><a href="#ch03" data-id="ch03"><span class="n">3</span><span class="t">pgAdmin4とpsql</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="ready"><a href="#ch04" data-id="ch04"><span class="n">4</span><span class="t">サンプルデータを入れる・元に戻す</span><span class="done" aria-label="読了">✓</span></a></li>
 <li data-required="true" class="ready"><a href="#ch05" data-id="ch05"><span class="n">5</span><span class="t">Claude Codeに頼む前の約束</span><span class="done" aria-label="読了">✓</span></a></li>
 </ul>
@@ -286,6 +286,10 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 </thead>
 <tbody>
 <tr>
+<td><a href="#ch03">第3章 pgAdmin4とpsql</a></td>
+<td>psql の起動、日本語の文字化けの直し方、CSV 出力、pgAdmin4 は見るだけ</td>
+</tr>
+<tr>
 <td><a href="#ch04">第4章 サンプルデータを入れる・元に戻す</a></td>
 <td>学習用DBの作り方、2段階のリセット、全員の設定確認</td>
 </tr>
@@ -315,12 +319,446 @@ ul.checklist .from { font-family: var(--f-mono); font-size: 12px; color: var(--m
 <li>正は <code>src/</code> 配下の章ごとの Markdown です。<code>python3 build/build.py</code> で、この HTML を作り直します。</li>
 <li>図（ER図）はビルドのときに画像（SVG）にしているので、インターネットにつながっていなくても表示できます。</li>
 <li>付録A（用語集）、付録C（チェックリスト）、付録D（初期化SQL）は、本文と SQL ファイルから自動で作られます。</li>
-<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第4章・第5章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
+<li>本文中の SQL と実行結果は、実際の PostgreSQL で実行して確かめます。第7章・第10章は PostgreSQL 16 で確認済み、第3章・第4章・第5章は未確認です（PostgreSQL 18 での確認はこれから行います）。</li>
 </ul></div></article>
 <article id="page-ch00" data-id="ch00" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ はじめに</p><h1><span class="ch-no">第0章</span>はじめに（読み方・所要時間・質問テンプレート）</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch01" data-id="ch01" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 考え方</p><h1><span class="ch-no">第1章</span>RDBとは何か・用語の固定</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-ch02" data-id="ch02" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第1部 考え方</p><h1><span class="ch-no">第2章</span>テーブル設計の基本</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-ch03" data-id="ch03" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第3章</span>pgAdmin4とpsql</h1><div class="pills"><span class="pill req">必修</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
+<article id="page-ch03" data-id="ch03" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第3章</span>pgAdmin4とpsql</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第1章（RDBとは何か）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
+<ul>
+<li>psql と pgAdmin4 の役割の違いを説明でき、場面によって使い分けられる</li>
+<li>コマンドプロンプトから psql を起動し、SQL とメタコマンドを実行できる</li>
+<li>日本語が化けたときに、どこを揃えれば直るかが分かる</li>
+<li>表の形を <code>\d</code> で確かめ、結果を <code>\copy</code> で CSV ファイルに出せる</li>
+</ul>
+<h2>1. 2つの道具の役割</h2>
+<p>PostgreSQL を操作する道具は、この資料では2つ使います。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th></th>
+<th>psql</th>
+<th>pgAdmin4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>形</td>
+<td>文字だけの画面（コマンドプロンプト）</td>
+<td>マウスで操作する画面</td>
+</tr>
+<tr>
+<td>この資料での役割</td>
+<td><strong>主に使う道具</strong>。SQL を実行する</td>
+<td><strong>見る道具</strong>。表の一覧や中身を眺める</td>
+</tr>
+<tr>
+<td>Claude Code との関係</td>
+<td>Claude Code が実際に使う</td>
+<td>Claude Code は使わない</td>
+</tr>
+<tr>
+<td>結果の形</td>
+<td>文字なので、そのままコピーして質問に貼れる</td>
+<td>表の画面。コピーはできるが形が崩れやすい</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜ psql を主にするのか</strong>：Claude Code がデータベースを操作するときは、psql を実行します（第5章）。Claude Code の画面に出てくるコマンドと結果を読めるようになるには、自分でも同じ psql を使い、同じ形の結果を見慣れておくのがいちばんの近道です。</p></aside>
+<p>psql で覚えるのは、次の4つだけです。この資料の範囲では、これで足ります。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>使い方</th>
+<th>何をするか</th>
+<th>Claude Code が使う場面</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-c "SQL"</code></td>
+<td>SQL を1つ実行して終わる</td>
+<td>件数を数える、表を見るなど、ほとんどの場面</td>
+</tr>
+<tr>
+<td><code>-f ファイル</code></td>
+<td>ファイルに書いた SQL を順に実行する</td>
+<td>初期化SQLを流す（第4章）</td>
+</tr>
+<tr>
+<td><code>\d</code></td>
+<td>表の一覧や、表の列を見る</td>
+<td>表の形を確かめる</td>
+</tr>
+<tr>
+<td><code>\copy</code></td>
+<td>結果を CSV ファイルに出す</td>
+<td>データを取り出す</td>
+</tr>
+</tbody>
+</table></div>
+<h2>2. psql を起動できるようにする</h2>
+<h3>コマンドプロンプトを開く</h3>
+<p>この資料では、コマンドを打つ画面は<strong>コマンドプロンプト</strong>に揃えます。スタートメニューで「cmd」と入力して開きます。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ PowerShell ではなくコマンドプロンプトなのか</strong>：PowerShell でも psql は動きますが、引用符の扱いや、一部のコマンドの意味が違います。たとえば <code>where</code> は、コマンドプロンプトでは「コマンドの場所を探す」ですが、PowerShell では別の意味になります。資料のコマンドをそのまま打てるように、画面を1つに揃えます。</p></aside>
+<h3>psql がどこにあるかを確かめる</h3>
+<p>コマンドプロンプトで、次を実行します。</p>
+<pre class="code text"><code>where psql</code></pre>
+<p><code>C:\Program Files\PostgreSQL\18\bin\psql.exe</code> のように場所が表示されれば、準備はできています。次の「起動する」へ進んでください。</p>
+<p>「情報: 与えられたパターンのファイルが見つかりませんでした。」と表示されたら、psql の場所が Windows に登録されていません。次の手順で登録します。</p>
+<ol>
+<li>スタートメニューで「環境変数」と入力し、「環境変数を編集」（自分のアカウントの環境変数）を開きます。</li>
+<li>上の欄（ユーザー環境変数）の <code>Path</code> を選び、「編集」を押します。</li>
+<li>「新規」を押し、<code>C:\Program Files\PostgreSQL\18\bin</code> と入力して、OK を2回押します。</li>
+<li><strong>コマンドプロンプトを閉じて、開き直します。</strong></li>
+<li>もう一度 <code>where psql</code> を実行し、場所が表示されることを確かめます。</li>
+</ol>
+<aside class="aside mech"><p>🔍 <strong>なぜ登録が要るのか</strong>：コマンドプロンプトで <code>psql</code> と打つと、Windows は <code>Path</code> に登録されたフォルダを順に探して、<code>psql.exe</code> を見つけます。PostgreSQL のインストーラーは、このフォルダを登録しないことがあります。登録しないと、毎回 <code>"C:\Program Files\PostgreSQL\18\bin\psql.exe"</code> と長い場所を打つ必要があり、Claude Code も psql を見つけられません。</p>
+<p>🔍 <strong>なぜ開き直すのか</strong>：コマンドプロンプトは、開いた時点の <code>Path</code> を覚えて使います。登録したあとに開いた画面でないと、新しい <code>Path</code> が反映されません。</p></aside>
+<h3>起動する</h3>
+<pre class="code text"><code>psql -h localhost -U postgres -d postgres</code></pre>
+<p>インストールのときに決めた <code>postgres</code> のパスワードを入力します（入力した文字は表示されません）。次のように表示されれば、接続できています。</p>
+<pre class="code text"><code>psql (18.0)
+Type "help" for help.
+
+postgres=#</code></pre>
+<p>最後の行の <code>postgres=#</code> を<strong>プロンプト</strong>と呼びます。ここに SQL を入力します。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>postgres</code></td>
+<td>いま接続している<button type="button" class="term" data-def="表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。">データベース</button>の名前</td>
+</tr>
+<tr>
+<td><code>=#</code></td>
+<td><button type="button" class="term" data-def="すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。">スーパーユーザー</button>で接続している印</td>
+</tr>
+<tr>
+<td><code>=&gt;</code></td>
+<td>ふつうのロールで接続している印（第4章の <code>learner</code> で接続すると、こちらになる）</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside mech"><p>🔍 <strong>プロンプトの記号を見る習慣</strong>：<code>#</code> が出ていたら、何でもできるロールで接続しています。打ち間違いがそのまま大きな事故になる状態なので、<code>#</code> を見たら一度手を止める、と覚えておいてください。</p></aside>
+<h2>3. psql の基本</h2>
+<h3>SQL は <code>;</code> で終わる</h3>
+<p>プロンプトで、次の SQL を実行します。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> version();</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL 18.0, compiled by Visual C++ build …, 64-bit</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(1 行)</div></div>
+<p>表示される文字は PC によって違います。<code>PostgreSQL 18</code> で始まっていれば大丈夫です。</p>
+<p>SQL の最後の <code>;</code> を忘れて Enter を押すと、プロンプトが <code>postgres-#</code> に変わり、何も実行されません。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ <code>;</code> が要るのか</strong>：SQL は、長くなると何行にも分けて書きます。psql は、Enter を押しても「まだ続きがあるかもしれない」と考えて待ち、<code>;</code> が来たところで「ここまでが1つの SQL」と判断して実行します。プロンプトの <code>=</code> が <code>-</code> に変わっているのは「続きを待っている」という印です。<code>;</code> だけを打って Enter を押せば実行されます。</p></aside>
+<h3>メタコマンドは <code>\</code> で始まる</h3>
+<p><code>\</code> で始まる命令は、SQL ではなく psql 自身への命令です。これを<strong>メタコマンド</strong>と呼びます。メタコマンドには <code>;</code> は要りません。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>メタコマンド</th>
+<th>何をするか</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\conninfo</code></td>
+<td>いま、どこに、どのロールで接続しているかを表示する</td>
+</tr>
+<tr>
+<td><code>\l</code></td>
+<td>データベースの一覧を表示する</td>
+</tr>
+<tr>
+<td><code>\du</code></td>
+<td>ロールの一覧を表示する</td>
+</tr>
+<tr>
+<td><code>\d</code></td>
+<td>表の一覧を表示する。<code>\d 表の名前</code> で、その表の列を表示する</td>
+</tr>
+<tr>
+<td><code>\?</code></td>
+<td>メタコマンドの一覧（ヘルプ）を表示する</td>
+</tr>
+<tr>
+<td><code>\q</code></td>
+<td>psql を終わる</td>
+</tr>
+</tbody>
+</table></div>
+<p>日本語のキーボードでは、<code>\</code> は <code>¥</code> と表示されることがあります。同じキーなので、そのまま押してください。</p>
+<h3><code>-c</code>：1つ実行して終わる</h3>
+<p>psql を起動せずに、コマンドプロンプトから直接 SQL を1つだけ実行することもできます。</p>
+<pre class="code text"><code>psql -h localhost -U postgres -d postgres -c "SELECT version();"</code></pre>
+<p>実行すると結果を表示して、すぐにコマンドプロンプトに戻ります。Claude Code が psql を使うときは、ほとんどがこの形です。第5章で、Claude Code が実行してよいか尋ねてくるのも、この形のコマンドです。</p>
+<h2>4. 日本語が化けたら</h2>
+<p>psql の結果で日本語が <code>縺薙ｌ</code> のような意味のない文字になったら、<strong>画面の<button type="button" class="term" data-def="文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。">文字コード</button>と、psql の文字コードが揃っていない</strong>状態です。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>どこの設定か</th>
+<th>確かめ方</th>
+<th>変え方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>画面（コマンドプロンプト）</td>
+<td><code>chcp</code> を実行する</td>
+<td><code>chcp 65001</code>（UTF-8 にする）</td>
+</tr>
+<tr>
+<td>psql</td>
+<td>psql の中で <code>\encoding</code> を実行する</td>
+<td><code>\encoding UTF8</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>この資料では、両方を UTF-8 に揃える方法を標準にします。</p>
+<ol>
+<li>コマンドプロンプトで <code>chcp 65001</code> を実行します。</li>
+<li>psql を起動し、<code>\encoding UTF8</code> を実行します。</li>
+<li>日本語を含む結果が正しく表示されることを確かめます。</li>
+</ol>
+<p>手順1のあと psql を起動すると、「コンソールのコードページ (65001) が Windows のコードページ (932) と異なります」という意味の警告が出ることがあります。揃えた結果として出る警告なので、日本語が正しく表示されていれば気にしなくてかまいません。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ化けるのか</strong>：データベースの中の日本語は、UTF-8 という形式の数字の並びで保存されています。psql はそれを「画面に合わせた形式」に直して送り出し、画面は「自分の形式」で読んで文字にします。この2つの形式が違うと、同じ数字の並びを別の文字として読んでしまいます。直すには、どちらか片方ではなく、両方を同じ形式に揃えます。</p>
+<p>🧭 <strong>なぜ UTF-8 に揃えるのか</strong>：日本語の Windows の古い形式（Shift_JIS の仲間）では、一部の漢字や記号を表せません。表せない文字が出てくると、化けるのではなく psql がエラーで止まります。UTF-8 なら、データベースに入っている文字をすべて表せます。</p></aside>
+<p>毎回打つのが面倒な場合は、豆知識の「毎回の設定を省く」を見てください。</p>
+<h2>5. 表を見る：<code>\d</code>（第4章のあとで試す）</h2>
+<p>この節と次の節は、第4章で学習用のデータベース <code>pglearn</code> を作ったあとで試します。</p>
+<p><code>\d</code> で、表の一覧を表示します。</p>
+<pre class="code text"><code>pglearn=&gt; \d</code></pre>
+<pre class="code text"><code>               List of relations
+ Schema |      Name       |   Type   |  Owner
+--------+-----------------+----------+---------
+ public | article_tags    | table    | learner
+ public | articles        | table    | learner
+ public | articles_id_seq | sequence | learner
+ public | sources         | table    | learner
+ public | sources_id_seq  | sequence | learner
+ public | tags            | table    | learner
+ public | tags_id_seq     | sequence | learner
+(7 rows)</code></pre>
+<p>psql の画面の言葉は、PC の言語の設定によって日本語で表示されることもあります。この資料では英語の表示で説明します。</p>
+<p><code>sequence</code>（シーケンス）は、<code>id</code> の番号を順に振るための部品で、表ではありません（第2章）。表は <code>table</code> の4つです。</p>
+<p><code>\d 表の名前</code> で、その表の列を表示します。</p>
+<pre class="code text"><code>pglearn=&gt; \d articles</code></pre>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>見る列</th>
+<th>分かること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Column</code></td>
+<td>列の名前</td>
+</tr>
+<tr>
+<td><code>Type</code></td>
+<td>何の種類の値が入るか（<code>integer</code> は整数、<code>text</code> は文字、<code>timestamp with time zone</code> はタイムゾーン付きの日時）</td>
+</tr>
+<tr>
+<td><code>Nullable</code></td>
+<td><code>not null</code> と書いてあれば、<button type="button" class="term" data-def="値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。">NULL</button> は入らない</td>
+</tr>
+<tr>
+<td><code>Default</code></td>
+<td>値を指定しなかったときに入る値</td>
+</tr>
+</tbody>
+</table></div>
+<p>その下の <code>Indexes:</code> や <code>Foreign-key constraints:</code> などに、<button type="button" class="term" data-def="表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。">主キー</button>、<button type="button" class="term" data-def="指定した列に、同じ値が2回入らないようにする決まり。">UNIQUE制約</button>、<button type="button" class="term" data-def="別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。">外部キー</button>などの決まりが一覧で出ます。</p>
+<aside class="aside design"><p>🧭 <strong>なぜ <code>\d</code> を覚えるのか</strong>：Claude Code が「articles には published_at 列があります」と説明しても、それが本当かは表の形を見ないと分かりません。<code>\d</code> は、説明ではなく実物を見る方法です。</p></aside>
+<h2>6. 結果を CSV に出す：<code>\copy</code>（第4章のあとで試す）</h2>
+<p>SQL の結果を、Excel などで開ける CSV ファイルに出します。出力先のフォルダ <code>C:\pglearn\out\</code> を先に作っておきます。</p>
+<pre class="code text"><code>pglearn=&gt; \copy (SELECT id, title, published_at FROM articles ORDER BY id) TO 'C:/pglearn/out/articles.csv' WITH (FORMAT csv, HEADER)</code></pre>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>部分</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>( ... )</code> の中</td>
+<td>出したい結果の SELECT</td>
+</tr>
+<tr>
+<td><code>TO '...'</code></td>
+<td>出力先のファイル</td>
+</tr>
+<tr>
+<td><code>FORMAT csv</code></td>
+<td>CSV 形式で出す</td>
+</tr>
+<tr>
+<td><code>HEADER</code></td>
+<td>1行目に列の名前を入れる</td>
+</tr>
+</tbody>
+</table></div>
+<p>成功すると <code>COPY 5</code> と表示されます。5 は書き出した行の数です。SELECT の結果の行数と同じか、必ず確かめてください。</p>
+<p><code>\copy</code> を使うときは、次の3つに気をつけます。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>気をつけること</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全部を<strong>1行</strong>で書く。最後に <code>;</code> を付けない</td>
+<td><code>\copy</code> はメタコマンドなので、Enter を押した時点で命令が終わる。途中で改行すると、そこまでで実行されてしまう</td>
+</tr>
+<tr>
+<td>ファイルの場所は <code>/</code> で区切る（<code>C:/pglearn/out/...</code>）</td>
+<td>psql では、引用符の中の <code>\</code> が特別な意味に読まれることがある。Windows は <code>/</code> で区切っても同じ場所として扱う</td>
+</tr>
+<tr>
+<td><code>COPY</code> ではなく <code>\copy</code> を使う</td>
+<td>下の 🔍 を参照</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside mech"><p>🔍 <strong><code>\copy</code> と <code>COPY</code> の違い</strong>：<code>COPY</code>（<code>\</code> なし）は SQL で、ファイルを書くのは <strong>PostgreSQL のサーバー</strong>です。サーバーは、あなたとは別の Windows のアカウントで動いていることが多く、あなたのフォルダに書き込めなかったり、書き込むのに特別な権限（スーパーユーザーなど）が要ったりします。<code>\copy</code> は psql の命令で、ファイルを書くのは **psql（つまり、あなた）**です。自分の PC の自分のフォルダに出すときは、<code>\copy</code> を使います。</p></aside>
+<h3>Excel で開くと日本語が化ける</h3>
+<p><code>articles.csv</code> をダブルクリックして Excel で開くと、日本語が化けることがあります。ファイルが壊れているわけではありません。</p>
+<aside class="aside mech"><p>🔍 <strong>なぜ Excel だと化けるのか</strong>：<code>\copy</code> は、ファイルを UTF-8 で書きます。Excel は、CSV をダブルクリックで開くと、ファイルの形式を Shift_JIS の仲間だと考えて読むことがあります。第4節と同じで、書いた側と読む側の形式が揃っていないために化けます。</p></aside>
+<p>Excel で開くときは、Excel を先に起動し、「データ」タブの「テキストまたは CSV から」でファイルを選び、「元のファイル」を「65001: Unicode (UTF-8)」にして読み込みます。</p>
+<h2>7. pgAdmin4 で見る</h2>
+<p>pgAdmin4 は、データベースの中を、フォルダをたどるように眺められる道具です。</p>
+<ol>
+<li>pgAdmin4 を起動し、左の一覧で「Servers」を開きます。PostgreSQL 18 のサーバーが登録されていれば、それを選び、<code>postgres</code> のパスワードを入力します。</li>
+<li>「Databases」→ データベースの名前 →「Schemas」→「public」→「Tables」の順に開くと、表の一覧が出ます（第4章のあとなら、<code>pglearn</code> の下に4つの表があります）。</li>
+<li>表を右クリックし、「View/Edit Data」→「All Rows」で中身を表示できます。</li>
+</ol>
+<p>pgAdmin4 の表の画面では、<button type="button" class="term" data-def="値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。">NULL</button> は <code>[null]</code> と表示されます。空の文字とは区別されます。</p>
+<p>この資料では、pgAdmin4 は<strong>見るだけ</strong>に使います。次の2つはしないでください。</p>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>しないこと</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表の画面で、値を直接書き換える</td>
+<td>どの行の何を変えたかが SQL として残らないので、あとから確かめられない。元に戻すときも、何を戻せばよいか分からない</td>
+</tr>
+<tr>
+<td>pgAdmin4 を開いたまま、完全リセット（第4章）をする</td>
+<td>pgAdmin4 がデータベースに接続したままになり、<code>DROP DATABASE</code> が「使用中」で止まる</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="aside design"><p>🧭 <strong>なぜ「見るだけ」なのか</strong>：この資料で身につけたいのは、Claude Code が出した SQL と結果を読む力です。マウスの操作で変更すると、その変更は SQL の形で目に入りません。変更は SQL で行い、psql で結果を確かめる、という形に揃えておくと、Claude Code に任せたときも同じ見方で確かめられます。</p></aside>
+<h2>8. 手を動かす</h2>
+<h3>今すぐ試す</h3>
+<ol>
+<li>コマンドプロンプトで <code>where psql</code> を実行し、psql の場所が表示されることを確かめます。表示されなければ、第2節の手順で登録します。</li>
+<li><code>chcp 65001</code> を実行してから、<code>postgres</code> で psql を起動します。プロンプトの最後が <code>#</code> であることを確かめます。</li>
+<li><code>\encoding UTF8</code> を実行します。</li>
+<li><code>SELECT version();</code> を実行し、<code>PostgreSQL 18</code> で始まることを確かめます。</li>
+<li>次に <code>;</code> を付けずに <code>SELECT 1</code> と打って Enter を押し、プロンプトが <code>postgres-#</code> に変わることを確かめます。<code>;</code> だけを打って Enter を押すと実行されます。</li>
+<li><code>\conninfo</code>、<code>\l</code>、<code>\du</code> を順に実行し、何が表示されるかを見ます。<code>\du</code> には、いまは <code>postgres</code> しかいないはずです。</li>
+<li><code>\q</code> で終わり、<code>-c</code> の形で <code>SELECT version();</code> を実行します。</li>
+<li>pgAdmin4 を起動し、サーバーに接続して、「Databases」の下にあるデータベースを見ます。</li>
+</ol>
+<h3>第4章のあとで試す</h3>
+<ol>
+<li><code>learner</code> で <code>pglearn</code> に接続し、プロンプトの最後が <code>&gt;</code> であることを確かめます（<code>pglearn=&gt;</code>）。</li>
+<li><code>\d</code> で表が4つあること、<code>\d articles</code> で <code>source_id</code> 列に <code>not null</code> が付いていないことを確かめます（配信元が不明な記事があるため）。</li>
+</ol>
+<p>続けて、次の SQL で記事の最初の3本を表示します。</p>
+<pre class="code sql"><code><span class="kw">SELECT</span> id, title <span class="kw">FROM</span> articles <span class="kw">ORDER</span> <span class="kw">BY</span> id <span class="kw">LIMIT</span> 3;</code></pre>
+<div class="result"><div class="result-head"><span>実行結果</span></div><div class="scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">id</th>
+<th>title</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>クラウド利用料、来春から改定へ</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>社内AIの導入率が過半数に</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>半導体工場の新設計画を発表</td>
+</tr>
+</tbody>
+</table></div><div class="result-foot">(3 行)</div></div>
+<p>最後に、出力と pgAdmin4 を試します。</p>
+<ol>
+<li>第6節の <code>\copy</code> で <code>articles.csv</code> を出し、<code>COPY 5</code> と表示されることを確かめます。</li>
+<li>Excel の「テキストまたは CSV から」で開き、日本語が正しく表示されることを確かめます。</li>
+<li>pgAdmin4 で <code>pglearn</code> の4つの表を見つけ、<code>articles</code> の中身を表示して、<code>source_id</code> が <code>[null]</code> の行を見つけます。確認したら、pgAdmin4 を閉じます。</li>
+</ol>
+<h2>💡 Claude Codeで使うなら</h2>
+<section class="box claude"><h3 class="box-title">頼み方の例</h3><p>Claude Code を使い始めるのは第5章からです。第5章を終えたあとで、表の形を確かめるときと、CSV に出すときの例を載せておきます。</p>
+<pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）で、articles 表の列を確かめてください。
+- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
+- psql の \d articles の結果を、加工せずにそのまま見せる
+- 表の中身は変更しない</code></pre>
+<pre class="code text"><code>PostgreSQL 18 の学習用DB（pglearn）から、記事の id・タイトル・公開日時を CSV に出してください。
+- 接続: ホスト localhost、ロール learner、データベース pglearn。psql には -w を付ける
+- psql の \copy を使い、C:/pglearn/out/articles.csv に出す。1行目は列名
+- 実行前に、\copy の行をそのまま見せる
+- 実行後に、COPY のあとに表示された行数と、articles の件数を並べて見せる</code></pre>
+<p><strong>出てきたものの検証ポイント</strong></p>
+<ol>
+<li>表の形の説明が、<code>\d</code> の結果（実物）と一致しているか</li>
+<li><code>\copy</code> を使っているか。<code>COPY</code>（<code>\</code> なし）でサーバーにファイルを書かせていないか</li>
+<li><code>COPY 5</code> の行数が、出したかった件数と一致しているか</li>
+</ol>
+<p><strong>起きがちな失敗と、その理由</strong></p>
+<ul>
+<li><strong><code>psql</code> が見つからないと言われる</strong>：psql の場所が <code>Path</code> に登録されていないか、登録したあとに Claude Code を起動し直していないことが原因です。Claude Code も、起動した時点の <code>Path</code> を使います。</li>
+<li><strong><code>\d</code> の結果ではなく、要約した説明だけが返ってくる</strong>：Claude Code は、読みやすく言い換えて報告することがあります。言い換えの途中で列が抜けたり、型が違って書かれたりしても気づけないので、「加工せずにそのまま見せる」と頼みます。</li>
+<li><strong>CSV の件数が足りない</strong>：<code>\copy</code> の中の SELECT に、頼んでいない条件（<code>WHERE</code> や <code>LIMIT</code>）が入っていることがあります。<code>COPY</code> の行数と、元の表の件数を必ず比べます。</li>
+</ul></section>
+<h2>確認問題</h2>
+<details class="quiz"><summary><span class="q">Q1. psql で SELECT を打って Enter を押したのに、結果が出ず、プロンプトが <code>pglearn-#</code> になりました。何が起きていますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>SQL の最後に <code>;</code> が無いため、psql が「続きがある」と考えて待っています。プロンプトの <code>=</code> が <code>-</code> に変わっているのが、その印です。<code>;</code> だけを打って Enter を押せば実行されます。（<code>#</code> なので、スーパーユーザーで接続していることにも気づけるとなお良いです。）</p></div></details>
+<details class="quiz"><summary><span class="q">Q2. Claude Code が「CSV に出力しました」と報告し、実行したのは <code>psql ... -c "COPY (SELECT ...) TO 'C:/pglearn/out/articles.csv' ..."</code> でした。ところが、そのフォルダにファイルがありません（またはエラーになっています）。どこを疑いますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p><code>\copy</code> ではなく <code>COPY</code> を使っていることを疑います。<code>COPY</code> は PostgreSQL のサーバーがファイルを書くので、あなたのフォルダには書けなかったり、権限が無いというエラーになったりします。<code>\copy</code> を使うように頼み直します。</p></div></details>
+<details class="quiz"><summary><span class="q">Q3. 同僚から「psql の結果の日本語が化ける」と相談されました。<code>chcp</code> は 65001、psql の <code>\encoding</code> は SJIS でした。どうすれば直りますか？</span><span class="reveal">答えを見る</span></summary><div class="ans"><p>画面（UTF-8）と psql（SJIS）の文字コードが揃っていません。psql の中で <code>\encoding UTF8</code> を実行し、両方を UTF-8 に揃えます。片方だけを変えても直らない、というのがポイントです。</p></div></details>
+<details class="why"><summary>📚 なぜ？豆知識（読み飛ばしてもかまいません）</summary><div class="why-body"><h3>🔍 毎回の設定を省く</h3>
+<p><code>chcp 65001</code> と <code>\encoding UTF8</code> を毎回打つ代わりに、次の方法があります。</p>
+<ul>
+<li><strong>psql の文字コード</strong>：ユーザー環境変数に <code>PGCLIENTENCODING</code> という名前で <code>UTF8</code> を登録すると、psql は起動したときから UTF-8 でやり取りします（登録のしかたは第2節の <code>Path</code> と同じ画面です）。</li>
+<li><strong>画面の文字コード</strong>：Windows Terminal など、最初から UTF-8 で表示する画面を使う方法もあります。</li>
+</ul>
+<p>どちらも PC 全体の設定を変えるので、変えたことをメモしておき、困ったときに資料作成者へ伝えてください。</p>
+<h3>🔍 結果が長いとき</h3>
+<p>psql は、結果が画面に入りきらないとき、1画面ずつ止めて表示することがあります。スペースキーで次の画面へ進み、<code>q</code> で表示を終わります。Claude Code が <code>-c</code> で実行したときは、画面ではないので止まりません。</p>
+<h3>🧭 pgAdmin4 の Query Tool について</h3>
+<p>pgAdmin4 にも、SQL を実行する画面（Query Tool）があります。psql と同じ SQL を実行できますが、既定では1つの SQL を実行するたびに、変更がすぐ確定します。「やってから戻す」方法（<code>BEGIN</code> と <code>ROLLBACK</code>）は第8章で扱うので、それまでは、変更する SQL を Query Tool で実行しないでください。</p>
+<p>さらに知りたい人は、公式ドキュメント（PostgreSQL 18）の <a href="https://www.postgresql.org/docs/18/app-psql.html">psql</a> と <a href="https://www.postgresql.org/docs/18/multibyte.html">文字セットのサポート</a> を参照してください。</p></div></details>
+<div class="check"><div class="check-label">チェックリストに追加する1行</div><p>□ psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</p></div></div></article>
 <article id="page-ch04" data-id="ch04" hidden><header class="ch-head"><p class="crumb">第1冊 基礎＋設計 ／ 第2部 道具と環境</p><h1><span class="ch-no">第4章</span>サンプルデータを入れる・元に戻す</h1><div class="pills"><span class="pill req">必修</span><span class="pill time">約30分</span><span class="pill draft">下書き</span></div><p class="prereq">前提：第3章（pgAdmin4とpsql）</p></header><div class="prose"><h2>この章で分かるようになること</h2>
 <ul>
 <li>この資料で使う学習用の<button type="button" class="term" data-def="表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。">データベース</button>と<button type="button" class="term" data-def="PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。">ロール</button>を作り、サンプルデータを入れられる</li>
@@ -430,7 +868,7 @@ C:\pglearn\sql\02_seed.sql</code></pre>
 <p>ファイルは、文字コードを <strong>UTF-8</strong> にして保存します（メモ帳なら「名前を付けて保存」の画面の下にある「エンコード」で選びます）。どのファイルも、1行目は <code>SET client_encoding = 'UTF8';</code> です。</p>
 <aside class="aside mech"><p>🔍 <strong>なぜ1行目で文字コードを指定するのか</strong>：psql は、PC の言語の設定から「やり取りする文字の形式」を決めることがあります。日本語の Windows では、それが UTF-8 ではない形式（Shift_JIS の仲間）になる場合があります。そのまま UTF-8 のファイルを流すと、日本語のデータが化けたり、エラーになったりします。ファイルの1行目で「このファイルは UTF-8 で読んで」と指定しておけば、PC の設定に左右されません。</p></aside>
 <h3>3つのファイルを順に流す</h3>
-<p>コマンドプロンプト（または PowerShell）で、次の3行を順に実行します。どの行も、<code>learner</code> で <code>pglearn</code> に接続し、ファイルを1つ流します。</p>
+<p>コマンドプロンプトで、次の3行を順に実行します。どの行も、<code>learner</code> で <code>pglearn</code> に接続し、ファイルを1つ流します。</p>
 <pre class="code text"><code>psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\99_reset.sql
 psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\01_schema.sql
 psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\02_seed.sql</code></pre>
@@ -1873,7 +2311,7 @@ CREATE DATABASE pglearn OWNER learner;
 <article id="page-ex06" data-id="ex06" hidden><header class="ch-head"><p class="crumb">別冊 深掘り ／ 別冊</p><h1><span class="ch-no">別6</span>PoCの外へ出るとき</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
 <article id="page-apA" data-id="apA" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録A</span>用語集</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>本文中の点線の用語は、この表から説明を表示しています。元データは <code>src/glossary.yaml</code> です。</p><div class="scroll"><table class="gloss"><tr><th>JOIN</th><td>2つ以上の表を、指定した列の値が一致する行どうしで横に並べる操作。「結合」とも呼ぶ。</td></tr><tr><th>NULL</th><td>値が「不明」または「存在しない」ことを表す特別な状態。0 や空文字とは別物。</td></tr><tr><th>主キー</th><td>表の中で1行を必ず1つに特定できる列（または列の組）。重複も NULL も許されない。英語では PRIMARY KEY。</td></tr><tr><th>外部キー</th><td>別の表の主キーを指す列。存在しない相手を指せないように、PostgreSQL が確認する。英語では FOREIGN KEY。</td></tr><tr><th>UNIQUE制約</th><td>指定した列に、同じ値が2回入らないようにする決まり。</td></tr><tr><th>中間テーブル</th><td>多対多の関係（記事とタグなど）を表すために、両方の id の組だけを持つ表。</td></tr><tr><th>粒度</th><td>表の1行が何を表すか。「1記事」「1回の取得」など。英語では grain。</td></tr><tr><th>正規化</th><td>同じ事実を1か所にだけ書くように、表を分ける考え方。ここでは「表記をそろえる」の意味でも使う（URL の正規化）。</td></tr><tr><th>インデックス</th><td>検索を速くするために、列の値を並べ替えて持っておく仕組み。本の索引にあたる。</td></tr><tr><th>ハッシュ</th><td>データの中身から計算した、指紋のような短い値。中身が同じなら同じ値になる。</td></tr><tr><th>データベース</th><td>表をまとめて入れておく入れ物。この資料では学習用の pglearn を使う。1台の PostgreSQL の中に複数作れる。</td></tr><tr><th>ロール</th><td>PostgreSQL に接続するときの名前と、その名前に与えた権限のまとまり。ユーザーとほぼ同じ意味。この資料では learner と postgres を使い分ける。</td></tr><tr><th>スーパーユーザー</th><td>すべての権限の確認を飛ばして、何でもできるロール。インストールで作られる postgres がこれにあたる。</td></tr><tr><th>文字コード</th><td>文字をコンピューターの中でどの数字の並びとして持つかの決まり。この資料では UTF-8 にそろえる。英語では encoding。</td></tr><tr><th>照合順序</th><td>文字を並べるときの順番のルール。大文字と小文字、ひらがなとカタカナのどれを先にするかなどが決まる。英語では collation。</td></tr><tr><th>トランザクション</th><td>複数の変更を「全部成功するか、何もしないか」の1つのまとまりとして扱う仕組み。</td></tr><tr><th>pgpass</th><td>psql などが接続するときに、パスワードを聞かずに読みにいくファイル。Windows では %APPDATA%\postgresql\pgpass.conf。</td></tr></table></div></div></article>
 <article id="page-apB" data-id="apB" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録B</span>指示テンプレート</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose stub"><p>この章は準備中です。</p><p>見本として本文があるのは、第7章「JOINを読む」と第10章「設計の5つの問い」です。付録A・C・D は、本文と SQL から自動で作られています。</p></div></article>
-<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">4章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">5章</span>Claude Code が実行するコマンドの <code>-U</code>（<code>learner</code> か）と <code>-d</code>（<code>pglearn</code> か）を、許可する前に読んだか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
+<article id="page-apC" data-id="apC" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録C</span>チェックリスト1枚版</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>各章の最後にある「チェックリストに追加する1行」を、ビルドのときに自動で集めた一覧です。章を書き足すと、ここも増えます。</p><ul class="checklist"><li><span class="from">3章</span>psql のプロンプトの記号（<code>#</code> か <code>&gt;</code> か）と、<code>\conninfo</code> の接続先を見て、どこに何のロールで接続しているかを確かめたか</li><li><span class="from">4章</span>初期化の前に接続先（<code>-d pglearn</code>・<code>-U learner</code>）を確かめ、初期化の後に4つの表の件数（3・5・4・8）を数えたか</li><li><span class="from">5章</span>Claude Code が実行するコマンドの <code>-U</code>（<code>learner</code> か）と <code>-d</code>（<code>pglearn</code> か）を、許可する前に読んだか</li><li><span class="from">7章</span>JOIN の前後で行数を比べ、増えた理由（1対多）または減った理由（INNER JOIN で相手がいない）を説明できるか</li><li><span class="from">10章</span>設計案を受け取る前に、5つの問いへの仮定を表で出させ、自分の答えと比べたか</li></ul></div></article>
 <article id="page-apD" data-id="apD" hidden><header class="ch-head"><p class="crumb">付録 ／ 付録</p><h1><span class="ch-no">付録D</span>初期化SQL一式</h1><div class="pills"><span class="pill opt">任意</span></div></header><div class="prose"><p>第4章で実行する初期化 SQL です。<code>99_reset.sql</code> → <code>01_schema.sql</code> → <code>02_seed.sql</code> の順に流すと、学習用データが初期状態に戻ります。</p><h2>01_schema.sql</h2><pre class="code sql"><code><span class="kw">SET</span> client_encoding = <span class="st">'UTF8'</span>;  <span class="cm">-- このファイルは UTF-8。PC の設定に関係なく正しく読ませる（第4章）</span>
 <span class="cm">-- =============================================================</span>
 <span class="cm">-- 01_schema.sql  学習用サンプル：ニュース情報（第4章で実行）</span>

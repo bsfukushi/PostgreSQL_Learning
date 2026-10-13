@@ -94,7 +94,7 @@ C:\pglearn\sql\02_seed.sql
 
 ### 3つのファイルを順に流す
 
-コマンドプロンプト（または PowerShell）で、次の3行を順に実行します。どの行も、`learner` で `pglearn` に接続し、ファイルを1つ流します。
+コマンドプロンプトで、次の3行を順に実行します。どの行も、`learner` で `pglearn` に接続し、ファイルを1つ流します。
 
 ```text
 psql -h localhost -U learner -d pglearn -v ON_ERROR_STOP=1 -f C:\pglearn\sql\99_reset.sql

@@ -12,7 +12,7 @@ books:
           - {id: ch02, num: "2", title: "テーブル設計の基本", required: true}
       - title: 第2部 道具と環境
         chapters:
-          - {id: ch03, num: "3", title: "pgAdmin4とpsql", required: true}
+          - {id: ch03, num: "3", title: "pgAdmin4とpsql", required: true, file: vol1/v1_03_psql-pgadmin.md}
           - {id: ch04, num: "4", title: "サンプルデータを入れる・元に戻す", required: true, file: vol1/v1_04_sample-data.md}
           - {id: ch05, num: "5", title: "Claude Codeに頼む前の約束", required: true, file: vol1/v1_05_before-claude-code.md}
       - title: 第3部 読む力
