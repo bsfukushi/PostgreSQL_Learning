@@ -1,7 +1,7 @@
 ---
 id: ch03
 volume: 第1冊 基礎＋設計
-part: 第2部 道具と環境
+part: 第1部 準備：考え方と道具
 number: 2
 title: pgAdmin4とpsql
 required: true

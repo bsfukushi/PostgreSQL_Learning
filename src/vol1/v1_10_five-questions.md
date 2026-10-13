@@ -1,13 +1,13 @@
 ---
 id: ch10
 volume: 第1冊 基礎＋設計
-part: 第4部 設計を自分で見つける
+part: 第3部 設計を自分で見つける
 number: 10
 title: 設計の5つの問い
 required: true
 minutes: 30
 status: draft
-prereq: 第5章（テーブル設計の基本）、第7章（JOINを読む）
+prereq: 第5章（表の形を読む）、第7章（JOINを読む）
 ---
 
 ## この章で分かるようになること

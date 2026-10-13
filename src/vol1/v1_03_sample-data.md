@@ -1,7 +1,7 @@
 ---
 id: ch04
 volume: 第1冊 基礎＋設計
-part: 第2部 道具と環境
+part: 第1部 準備：考え方と道具
 number: 3
 title: サンプルデータを入れる・元に戻す
 required: true

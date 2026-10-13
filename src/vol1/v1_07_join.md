@@ -1,7 +1,7 @@
 ---
 id: ch07
 volume: 第1冊 基礎＋設計
-part: 第3部 読む力
+part: 第2部 表と SQL を読む
 number: 7
 title: JOINを読む
 required: true
